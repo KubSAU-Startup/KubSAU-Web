@@ -1,0 +1,91 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.conteiner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('../../img/bg.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+
+}
+
+.auth-form {
+    width: 328px;
+    border-radius: 25px;
+    border: 1px solid #A7A7A7;
+    background: #FFF;
+    padding: 20px 40px;
+    display: grid;
+    justify-content: center;
+}
+
+.img-conteiner>img {
+    width: 103px;
+    height: 152px;
+}
+
+.img-conteiner {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.auth-input {
+    padding: 15px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #000;
+    background: #E2E2E2;
+    color: #454545;
+    font-size: 15px;
+    /* margin-top: 10px;
+    margin-bottom: 10px; */
+}
+
+.passw-eye i {
+    position: absolute;
+    margin: 10px 10px;
+}
+
+.forgot_pass {
+    color: #4E4E4E;
+    font-size: 15px;
+    /* display: inline; */
+    cursor: pointer;
+    margin: 20px 0;
+    float: left;
+}
+
+.auth-submit {
+    width: 100%;
+    height: 50px;
+    color: #fff;
+    font-size: 15px;
+    border: 0;
+    border-radius: 10px;
+    background: #4B4B4B;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.auth-error {
+    color: red;
+    font-size: 12px;
+    margin-bottom: 10px;
+    visibility: visible;
+}
+
+.auth-error.hide {
+    visibility: hidden;
+}

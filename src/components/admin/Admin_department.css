@@ -1,0 +1,136 @@
+.cart-department {
+    border-radius: 16px;
+    border: 1px solid #A2A2A2;
+    background: #F1F1F1;
+    box-shadow: 6px 6px 4px 0px rgba(0, 0, 0, 0.25);
+    margin: 20px 70px;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    position: relative;
+}
+
+.department-setting {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.department-setting img {
+    width: 18px;
+}
+
+.data-department {
+    color: #000;
+    font-size: 16px;
+    display: flex;
+    width: 100%;
+    /* justify-content: space-between; */
+}
+.data-department p{
+    /* display: inline-block; */
+    text-align: left;
+    width: 50%;
+}
+.data-department span {
+    font-weight: 700;
+}
+
+.search-add {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-department {
+    background: none;
+    border: none;
+    margin-right: 70px;
+    cursor: pointer;
+}
+
+.add-department img {
+    width: 36px;
+}
+
+.button-edit-delete {
+    position: absolute;
+    left: auto;
+    right: 40px;
+    top: -10px;
+    border-radius: 6px;
+    border: 1px solid #909090;
+    background: #D7D7D7;
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    transition: 0.3s;
+}
+
+.button-edit-delete.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.button-edit-delete button {
+    background: none;
+    border: none;
+    margin: 10px;
+}
+
+.button-edit-delete img {
+    width: 26px;
+    cursor: pointer;
+}
+
+.modal-department {
+    display: grid;
+    justify-content: left;
+}
+
+.input-conteiner {
+    display: flex;
+    justify-content: left;
+    position: relative;
+    margin: 20px 0;
+    margin-bottom: 30px;
+}
+
+.label-name {
+    color: #000;
+    font-size: 16px;
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+.name-dapartment,
+.phone-dapartment {
+    width: 725px;
+    border: none;
+    border-bottom: 1px solid #919191;
+    outline: 0;
+    padding: 5px 10px;
+    font-size: 16px;
+    color: #000;
+    background: none;
+}
+
+.name-dapartment:focus,
+.phone-dapartment:focus,
+.name-dapartment:hover,
+.phone-dapartment:hover {
+    border-bottom: 1px solid #000000;
+    transition: 0.3s;
+}
+
+.name-dapartment:focus~.label-name,
+.phone-dapartment:focus~.label-name,
+.name-dapartment:not(:placeholder-shown)~.label-name,
+.phone-dapartment:not(:placeholder-shown)~.label-name {
+    top: -18px;
+    font-size: 12px;
+    color: #4a4a4a;
+}

@@ -1,0 +1,86 @@
+.account-content {
+    display: grid;
+    grid-template-columns: 0.4fr 0.6fr;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.img-account img {
+    width: 215px;
+    float: right;
+    margin-right: 90px;
+}
+
+.personal-data,
+.secure {
+    border-radius: 20px;
+    border: 2px solid #04D300;
+    background: rgba(15, 7, 7, 0.00);
+    width: 670px;
+    padding: 20px 80px;
+    margin-bottom: 30px;
+}
+
+.data-account h2 {
+    color: #026700;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.personal-data .data,
+.secure .data {
+    display: flex;
+}
+
+.personal-data .data div,
+.secure .data div {
+    display: grid;
+}
+
+.personal-data .data p,
+.secure .data p {
+    margin-left: 20px;
+    color: #000;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.personal-data .data span,
+.secure .data span {
+    color: #000;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.personal-data .data p,
+.personal-data .data span,
+.secure .data p,
+.secure .data span {
+    margin-bottom: 10px;
+}
+
+.personal-data button,
+.secure button {
+    border-radius: 4px;
+    background: #26BD00;
+    border: none;
+    padding: 5px 40px;
+    color: #FFF;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.secure-password {
+    border-radius: 5px;
+    border: 1px solid #16A000;
+    background-color: #5BED4E;
+    margin-left: 20px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    font-size: 16px;
+}
+
+.secure .data div:first-child img{
+    float: right;
+}
