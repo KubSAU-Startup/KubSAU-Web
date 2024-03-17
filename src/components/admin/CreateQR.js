@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import './Admin_header.css';
 import './CreateQR.css'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import Select from 'react-select';
+import QRCode from 'qrcode.react';
+import { Hidden } from '@mui/material';
+
+
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -13,6 +18,11 @@ function CreateQR() {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState();
+
+  const [semester, setSemester] = useState(null);
+  const [program, setProgram] = useState(null);
+  const [group, setGroup] = useState(null);
+  const [qrCodeText, setQRCodeText] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +66,39 @@ function CreateQR() {
   if (isAuthenticated == false) {
     return <Navigate to='/Log' />
   }
+
+  function handleSelectSemester(data) {
+    setSemester(data);
+  }
+  function handleSelectProgram(data) {
+    setProgram(data);
+  }
+  function handleSelectGroup(data) {
+    setGroup(data);
+  }
+
+  const getQR = () => {
+    if (semester !== null && program !== null && group !== null) {
+
+      let dataToQR = semester.value + ',' + program.value + ',' + group.value;
+
+      setQRCodeText(dataToQR);
+      const qrCodeURL = document.getElementById('qrCodeEl')
+        .toDataURL("image/png")
+        .replace("image/png", "image/octet-stream");
+      console.log(qrCodeURL)
+      let aEl = document.createElement("a");
+      aEl.href = qrCodeURL;
+      aEl.download = `${semester.value}.png`;
+      document.body.appendChild(aEl);
+      aEl.click();
+      document.body.removeChild(aEl);
+
+    } else {
+      alert("iii");
+    }
+  }
+
   return (
     <>
       <div className='ad_main_header'>
@@ -82,25 +125,41 @@ function CreateQR() {
           <h2>Создать QR-код</h2>
           <p>Выберите:</p>
           <div className='filter-qr'>
-            <select>
-              <option value={''}>Семестр: </option>
-              {allUsers.map(user =>
-                <option key={user.id} value={user.company.name}>{user.company.name}</option>
-              )}
-            </select>
-            <select>
-              <option value={''}>Направление: </option>
-              {allUsers.map(user =>
-                <option key={user.id} value={user.address.suite}>{user.address.suite}</option>
-              )}
-            </select>
-            <select>
-              <option value={''}>Группа: </option>
-              {allUsers.map(user =>
-                <option key={user.id} value={user.address.suite}>{user.address.suite}</option>
-              )}
-            </select>
-            <button className='btn-create-qr'>
+            <Select
+              // styles={customStyles}
+              placeholder="Семестр"
+              value={semester}
+              onChange={handleSelectSemester}
+              isSearchable={true}
+              options={allUsers.map(user => ({
+                value: user.address.street,
+                label: user.address.street,
+              }))}
+            />
+            <Select
+              // styles={customStyles}
+              placeholder="Программа"
+              value={program}
+              onChange={handleSelectProgram}
+              isSearchable={true}
+              options={allUsers.map(user => ({
+                value: user.address.zipcode,
+                label: user.address.zipcode,
+              }))}
+            />
+            <Select
+              // styles={customStyles}
+              placeholder="Группа"
+              value={group}
+              onChange={handleSelectGroup}
+              isSearchable={true}
+              options={allUsers.map(user => ({
+                value: user.address.suite,
+                label: user.address.suite,
+              }))}
+            />
+
+            <button className='btn-create-qr' onClick={getQR}>
               Создать qr
               <img src={require('../../img/qr_white.png')} />
             </button>
@@ -121,7 +180,7 @@ function CreateQR() {
               )}
             </select>
             <select>
-              <option value={''}>Направление: </option>
+              <option value={''}>Программа: </option>
               {allUsers.map(user =>
                 <option key={user.id} value={user.address.suite}>{user.address.suite}</option>
               )}
@@ -134,12 +193,18 @@ function CreateQR() {
       <button className='add-qr-group' >
         <img src={require('../../img/add.png')} alt='add' />
       </button>
+      <QRCode
+        id="qrCodeEl"
+        size={150}
+        value={qrCodeText}
+        style={{ display: 'none' }}
+      />
       {filteredUsers.map(user => (
         <div className='cart-qr-group' key={user.id}>
           <div className='data-qr'>
             <div className='qr1'>
               <p><span>Семестр: </span>{user.address.street}</p>
-              <p><span>Наравление: </span>{user.address.zipcode}</p>
+              <p><span>Программа: </span>{user.address.zipcode}</p>
             </div>
             <div className='qr2'>
               <span>Дисциплины: </span>
