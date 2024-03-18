@@ -5,6 +5,7 @@ import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
 import QRCode from 'qrcode.react';
 import { Hidden } from '@mui/material';
+import { isDisabled } from '@testing-library/user-event/dist/utils';
 
 
 
@@ -23,6 +24,9 @@ function CreateQR() {
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
   const [qrCodeText, setQRCodeText] = useState('');
+
+  const [semesterFilter, setSemesterFilter] = useState(null);
+  const [programFilter, setProgramFilter] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,12 +82,13 @@ function CreateQR() {
   }
 
   const getQR = () => {
-    if (semester !== null && program !== null && group !== null) {
+  
 
       let dataToQR = semester.value + ',' + program.value + ',' + group.value;
 
       setQRCodeText(dataToQR);
-      const qrCodeURL = document.getElementById('qrCodeEl')
+      setTimeout(() => {
+        const qrCodeURL = document.getElementById('qrCodeEl')
         .toDataURL("image/png")
         .replace("image/png", "image/octet-stream");
       console.log(qrCodeURL)
@@ -93,12 +98,80 @@ function CreateQR() {
       document.body.appendChild(aEl);
       aEl.click();
       document.body.removeChild(aEl);
+      }, 1000);
 
-    } else {
-      alert("iii");
-    }
+    
   }
 
+  function handleSelectSemesterFilter(data) {
+    setSemesterFilter(data);
+  }
+  function handleSelectProgramFilter(data) {
+    setProgramFilter(data);
+  }
+
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      fontSize: '14px',
+      color: state.isSelected ? 'white' : 'green',
+      backgroundColor: state.isSelected ? 'green' : 'white',
+      cursor: 'pointer',
+      border: 'none',
+      '&:hover': {
+        backgroundColor: 'green',
+        color: 'white',
+      },
+      ...(state.isActive && {
+        border: 'none',
+        boxShadow: '0 0 0 2px green',
+      }),
+
+    }),
+    control: (provided) => ({
+      ...provided,
+
+      minWidth: '150px',
+      border: 'none',
+      boxShadow: '0 0 0 2px green',
+      margin: '0px 20px 0px 0px'
+    }),
+    menu: (provided) => ({
+      ...provided,
+      width: '100%',
+    }),
+  };
+  const customStylesFilters = {
+    option: (provided, state) => ({
+      ...provided,
+      fontSize: '14px',
+      color: state.isSelected ? 'white' : 'green',
+      backgroundColor: state.isSelected ? 'green' : 'white',
+      cursor: 'pointer',
+      border: 'none',
+      '&:hover': {
+        backgroundColor: 'green',
+        color: 'white',
+      },
+      ...(state.isActive && {
+        border: 'none',
+        boxShadow: '0 0 0 2px green',
+      }),
+
+    }),
+    control: (provided) => ({
+      ...provided,
+
+      minWidth: '150px',
+      border: 'none',
+      boxShadow: '0 0 0 2px green',
+      margin: '0px 20px 0px 0px'
+    }),
+    menu: (provided) => ({
+      ...provided,
+      width: '100%',
+    }),
+  };
   return (
     <>
       <div className='ad_main_header'>
@@ -123,10 +196,10 @@ function CreateQR() {
       <div className='qr-options'>
         <div className='create-qr'>
           <h2>Создать QR-код</h2>
-          <p>Выберите:</p>
+          <p>Выберите последовательно:</p>
           <div className='filter-qr'>
             <Select
-              // styles={customStyles}
+              styles={customStyles}
               placeholder="Семестр"
               value={semester}
               onChange={handleSelectSemester}
@@ -137,30 +210,32 @@ function CreateQR() {
               }))}
             />
             <Select
-              // styles={customStyles}
+              styles={customStyles}
               placeholder="Программа"
               value={program}
               onChange={handleSelectProgram}
               isSearchable={true}
+              isDisabled={semester !== null ? false : true}
               options={allUsers.map(user => ({
                 value: user.address.zipcode,
                 label: user.address.zipcode,
               }))}
             />
             <Select
-              // styles={customStyles}
+              styles={customStyles}
               placeholder="Группа"
               value={group}
               onChange={handleSelectGroup}
               isSearchable={true}
+              isDisabled={(semester !== null && program !== null) ? false : true}
               options={allUsers.map(user => ({
                 value: user.address.suite,
                 label: user.address.suite,
               }))}
             />
 
-            <button className='btn-create-qr' onClick={getQR}>
-              Создать qr
+            <button className='btn-create-qr' onClick={getQR} disabled={(semester !== null && program !== null && group !== null) ? false : true}>
+              Создать QR
               <img src={require('../../img/qr_white.png')} />
             </button>
           </div>
@@ -173,19 +248,31 @@ function CreateQR() {
               placeholder='Поиск по направлению...' />
           </div>
           <div className='filter-data-qr'>
-            <select>
-              <option value={''}>Семестр: </option>
-              {allUsers.map(user =>
-                <option key={user.id} value={user.address.suite}>{user.address.suite}</option>
-              )}
-            </select>
-            <select>
-              <option value={''}>Программа: </option>
-              {allUsers.map(user =>
-                <option key={user.id} value={user.address.suite}>{user.address.suite}</option>
-              )}
-            </select>
+          <Select
+              styles={customStylesFilters}
+              placeholder="Семестр"
+              value={semesterFilter}
+              onChange={handleSelectSemesterFilter}
+              isSearchable={true}
+              options={allUsers.map(user => ({
+                value: user.address.street,
+                label: user.address.street,
+              }))}
+            />
+            <Select
+              styles={customStylesFilters}
+              placeholder="Программа"
+              value={programFilter}
+              onChange={handleSelectProgramFilter}
+              isSearchable={true}
+              options={allUsers.map(user => ({
+                value: user.address.zipcode,
+                label: user.address.zipcode,
+              }))}
+            />
             {/* onClick={() => setModalActive(true) */}
+            <button className='get-params-qr' type='submit' >Применить</button>
+            <button className='delete-params-qr' >Сбросить</button>
 
           </div>
         </div>
@@ -208,7 +295,7 @@ function CreateQR() {
             </div>
             <div className='qr2'>
               <span>Дисциплины: </span>
-              <p>{user.address.street}</p>
+              <p> {user.address.street}</p>
             </div>
             <div className='qr3'>
 
