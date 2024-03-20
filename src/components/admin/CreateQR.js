@@ -4,8 +4,7 @@ import './CreateQR.css'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
 import QRCode from 'qrcode.react';
-import { Hidden } from '@mui/material';
-import { isDisabled } from '@testing-library/user-event/dist/utils';
+import JSZip from "jszip";
 
 
 
@@ -84,21 +83,28 @@ function CreateQR() {
   const getQR = () => {
   
 
-      let dataToQR = semester.value + ',' + program.value + ',' + group.value;
+    let dataToQR = semester.value + ',' + program.value + ',' + group.value;
 
-      setQRCodeText(dataToQR);
-      setTimeout(() => {
-        const qrCodeURL = document.getElementById('qrCodeEl')
-        .toDataURL("image/png")
-        .replace("image/png", "image/octet-stream");
-      console.log(qrCodeURL)
-      let aEl = document.createElement("a");
-      aEl.href = qrCodeURL;
-      aEl.download = `${semester.value}.png`;
-      document.body.appendChild(aEl);
-      aEl.click();
-      document.body.removeChild(aEl);
-      }, 1000);
+    setQRCodeText(dataToQR);
+    setTimeout(() => {
+      const qrCodeURL = document.getElementById('qrCodeEl')
+        .toDataURL("image/png");
+  
+      let zip = new JSZip();
+      let folder = zip.folder('Иванов');
+      folder.file(`${semester.value}.png`, qrCodeURL.split('base64,')[1], {base64: true});
+  
+      zip.generateAsync({type:"blob"})
+        .then(function(content) {
+          let aEl = document.createElement("a");
+          aEl.href = URL.createObjectURL(content);
+          aEl.download = `${group.value}.zip`;
+          document.body.appendChild(aEl);
+          aEl.click();
+          document.body.removeChild(aEl);
+        });
+  
+    }, 1000);
 
     
   }
