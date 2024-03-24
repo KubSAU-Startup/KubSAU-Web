@@ -4,7 +4,13 @@ import './CreateQR.css'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
 import QRCode from 'qrcode.react';
-import JSZip from "jszip";
+import JSZip, { filter } from "jszip";
+import Modal from '../Modal/Modal';
+// import { FaFilter } from "react-icons/fa";
+import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faTimes} from '@fortawesome/free-solid-svg-icons';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 
@@ -26,6 +32,11 @@ function CreateQR() {
 
   const [semesterFilter, setSemesterFilter] = useState(null);
   const [programFilter, setProgramFilter] = useState(null);
+
+  const [getSemester, setGetSemester] = useState(null);
+  const [getDirection, setGetDirection] = useState(null);
+  const [getSubject, setGetSubject] = useState(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,7 +92,7 @@ function CreateQR() {
   }
 
   const getQR = () => {
-  
+
 
     let dataToQR = semester.value + ',' + program.value + ',' + group.value;
 
@@ -89,13 +100,13 @@ function CreateQR() {
     setTimeout(() => {
       const qrCodeURL = document.getElementById('qrCodeEl')
         .toDataURL("image/png");
-  
+
       let zip = new JSZip();
       let folder = zip.folder('Иванов');
-      folder.file(`${semester.value}.png`, qrCodeURL.split('base64,')[1], {base64: true});
-  
-      zip.generateAsync({type:"blob"})
-        .then(function(content) {
+      folder.file(`${semester.value}.png`, qrCodeURL.split('base64,')[1], { base64: true });
+
+      zip.generateAsync({ type: "blob" })
+        .then(function (content) {
           let aEl = document.createElement("a");
           aEl.href = URL.createObjectURL(content);
           aEl.download = `${group.value}.zip`;
@@ -103,10 +114,10 @@ function CreateQR() {
           aEl.click();
           document.body.removeChild(aEl);
         });
-  
+
     }, 1000);
 
-    
+
   }
 
   function handleSelectSemesterFilter(data) {
@@ -114,6 +125,18 @@ function CreateQR() {
   }
   function handleSelectProgramFilter(data) {
     setProgramFilter(data);
+  }
+
+  function handelGetSemester(data){
+    setGetSemester(data);
+  }
+
+  function handelGetDirection(data){
+    setGetDirection(data);
+  }
+
+  function handelGetSubject(data){
+    setGetSubject(data);
   }
 
   const customStyles = {
@@ -147,7 +170,7 @@ function CreateQR() {
       width: '100%',
     }),
   };
-  const customStylesFilters = {
+  const customStylesModal = {
     option: (provided, state) => ({
       ...provided,
       fontSize: '14px',
@@ -168,10 +191,10 @@ function CreateQR() {
     control: (provided) => ({
       ...provided,
 
-      minWidth: '150px',
+      width: '400px',
       border: 'none',
       boxShadow: '0 0 0 2px green',
-      margin: '0px 20px 0px 0px'
+      margin: '20px'
     }),
     menu: (provided) => ({
       ...provided,
@@ -254,8 +277,8 @@ function CreateQR() {
               placeholder='Поиск по направлению...' />
           </div>
           <div className='filter-data-qr'>
-          <Select
-              styles={customStylesFilters}
+            <Select
+              styles={customStyles}
               placeholder="Семестр"
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
@@ -266,7 +289,7 @@ function CreateQR() {
               }))}
             />
             <Select
-              styles={customStylesFilters}
+              styles={customStyles}
               placeholder="Программа"
               value={programFilter}
               onChange={handleSelectProgramFilter}
@@ -277,13 +300,14 @@ function CreateQR() {
               }))}
             />
             {/* onClick={() => setModalActive(true) */}
-            <button className='get-params-qr' type='submit' >Применить</button>
-            <button className='delete-params-qr' >Сбросить</button>
+
+            <button className='get-params-qr' type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
+            <button className='delete-params-qr' ><FontAwesomeIcon icon={faTimes }/></button>
 
           </div>
         </div>
       </div>
-      <button className='add-qr-group' >
+      <button className='add-qr-group' onClick={() => setModalActive(true)}>
         <img src={require('../../img/add.png')} alt='add' />
       </button>
       <QRCode
@@ -325,6 +349,52 @@ function CreateQR() {
           </div>
         </div>
       ))}
+      <Modal active={modalActive} setActive={setModalActive}>
+        <div className='modal-qr'>
+          <Select
+          styles={customStylesModal}
+            placeholder="Семестр"
+            value={getSemester}
+            onChange={handelGetSemester}
+            isSearchable={true}
+            options={[{value: 1, label: 1},
+            {value: 2, label: 2},
+            {value: 3, label: 3},
+            {value: 4, label: 4},
+            {value: 5, label: 5},
+            {value: 6, label: 6},
+            {value: 7, label: 7},
+            {value: 8, label: 8},
+            {value: 9, label: 9},
+            {value: 10, label: 10},
+            {value: 11, label: 11}
+            ]}
+          />
+          <Select
+          styles={customStylesModal}
+            placeholder="Направление"
+            value={getDirection}
+            onChange={handelGetDirection}
+            isSearchable={true}
+            options={filteredUsers.map(user=> ({
+              value: user.address.street,
+              label: user.address.street
+            }))}
+          />
+          <Select
+          styles={customStylesModal}
+            placeholder="Дисциплины"
+            value={getSubject}
+            onChange={handelGetSubject}
+            isSearchable={true}
+            isMulti={true}
+            options={filteredUsers.map(user=> ({
+              value: user.address.street,
+              label: user.address.street
+            }))}
+          />
+        </div>
+      </Modal>
     </>
 
 
