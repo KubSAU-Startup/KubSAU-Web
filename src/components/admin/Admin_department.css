@@ -47,6 +47,8 @@
     border: none;
     margin-right: 70px;
     cursor: pointer;
+    font-size: 40px;
+    color: #04D300;
 }
 
 .add-department img {

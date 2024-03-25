@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Admin_header from './Admin_header';
 import './Admin_department.css'
 import Modal from '../Modal/Modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -61,7 +64,8 @@ function Admin_department() {
                     />
                 </div>
                 <button className='add-department' onClick={() => setModalActive(true)}>
-                    <img src={require('../../img/add.png')} alt='add' />
+                    {/* <img src={require('../../img/add.png')} alt='add' /> */}
+                    <FontAwesomeIcon icon={faPlusCircle}/>
                 </button>
             </div>
 

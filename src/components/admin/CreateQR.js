@@ -6,9 +6,10 @@ import Select from 'react-select';
 import QRCode from 'qrcode.react';
 import JSZip, { filter } from "jszip";
 import Modal from '../Modal/Modal';
-// import { FaFilter } from "react-icons/fa";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import { faTimes} from '@fortawesome/free-solid-svg-icons';
+import { faUndo} from '@fortawesome/free-solid-svg-icons';
+import { faPlusCircle} from '@fortawesome/free-solid-svg-icons';
+
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -302,13 +303,14 @@ function CreateQR() {
             {/* onClick={() => setModalActive(true) */}
 
             <button className='get-params-qr' type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
-            <button className='delete-params-qr' ><FontAwesomeIcon icon={faTimes }/></button>
+            <button className='delete-params-qr' ><FontAwesomeIcon icon={faUndo}/></button>
 
           </div>
         </div>
       </div>
       <button className='add-qr-group' onClick={() => setModalActive(true)}>
-        <img src={require('../../img/add.png')} alt='add' />
+        {/* <img src={require('../../img/add.png')} alt='add' /> */}
+        <FontAwesomeIcon icon={faPlusCircle}/>
       </button>
       <QRCode
         id="qrCodeEl"

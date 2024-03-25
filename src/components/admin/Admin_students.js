@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Admin_header from './Admin_header';
 import './Admin_students.css'
+import Select from 'react-select';
+import { customStyles } from '../Select_style/Select_style';
+import { customStylesModal } from '../Select_style/Select_style';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import Modal from '../Modal/Modal';
+
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -10,6 +17,15 @@ function Admin_students() {
     const [allUsers, setAllUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [filterGroup, setFilterGroup] = useState(null);
+    const [filterDirectioin, setFilterDirection] = useState(null);
+    const [filterProgram, setFilterProgram] = useState(null);
+
+    const [modalGroup, setModalGroup] = useState(null);
+    const [modalDirectioin, setModalDirection] = useState(null);
+    const [modalDirectivity, setModalDirectivity] = useState(null);
+    const [modalProgram, setModalProgram] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,6 +62,34 @@ function Admin_students() {
             [userId]: !prevUserStates[userId],
         }));
     };
+
+    function handleFilterGroup(data) {
+        setFilterGroup(data);
+    }
+
+    function handleFilterDirection(data) {
+        setFilterDirection(data);
+    }
+
+    function handleFilterProgram(data) {
+        setFilterProgram(data);
+    }
+
+    function handleModalGroup(data) {
+        setModalGroup(data);
+    }
+
+    function handleModalDirection(data) {
+        setModalDirection(data);
+    }
+
+    function handleModalDirectivity(data) {
+        setModalDirectivity(data);
+    }
+
+    function handleModalProgram(data) {
+        setModalProgram(data);
+    }
     return (
         <>
             <Admin_header />
@@ -58,26 +102,48 @@ function Admin_students() {
                 />
             </div>
             <div className='filters'>
-                <select>
-                    <option value={''}>Группа: </option>
-                    {allUsers.map(user =>
-                        <option key={user.id} value={user.company.name}>{user.company.name}</option>
-                    )}
-                </select>
-                <select>
-                    <option value={''}>Направление: </option>
-                    {allUsers.map(user =>
-                        <option key={user.id} value={user.address.city}>{user.address.city}</option>
-                    )}
-                </select>
-                <select>
-                    <option value={''}>Программа: </option>
-                    {allUsers.map(user =>
-                        <option key={user.id} value={user.email}>{user.email}</option>
-                    )}
-                </select>
-                
+                <Select
+                    styles={customStyles}
+                    placeholder="Группа"
+                    value={filterGroup}
+                    onChange={handleFilterGroup}
+                    isSearchable={true}
+                    options={allUsers.map(user => ({
+                        value: user.address.suite,
+                        label: user.address.suite,
+                    }))}
+                />
+                <Select
+                    styles={customStyles}
+                    placeholder="Направление"
+                    value={filterDirectioin}
+                    onChange={handleFilterDirection}
+                    isSearchable={true}
+                    options={allUsers.map(user => ({
+                        value: user.address.city,
+                        label: user.address.city,
+                    }))}
+                />
+                <Select
+                    styles={customStyles}
+                    placeholder="Программа"
+                    value={filterProgram}
+                    onChange={handleFilterProgram}
+                    isSearchable={true}
+                    options={allUsers.map(user => ({
+                        value: user.email,
+                        label: user.email,
+                    }))}
+                />
+                <button className='get-params' type='submit'>Применить</button>
+                <button className='delete-params'>Сбросить</button>
+
             </div>
+
+            <button className='add-student' onClick={() => setModalActive(true)}>
+                <FontAwesomeIcon icon={faPlusCircle} />
+            </button>
+
             {filteredUsers.map(user => (
                 <div className='cart-stud' key={user.id}>
                     {/* <div className='data'>
@@ -111,6 +177,63 @@ function Admin_students() {
                     </div>
                 </div>
             ))}
+            <Modal active={modalActive} setActive={setModalActive}>
+                <div className='modal-students'>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' />
+                        <label className='label-name'>ФИО</label>
+                    </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-course' placeholder=' ' />
+                        <label className='label-name'>Курс</label>
+                    </div>
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Группа"
+                        value={modalGroup}
+                        onChange={handleModalGroup}
+                        isSearchable={true}
+                        options={allUsers.map(user => ({
+                            value: user.address.suite,
+                            label: user.address.suite,
+                        }))}
+                    />
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Направление"
+                        value={modalDirectioin}
+                        onChange={handleModalDirection}
+                        isSearchable={true}
+                        options={allUsers.map(user => ({
+                            value: user.address.city,
+                            label: user.address.city,
+                        }))}
+                    />
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Направленность"
+                        value={modalDirectivity}
+                        onChange={handleModalDirectivity}
+                        isSearchable={true}
+                        options={allUsers.map(user => ({
+                            value: user.address.city,
+                            label: user.address.city,
+                        }))}
+                    />
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Программа"
+                        value={modalProgram}
+                        onChange={handleModalProgram}
+                        isSearchable={true}
+                        options={allUsers.map(user => ({
+                            value: user.email,
+                            label: user.email,
+                        }))}
+                    />
+
+                </div>
+            </Modal>
         </>
 
     );

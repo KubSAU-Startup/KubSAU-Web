@@ -34,7 +34,7 @@
 }
 .modal-content button {
     border-radius: 3px;
-    border: 1px solid #858585;
+    border: 0;
     background: #26BD00;
     color: #fff;
     font-size: 16px;
