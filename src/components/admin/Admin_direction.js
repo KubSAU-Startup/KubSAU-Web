@@ -172,38 +172,26 @@ function Admin_direction() {
                 </div>
             ))}
             <Modal active={modalActive} setActive={setModalActive}>
+            <div className='input-conteiner'>
+                    <input type='text' className='name-direction' placeholder=' ' />
+                    <label className='label-name'>Название направления</label>
+                </div>
+                <div className='input-conteiner'>
+                    <input type='text' className='name-direction' placeholder=' ' />
+                    <label className='label-name'>Название направленности</label>
+                </div>
                 <div className='input-conteiner'>
                     <input type='text' className='name-direction' placeholder=' ' />
                     <label className='label-name'>Аббревиатура направления</label>
                 </div>
-                <Select
-                    styles={customStylesModal}
-                    placeholder="Направление"
-                    value={modalDirectioin}
-                    onChange={handleModalDirection}
-                    isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.city,
-                        label: user.address.city,
-                    }))}
-                />
-                <Select
-                    styles={customStylesModal}
-                    placeholder="Направленность"
-                    value={modalDirectivity}
-                    onChange={handleModalDirectivity}
-                    isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.city,
-                        label: user.address.city,
-                    }))}
-                />
+                
                 <Select
                     styles={customStylesModal}
                     placeholder="Программа"
                     value={modalProgram}
                     onChange={handleModalProgram}
                     isSearchable={true}
+                    isMulti={true}
                     options={allUsers.map(user => ({
                         value: user.email,
                         label: user.email,
