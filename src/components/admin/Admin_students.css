@@ -72,6 +72,7 @@
     border: none;
     color: #04D300;
     font-size: 40px;
+    cursor: pointer;
 }
 
 .modal-students {
@@ -98,7 +99,7 @@
 
 .name-stud,
 .name-course {
-    width: 725px;
+    width: 400px;
     border: none;
     border-bottom: 1px solid #919191;
     outline: 0;
