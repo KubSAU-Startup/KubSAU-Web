@@ -92,7 +92,7 @@
     border-color: #1e971c;
 }
 
-.btn-loadMore{
+.btn-loadMore {
     display: flex;
     font-size: 18px;
     font-weight: 700;
@@ -134,4 +134,53 @@
 .cart p,
 .data {
     margin: 10px 0;
+}
+
+.error-modal {
+    width: 400px;
+    height: 300px;
+    text-align: center;
+}
+
+.error-modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.error-icon {
+    font-size: 60px;
+    color: #ffff00;
+    margin-right: 50px;
+}
+
+.error-modal-header p {
+    font-size: 20px;
+    font-weight: 700;
+}
+.error-modal{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+.error-modal>p {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.btn-to-log:link,
+.btn-to-log:visited {
+    color: #fff;
+    text-decoration: none;
+    background-color: #04D300;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 20px;
+    margin-top: 30px;
+}
+
+.btn-to-log:hover,
+.btn-to-log:active{
+    background-color: #1e971c;
 }

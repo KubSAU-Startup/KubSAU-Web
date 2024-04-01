@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './Admin_main.css';
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Admin_header from './Admin_header';
 import { getDataFilters } from '../../network';
 import { getDataAdminJournal } from '../../network';
 import Select from 'react-select';
+import Error_modal from '../Modal/Error_modal';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function Admin_main() {
+    const [errorActive, setErrorActive] = useState(false);
+    const [textError, setTextError] = useState('');
     const [allUsers, setAllUsers] = useState([]);
     const [selectedWorkType, setSelectedWorkType] = useState(null);
     const [selectedDiscipline, setSelectedDiscipline] = useState(null);
@@ -47,11 +53,30 @@ function Admin_main() {
 
     const loadMore = () => {
         setVisibleItems(prevVisibleItems => prevVisibleItems + 5);
-      };
+    };
 
     useEffect(() => {
         getDataFilters((res) => {
-            setFilter(res)
+            if (res.error) {
+                switch (res.error.code) {
+                    case 101:
+                        setTextError('Неверные учетные данные!');
+                        break;
+                    case 102:
+                        setTextError('Требуется токен доступа!');
+                        break;
+                    case 103:
+                        setTextError('Сессия истекла!');
+                        break;
+                    default:
+                        setTextError('Неизвестная ошибка!');
+                }
+                setErrorActive(true);
+
+            } else {
+                setFilter(res)
+            }
+
         })
     }, []);
 
@@ -76,8 +101,26 @@ function Admin_main() {
             workTypeId: null
         }
         getDataAdminJournal(journalParam, (data) => {
-            setMainData(data)
-            setFilteredUsers(data);
+            if (data.error) {
+                switch (data.error.code) {
+                    case 101:
+                        setTextError('Неверные учетные данные!');
+                        break;
+                    case 102:
+                        setTextError('Требуется токен доступа!');
+                        break;
+                    case 103:
+                        setTextError('Сессия истекла!');
+                        break;
+                    default:
+                        setTextError('Неизвестная ошибка!');
+                }
+                setErrorActive(true)
+            } else {
+                setMainData(data)
+                setFilteredUsers(data);
+            }
+
         })
 
     };
@@ -93,8 +136,26 @@ function Admin_main() {
 
         console.log(journalParam)
         getDataAdminJournal(journalParam, (data) => {
-            setMainData(data)
-            setFilteredUsers(data);
+            if (data.error) {
+
+                switch (data.error.code) {
+                    case 101:
+                        setTextError('Неверные учетные данные!');
+                        break;
+                    case 102:
+                        setTextError('Требуется токен доступа!');
+                        break;
+                    case 103:
+                        setTextError('Сессия истекла!');
+                        break;
+                    default:
+                        setTextError('Неизвестная ошибка!');
+                }
+                setErrorActive(true)
+            } else {
+                setMainData(data)
+                setFilteredUsers(data);
+            }
         })
     }
 
@@ -108,8 +169,26 @@ function Admin_main() {
             workTypeId: null
         }
         getDataAdminJournal(journalParam, (data) => {
-            setMainData(data)
-            setFilteredUsers(data);
+            if (data.error) {
+                switch (data.error.code) {
+                    case 101:
+                        setTextError('Неверные учетные данные!');
+                        break;
+                    case 102:
+                        setTextError('Требуется токен доступа!');
+                        break;
+                    case 103:
+                        setTextError('Сессия истекла!');
+                        break;
+                    default:
+                        setTextError('Неизвестная ошибка!');
+                }
+                setErrorActive(true);
+
+            } else {
+                setMainData(data)
+                setFilteredUsers(data);
+            }
         })
     }, []);
 
@@ -143,7 +222,7 @@ function Admin_main() {
     function handleSelectGroup(data) {
         setSelectedGroup(data);
     }
-    const customStylesGroup ={
+    const customStylesGroup = {
         option: (provided, state) => ({
             ...provided,
             fontSize: '14px',
@@ -292,6 +371,17 @@ function Admin_main() {
                 </div>
             ))}
             <button className='btn-loadMore' onClick={loadMore}>Загрузить ещё</button>
+            <Error_modal active={errorActive} setActive={setErrorActive}>
+                <div className='error-modal'>
+                    <div className='error-modal-header'>
+                        <FontAwesomeIcon icon={faExclamationTriangle} className='error-icon' />
+                        <p>Произошла ошибка:</p>
+                    </div>
+                    <p>{`${textError}`}</p>
+                    <p>Попробуйте авторизоваться</p>
+                    <Link to='/Log' className='btn-to-log'>Авторизоваться</Link>
+                </div>
+            </Error_modal>
         </>
     );
 }

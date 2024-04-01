@@ -22,16 +22,14 @@ async function loginAxios(loginInfo, callback) {
     })
 }
 
-async function checkAccount() {
+async function checkAccount(callback) {
     const url = `${baseUrl}/account`;
-    console.log(url)
-    const res = await fetch(url, {
-        headers: {
-            "Authorization": `Bearer ${localStorage.getItem('token')}`
-        }
-    })
 
-    return res.json()
+    await axios.get(url).then((res) => {
+        callback(res.data)
+    })
+    
+   
 }
 
 async function getDataFilters(callback) {
