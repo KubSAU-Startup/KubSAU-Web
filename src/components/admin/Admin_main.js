@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import './Admin_main.css';
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Admin_header from './Admin_header';
 import { getDataFilters } from '../../network';
 import { getDataAdminJournal } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { getTextError } from '../../network';
+import { customStyles } from '../Select_style/Select_style';
 
 function Admin_main() {
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-    const [allUsers, setAllUsers] = useState([]);
     const [selectedWorkType, setSelectedWorkType] = useState(null);
     const [selectedDiscipline, setSelectedDiscipline] = useState(null);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -58,19 +56,7 @@ function Admin_main() {
     useEffect(() => {
         getDataFilters((res) => {
             if (res.error) {
-                switch (res.error.code) {
-                    case 101:
-                        setTextError('Неверные учетные данные!');
-                        break;
-                    case 102:
-                        setTextError('Требуется токен доступа!');
-                        break;
-                    case 103:
-                        setTextError('Сессия истекла!');
-                        break;
-                    default:
-                        setTextError('Неизвестная ошибка!');
-                }
+                setTextError(getTextError(res.error));
                 setErrorActive(true);
 
             } else {
@@ -87,11 +73,6 @@ function Admin_main() {
         setSelectedTeacher(null);
         setSelectedDepartment(null);
         setSelectedGroup(null);
-        console.log('тип работы:', selectedWorkType);
-        console.log('дисциплина:', selectedDiscipline);
-        console.log('преподаватель:', selectedTeacher);
-        console.log('кафедра:', selectedDepartment);
-        console.log('группа:', selectedGroup);
 
         const journalParam = {
             disciplineId: null,
@@ -102,19 +83,7 @@ function Admin_main() {
         }
         getDataAdminJournal(journalParam, (data) => {
             if (data.error) {
-                switch (data.error.code) {
-                    case 101:
-                        setTextError('Неверные учетные данные!');
-                        break;
-                    case 102:
-                        setTextError('Требуется токен доступа!');
-                        break;
-                    case 103:
-                        setTextError('Сессия истекла!');
-                        break;
-                    default:
-                        setTextError('Неизвестная ошибка!');
-                }
+                setTextError(getTextError(data.error));
                 setErrorActive(true)
             } else {
                 setMainData(data)
@@ -137,20 +106,7 @@ function Admin_main() {
         console.log(journalParam)
         getDataAdminJournal(journalParam, (data) => {
             if (data.error) {
-
-                switch (data.error.code) {
-                    case 101:
-                        setTextError('Неверные учетные данные!');
-                        break;
-                    case 102:
-                        setTextError('Требуется токен доступа!');
-                        break;
-                    case 103:
-                        setTextError('Сессия истекла!');
-                        break;
-                    default:
-                        setTextError('Неизвестная ошибка!');
-                }
+                setTextError(getTextError(data.error));
                 setErrorActive(true)
             } else {
                 setMainData(data)
@@ -160,7 +116,6 @@ function Admin_main() {
     }
 
     useEffect(() => {
-
         const journalParam = {
             disciplineId: null,
             teacherId: null,
@@ -170,19 +125,7 @@ function Admin_main() {
         }
         getDataAdminJournal(journalParam, (data) => {
             if (data.error) {
-                switch (data.error.code) {
-                    case 101:
-                        setTextError('Неверные учетные данные!');
-                        break;
-                    case 102:
-                        setTextError('Требуется токен доступа!');
-                        break;
-                    case 103:
-                        setTextError('Сессия истекла!');
-                        break;
-                    default:
-                        setTextError('Неизвестная ошибка!');
-                }
+                setTextError(getTextError(data.error));
                 setErrorActive(true);
 
             } else {
@@ -222,64 +165,7 @@ function Admin_main() {
     function handleSelectGroup(data) {
         setSelectedGroup(data);
     }
-    const customStylesGroup = {
-        option: (provided, state) => ({
-            ...provided,
-            fontSize: '14px',
-            color: state.isSelected ? 'white' : 'green',
-            backgroundColor: state.isSelected ? 'green' : 'white',
-            cursor: 'pointer',
-            border: 'none',
-            '&:hover': {
-                backgroundColor: 'green',
-                color: 'white',
-            },
-            ...(state.isActive && {
-                border: 'none',
-                boxShadow: '0 0 0 2px green',
-            }),
-        }),
-        control: (provided) => ({
-            ...provided,
 
-            minWidth: '100px',
-            border: 'none',
-            boxShadow: '0 0 0 2px green',
-        }),
-        menu: (provided) => ({
-            ...provided,
-            width: '100%',
-        }),
-    };
-    const customStyles = {
-        option: (provided, state) => ({
-            ...provided,
-            fontSize: '14px',
-            color: state.isSelected ? 'white' : 'green',
-            backgroundColor: state.isSelected ? 'green' : 'white',
-            cursor: 'pointer',
-            border: 'none',
-            '&:hover': {
-                backgroundColor: 'green',
-                color: 'white',
-            },
-            ...(state.isActive && {
-                border: 'none',
-                boxShadow: '0 0 0 2px green',
-            }),
-        }),
-        control: (provided) => ({
-            ...provided,
-
-            minWidth: '200px',
-            border: 'none',
-            boxShadow: '0 0 0 2px green',
-        }),
-        menu: (provided) => ({
-            ...provided,
-            width: '100%',
-        }),
-    };
     return (
         <>
             <Admin_header />
@@ -333,7 +219,7 @@ function Admin_main() {
                 </div>
                 <div>
                     <Select
-                        styles={customStylesGroup}
+                        styles={customStyles}
                         placeholder="Группа"
                         value={selectedGroup}
                         onChange={handleSelectGroup}
@@ -371,17 +257,8 @@ function Admin_main() {
                 </div>
             ))}
             <button className='btn-loadMore' onClick={loadMore}>Загрузить ещё</button>
-            <Error_modal active={errorActive} setActive={setErrorActive}>
-                <div className='error-modal'>
-                    <div className='error-modal-header'>
-                        <FontAwesomeIcon icon={faExclamationTriangle} className='error-icon' />
-                        <p>Произошла ошибка:</p>
-                    </div>
-                    <p>{`${textError}`}</p>
-                    <p>Попробуйте авторизоваться</p>
-                    <Link to='/Log' className='btn-to-log'>Авторизоваться</Link>
-                </div>
-            </Error_modal>
+            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+
         </>
     );
 }

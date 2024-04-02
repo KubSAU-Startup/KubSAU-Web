@@ -2,6 +2,7 @@ import axios from 'axios'
 
 const baseUrl = 'https://testbackend.melod1n.dedyn.io';
 
+
 axios.interceptors.request.use(async request => {
     request.headers.Authorization = `Bearer ${localStorage.getItem('token')}`
     return request
@@ -60,8 +61,25 @@ async function getDataAdminJournal(parameter, callback) {
     })
 }
 
+function getTextError(data){
+    let textError = '';
+    switch (data.code) {
+        case 101:
+            textError = 'Неверные учетные данные!';
+            break;
+        case 102:
+            textError = 'Требуется токен доступа!';
+            break;
+        case 103:
+            textError = 'Сессия истекла!';
+            break;
+        default:
+            textError = 'Неизвестная ошибка!';
+    }
+    return textError;
+}
 
 export {
-    checkAccount, getDataFilters, loginAxios, getDataAdminJournal
+    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError
 }
 
