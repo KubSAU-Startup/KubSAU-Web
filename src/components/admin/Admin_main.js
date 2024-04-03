@@ -247,11 +247,13 @@ function Admin_main() {
                             <p><span>Тип работы:</span> {journal.work.type.title}</p>
                             <p><span>Статус:</span> {journal.student.status}</p>
                         </div>
+                        {/* ьалвдпдь */}
                         <div className='col2'>
                             <p><span>Дисциплина:</span> {journal.discipline.title}</p>
                             <p><span>Преподаватель:</span> {journal.teacher.lastName} {journal.teacher.firstName} {journal.teacher.middleName}</p>
                             <p><span>Кафедра:</span> {journal.teacher.fullName}</p>
                             {journal.work.title && <p><span>Название:</span> {journal.work.title}</p>}
+
                         </div>
                     </div>
                 </div>
