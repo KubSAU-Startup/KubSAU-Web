@@ -74,9 +74,12 @@
     flex-direction: column;
     justify-content: space-evenly;
 }
-.error-modal>p {
+.error-modal>p, .error-modal>a {
     font-size: 20px;
     margin-bottom: 10px;
+}
+.error-modal>a{
+    margin-bottom: 40px;
 }
 
 .btn-to-log:link,

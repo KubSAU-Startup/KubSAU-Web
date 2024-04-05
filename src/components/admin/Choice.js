@@ -17,8 +17,11 @@ function Choice() {
 
   useEffect(() => {
     checkAccount((res) => {
-      setTextError(getTextError(res.error));
-      setErrorActive(true);
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+      }
+
     })
   }, []);
 
