@@ -9,11 +9,8 @@ import Modal from '../Modal/Modal';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { faUndo} from '@fortawesome/free-solid-svg-icons';
 import { faPlusCircle} from '@fortawesome/free-solid-svg-icons';
-
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-
+import Loading from '../Modal/Loading';
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -25,6 +22,7 @@ function CreateQR() {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [semester, setSemester] = useState(null);
   const [program, setProgram] = useState(null);

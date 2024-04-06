@@ -1,6 +1,6 @@
 import './Log.css';
 import { useForm } from "react-hook-form";
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { loginAxios } from "../../network"
 import Error_auth_data from '../Modal/Error_auth_data';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,6 +8,7 @@ import { faEye, faL } from "@fortawesome/free-solid-svg-icons";
 import { faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Link, Navigate, Route, Redirect, useHistory } from 'react-router-dom';
 import Forgot_pass from '../Modal/Forgot_pass';
+import Loading from '../Modal/Loading';
 const eye = <FontAwesomeIcon icon={faEye} />;
 const eyeSlah = <FontAwesomeIcon icon={faEyeSlash} />;
 
@@ -16,23 +17,28 @@ function Log() {
     const [isAuthenticated, setIsAuthenticated] = useState();
     const [errorActive, setErrorActive] = useState(false);
     const [forgotPass, setForgotPass] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const mess = () => {
-        alert('Позвоните по номеру телефона: +7 (000) 000-00-00');
-    }
     const { register, handleSubmit, formState: { errors }, reset, watch, getValues } = useForm();
 
     const onSubmit = (data) => {
+        setIsLoading(true);
         loginAxios(data, (res) => {
             if (res.success) {
                 const token = res.response.accessToken
                 localStorage.setItem('token', token)
-                setIsAuthenticated(true)
+                setIsAuthenticated(true);
+                setIsLoading(false);
             } else {
                 setErrorActive(true);
+                setIsLoading(false);
             }
         })
     }
+
+    useEffect(()=>{
+        
+    },[])
 
     const [passwordShown, setPasswordShown] = useState(false);
     const togglePasswordVisiblity = () => {
@@ -45,7 +51,10 @@ function Log() {
         return <Navigate to='/Choice' />
     }
     return (
-        <><div className='conteiner'>
+        <>
+        <Loading active={isLoading} setActive={setIsLoading}/>
+
+        <div className='conteiner'>
             <form className='auth-form' onSubmit={handleSubmit(onSubmit)} action='/'>
                 <div className='img-conteiner'>
                     <img src={require('../../img/logo.png')} alt='Логотип КубГАУ' />

@@ -7,6 +7,7 @@ import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
 import { getTextError } from '../../network';
 import { customStyles } from '../Select_style/Select_style';
+import Loading from '../Modal/Loading';
 
 function Admin_main() {
     const [errorActive, setErrorActive] = useState(false);
@@ -16,6 +17,8 @@ function Admin_main() {
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
 
     const [filter, setFilter] = useState({
         response: {
@@ -58,16 +61,18 @@ function Admin_main() {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
+                setIsLoading(false);
 
             } else {
-                setFilter(res)
+                setFilter(res);
+                setIsLoading(false);
             }
 
         })
     }, []);
 
     const resetFilters = () => {
-
+        setIsLoading(true);
         setSelectedWorkType(null);
         setSelectedDiscipline(null);
         setSelectedTeacher(null);
@@ -82,12 +87,15 @@ function Admin_main() {
             workTypeId: null
         }
         getDataAdminJournal(journalParam, (data) => {
+            
             if (data.error) {
                 setTextError(getTextError(data.error));
-                setErrorActive(true)
+                setErrorActive(true);
+                setIsLoading(false);
             } else {
                 setMainData(data)
                 setFilteredUsers(data);
+                setIsLoading(false);
             }
 
         })
@@ -95,6 +103,7 @@ function Admin_main() {
     };
 
     const getParams = () => {
+        setIsLoading(true);
         const journalParam = {
             disciplineId: selectedDiscipline ? selectedDiscipline.value : null,
             teacherId: selectedTeacher ? selectedTeacher.value : null,
@@ -107,15 +116,18 @@ function Admin_main() {
         getDataAdminJournal(journalParam, (data) => {
             if (data.error) {
                 setTextError(getTextError(data.error));
-                setErrorActive(true)
+                setErrorActive(true);
+                setIsLoading(false);
             } else {
                 setMainData(data)
                 setFilteredUsers(data);
+                setIsLoading(false);
             }
         })
     }
 
     useEffect(() => {
+        setIsLoading(true);
         const journalParam = {
             disciplineId: null,
             teacherId: null,
@@ -127,10 +139,11 @@ function Admin_main() {
             if (data.error) {
                 setTextError(getTextError(data.error));
                 setErrorActive(true);
-
+                setIsLoading(false);
             } else {
                 setMainData(data)
                 setFilteredUsers(data);
+                setIsLoading(false);
             }
         })
     }, []);
@@ -168,6 +181,8 @@ function Admin_main() {
 
     return (
         <>
+              <Loading active={isLoading} setActive={setIsLoading}/>
+
             <Admin_header />
             <div className='admin-main-search'>
                 <input
