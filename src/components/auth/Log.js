@@ -1,6 +1,6 @@
 import './Log.css';
 import { useForm } from "react-hook-form";
-import React, { useState,useEffect } from 'react';
+import React, { useState } from 'react';
 import { loginAxios } from "../../network"
 import Error_auth_data from '../Modal/Error_auth_data';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -36,9 +36,7 @@ function Log() {
         })
     }
 
-    useEffect(()=>{
-        
-    },[])
+    
 
     const [passwordShown, setPasswordShown] = useState(false);
     const togglePasswordVisiblity = () => {
