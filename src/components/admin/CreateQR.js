@@ -7,10 +7,13 @@ import QRCode from 'qrcode.react';
 import JSZip, { filter } from "jszip";
 import Modal from '../Modal/Modal';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import { faUndo} from '@fortawesome/free-solid-svg-icons';
-import { faPlusCircle} from '@fortawesome/free-solid-svg-icons';
+import { faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
+import { getDataForQR } from '../../network';
+import { getTextError } from '../../network';
+import Error_modal from '../Modal/Error_modal';
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -24,7 +27,19 @@ function CreateQR() {
   const [isAuthenticated, setIsAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
-  const [semester, setSemester] = useState(null);
+  const [dataQR, setDataQR] = useState({
+    response: {
+      programs: [],
+      groups: []
+    },
+    error: null,
+    success: true
+  });
+
+  const [errorActive, setErrorActive] = useState(false);
+  const [textError, setTextError] = useState('');
+
+  const [semester, setSemester] = useState(-1);
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
   const [qrCodeText, setQRCodeText] = useState('');
@@ -38,6 +53,20 @@ function CreateQR() {
 
 
   useEffect(() => {
+    getDataForQR((res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+        setIsLoading(false);
+
+      } else {
+        setDataQR(res);
+        setIsLoading(false);
+      }
+    })
+
+
+
     const fetchData = async () => {
       try {
         const response = await fetch(endpoint);
@@ -91,30 +120,54 @@ function CreateQR() {
   }
 
   const getQR = () => {
+    setIsLoading(true);
+    // let dataToQR = semester.value + ',' + program.value + ',' + group.value;
 
-
-    let dataToQR = semester.value + ',' + program.value + ',' + group.value;
-
-    setQRCodeText(dataToQR);
+    // setQRCodeText(dataToQR);
     setTimeout(() => {
-      const qrCodeURL = document.getElementById('qrCodeEl')
-        .toDataURL("image/png");
+      // const qrCodeURL = document.getElementById('qrCodeEl')
+      //   .toDataURL("image/png");
+      // let zip = new JSZip();
+      // let folder = zip;
+      // dataQR.response.groups.filter(groups => groups.id === groups.value).map(groups => (
+      //   groups.students.map(students => (
+      //     folder = zip.folder(`${students.firstName}`),
+      //     folder.file(`${semester.value}.png`, qrCodeURL.split('base64,')[1], { base64: true })
+      //   ))
 
+      // ))
       let zip = new JSZip();
-      let folder = zip.folder('Иванов');
-      folder.file(`${semester.value}.png`, qrCodeURL.split('base64,')[1], { base64: true });
+      dataQR.response.groups.forEach(groups => {
+        if (groups.id === group.value) {
+          groups.students.forEach(student => {
+            const folder = zip.folder(`${student.firstName}` + ` ` + `${student.lastName}` + ` ` + `${student.middleName}`);
+            dataQR.response.programs.forEach(programs => {
+              if (programs.id === program.value) {
+                programs.disciplines.forEach(disciplin => {
+
+                  let dataToQR = student.id + ',' + disciplin.id;
+                  setQRCodeText(dataToQR);
+                  const qrCodeURL = document.getElementById('qrCodeEl').toDataURL("image/png");
+                  folder.file(`${disciplin.title}.png`, qrCodeURL.split('base64,')[1], { base64: true });
+                })
+              }
+            })
+
+          });
+        }
+      });
 
       zip.generateAsync({ type: "blob" })
         .then(function (content) {
           let aEl = document.createElement("a");
           aEl.href = URL.createObjectURL(content);
-          aEl.download = `${group.value}.zip`;
+          aEl.download = `${group.label}.zip`;
           document.body.appendChild(aEl);
           aEl.click();
           document.body.removeChild(aEl);
         });
-
-    }, 1000);
+      setIsLoading(false);
+    }, 10000);
 
 
   }
@@ -126,15 +179,15 @@ function CreateQR() {
     setProgramFilter(data);
   }
 
-  function handelGetSemester(data){
+  function handelGetSemester(data) {
     setGetSemester(data);
   }
 
-  function handelGetDirection(data){
+  function handelGetDirection(data) {
     setGetDirection(data);
   }
 
-  function handelGetSubject(data){
+  function handelGetSubject(data) {
     setGetSubject(data);
   }
 
@@ -202,6 +255,8 @@ function CreateQR() {
   };
   return (
     <>
+      <Loading active={isLoading} setActive={setIsLoading} />
+
       <div className='ad_main_header'>
         <img className='ad_main_logo' src={require('../../img/logo1.png')} />
         <button className='menu_button' onClick={() => setOpen(!isOpen)}>Журналы
@@ -232,10 +287,18 @@ function CreateQR() {
               value={semester}
               onChange={handleSelectSemester}
               isSearchable={true}
-              options={allUsers.map(user => ({
-                value: user.address.street,
-                label: user.address.street,
-              }))}
+              options={[{ value: 1, label: 1 },
+              { value: 2, label: 2 },
+              { value: 3, label: 3 },
+              { value: 4, label: 4 },
+              { value: 5, label: 5 },
+              { value: 6, label: 6 },
+              { value: 7, label: 7 },
+              { value: 8, label: 8 },
+              { value: 9, label: 9 },
+              { value: 10, label: 10 },
+              { value: 11, label: 11 }
+              ]}
             />
             <Select
               styles={customStyles}
@@ -243,10 +306,10 @@ function CreateQR() {
               value={program}
               onChange={handleSelectProgram}
               isSearchable={true}
-              isDisabled={semester !== null ? false : true}
-              options={allUsers.map(user => ({
-                value: user.address.zipcode,
-                label: user.address.zipcode,
+              isDisabled={semester !== -1 ? false : true}
+              options={dataQR.response.programs.filter(programs => programs.semester === semester.value).map(programs => ({
+                value: programs.id,
+                label: programs.title,
               }))}
             />
             <Select
@@ -255,10 +318,10 @@ function CreateQR() {
               value={group}
               onChange={handleSelectGroup}
               isSearchable={true}
-              isDisabled={(semester !== null && program !== null) ? false : true}
-              options={allUsers.map(user => ({
-                value: user.address.suite,
-                label: user.address.suite,
+              isDisabled={(semester !== -1 && program !== null) ? false : true}
+              options={dataQR.response.groups.map(groups => ({
+                value: groups.id,
+                label: groups.title,
               }))}
             />
 
@@ -282,10 +345,18 @@ function CreateQR() {
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
               isSearchable={true}
-              options={allUsers.map(user => ({
-                value: user.address.street,
-                label: user.address.street,
-              }))}
+              options={[{ value: 1, label: 1 },
+              { value: 2, label: 2 },
+              { value: 3, label: 3 },
+              { value: 4, label: 4 },
+              { value: 5, label: 5 },
+              { value: 6, label: 6 },
+              { value: 7, label: 7 },
+              { value: 8, label: 8 },
+              { value: 9, label: 9 },
+              { value: 10, label: 10 },
+              { value: 11, label: 11 }
+              ]}
             />
             <Select
               styles={customStyles}
@@ -293,22 +364,22 @@ function CreateQR() {
               value={programFilter}
               onChange={handleSelectProgramFilter}
               isSearchable={true}
-              options={allUsers.map(user => ({
-                value: user.address.zipcode,
-                label: user.address.zipcode,
+              options={dataQR.response.programs.map(programs => ({
+                value: programs.id,
+                label: programs.title,
               }))}
             />
             {/* onClick={() => setModalActive(true) */}
 
             <button className='get-params-qr' type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
-            <button className='delete-params-qr' ><FontAwesomeIcon icon={faUndo}/></button>
+            <button className='delete-params-qr' ><FontAwesomeIcon icon={faUndo} /></button>
 
           </div>
         </div>
       </div>
       <button className='add-qr-group' onClick={() => setModalActive(true)}>
         {/* <img src={require('../../img/add.png')} alt='add' /> */}
-        <FontAwesomeIcon icon={faPlusCircle}/>
+        <FontAwesomeIcon icon={faPlusCircle} />
       </button>
       <QRCode
         id="qrCodeEl"
@@ -316,30 +387,32 @@ function CreateQR() {
         value={qrCodeText}
         style={{ display: 'none' }}
       />
-      {filteredUsers.map(user => (
-        <div className='cart-qr-group' key={user.id}>
+      {dataQR.response.programs.map(programs => (
+        <div className='cart-qr-group' key={programs.id}>
           <div className='data-qr'>
             <div className='qr1'>
-              <p><span>Семестр: </span>{user.address.street}</p>
-              <p><span>Программа: </span>{user.address.zipcode}</p>
+              <p><span>Семестр: </span>{programs.semester}</p>
+              <p><span>Программа: </span>{programs.title}</p>
             </div>
+
             <div className='qr2'>
               <span>Дисциплины: </span>
-              <p> {user.address.street}</p>
-            </div>
-            <div className='qr3'>
+              <div className='dicip'>
+                {programs.disciplines.map(disciplines => (
+                  <p> {disciplines.title}</p>
+                ))}
 
-              <p>{user.address.street}</p>
+              </div>
 
             </div>
           </div>
           <button
             className='qr-setting'
-            onClick={() => handleSettingClick(user.id)}
+            onClick={() => handleSettingClick(programs.id)}
           >
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
-          <div className={`button-edit-delete ${userStates[user.id] ? 'active' : ''}`}>
+          <div className={`button-edit-delete ${userStates[programs.id] ? 'active' : ''}`}>
             <button>
               <img src={require('../../img/edit.png')} alt='edit' />
             </button>
@@ -352,49 +425,51 @@ function CreateQR() {
       <Modal active={modalActive} setActive={setModalActive}>
         <div className='modal-qr'>
           <Select
-          styles={customStylesModal}
+            styles={customStylesModal}
             placeholder="Семестр"
             value={getSemester}
             onChange={handelGetSemester}
             isSearchable={true}
-            options={[{value: 1, label: 1},
-            {value: 2, label: 2},
-            {value: 3, label: 3},
-            {value: 4, label: 4},
-            {value: 5, label: 5},
-            {value: 6, label: 6},
-            {value: 7, label: 7},
-            {value: 8, label: 8},
-            {value: 9, label: 9},
-            {value: 10, label: 10},
-            {value: 11, label: 11}
+            options={[{ value: 1, label: 1 },
+            { value: 2, label: 2 },
+            { value: 3, label: 3 },
+            { value: 4, label: 4 },
+            { value: 5, label: 5 },
+            { value: 6, label: 6 },
+            { value: 7, label: 7 },
+            { value: 8, label: 8 },
+            { value: 9, label: 9 },
+            { value: 10, label: 10 },
+            { value: 11, label: 11 }
             ]}
           />
           <Select
-          styles={customStylesModal}
-            placeholder="Направление"
+            styles={customStylesModal}
+            placeholder="Программа"
             value={getDirection}
             onChange={handelGetDirection}
             isSearchable={true}
-            options={filteredUsers.map(user=> ({
-              value: user.address.street,
-              label: user.address.street
+            options={dataQR.response.programs.map(programs => ({
+              value: programs.id,
+              label: programs.title
             }))}
           />
           <Select
-          styles={customStylesModal}
+            styles={customStylesModal}
             placeholder="Дисциплины"
             value={getSubject}
             onChange={handelGetSubject}
             isSearchable={true}
             isMulti={true}
-            options={filteredUsers.map(user=> ({
-              value: user.address.street,
-              label: user.address.street
+            options={dataQR.response.programs.map(programs => ({
+              value: programs.id,
+              label: programs.title
             }))}
           />
         </div>
       </Modal>
+      <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+
     </>
 
 

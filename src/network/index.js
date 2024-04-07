@@ -61,6 +61,15 @@ async function getDataAdminJournal(parameter, callback) {
     })
 }
 
+async function getDataForQR(callback){
+    const url = `${baseUrl}/qr`;
+
+    await axios.get(url).then((res)=>{
+        callback(res.data);
+    })
+
+}
+
 function getTextError(data){
     let textError = '';
     switch (data.code) {
@@ -80,6 +89,6 @@ function getTextError(data){
 }
 
 export {
-    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError
+    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError, getDataForQR
 }
 

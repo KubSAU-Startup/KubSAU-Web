@@ -25,7 +25,8 @@
     margin-bottom: 20px;
 }
 
-.filter-qr, .filter-data-qr {
+.filter-qr,
+.filter-data-qr {
     display: flex;
     align-items: center;
 }
@@ -98,7 +99,7 @@
 
 .data-qr {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 0.3fr 0.7fr;
     color: #000;
     font-size: 16px;
     font-weight: 400;
@@ -111,6 +112,19 @@
 .qr2 {
     display: flex;
 }
+
+.qr2 span {
+    margin-right: 20px;
+}
+
+.dicip {
+    width: 100%;
+    column-width: 48%;
+    column-count: 2;
+    column-gap: 3%;
+
+}
+
 
 .data-qr p {
     margin-bottom: 10px;
