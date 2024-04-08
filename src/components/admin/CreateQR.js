@@ -3,7 +3,7 @@ import './Admin_header.css';
 import './CreateQR.css'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
-import QRCode from 'qrcode.react';
+import QRCode from 'qrcode';
 import JSZip, { filter } from "jszip";
 import Modal from '../Modal/Modal';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +14,7 @@ import Loading from '../Modal/Loading';
 import { getDataForQR } from '../../network';
 import { getTextError } from '../../network';
 import Error_modal from '../Modal/Error_modal';
+import { saveAs } from 'file-saver';
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -64,8 +65,6 @@ function CreateQR() {
         setIsLoading(false);
       }
     })
-
-
 
     const fetchData = async () => {
       try {
@@ -119,58 +118,48 @@ function CreateQR() {
     setGroup(data);
   }
 
-  const getQR = () => {
+  const generateQRCode = async (studentId, subjectId) => {
+
+    const qrContent = `${studentId},${subjectId}`;
+    const qrUrl = await QRCode.toDataURL(qrContent);
+    return qrUrl;
+
+  };
+
+  const getQR = async () => {
+
     setIsLoading(true);
-    // let dataToQR = semester.value + ',' + program.value + ',' + group.value;
 
-    // setQRCodeText(dataToQR);
-    setTimeout(() => {
-      // const qrCodeURL = document.getElementById('qrCodeEl')
-      //   .toDataURL("image/png");
-      // let zip = new JSZip();
-      // let folder = zip;
-      // dataQR.response.groups.filter(groups => groups.id === groups.value).map(groups => (
-      //   groups.students.map(students => (
-      //     folder = zip.folder(`${students.firstName}`),
-      //     folder.file(`${semester.value}.png`, qrCodeURL.split('base64,')[1], { base64: true })
-      //   ))
+    const zip = new JSZip();
+    const folder = zip.folder(`${group.label}`);
 
-      // ))
-      let zip = new JSZip();
-      dataQR.response.groups.forEach(groups => {
-        if (groups.id === group.value) {
-          groups.students.forEach(student => {
-            const folder = zip.folder(`${student.firstName}` + ` ` + `${student.lastName}` + ` ` + `${student.middleName}`);
-            dataQR.response.programs.forEach(programs => {
-              if (programs.id === program.value) {
-                programs.disciplines.forEach(disciplin => {
+    for (const gr of dataQR.response.groups) {
+      if (gr.id === group.value) {
 
-                  let dataToQR = student.id + ',' + disciplin.id;
-                  setQRCodeText(dataToQR);
-                  const qrCodeURL = document.getElementById('qrCodeEl').toDataURL("image/png");
-                  folder.file(`${disciplin.title}.png`, qrCodeURL.split('base64,')[1], { base64: true });
-                })
+        for (const stud of gr.students) {
+          const studentFolder = folder.folder(`${stud.lastName}_${stud.firstName}_${stud.middleName}`);
+
+          for (const prog of dataQR.response.programs) {
+            if (prog.id === program.value) {
+
+              for (const disc of prog.disciplines) {
+                const qrCodeUrl = await generateQRCode(stud.id, disc.id);
+                const response = await fetch(qrCodeUrl);
+                const qrCodeBlob = await response.blob();
+
+                studentFolder.file(`${disc.title}.png`, qrCodeBlob);
               }
-            })
-
-          });
+            }
+          }
         }
-      });
+      }
+    }
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+      saveAs(content, `${group.label}.zip`);
+    });
+    setIsLoading(false);
 
-      zip.generateAsync({ type: "blob" })
-        .then(function (content) {
-          let aEl = document.createElement("a");
-          aEl.href = URL.createObjectURL(content);
-          aEl.download = `${group.label}.zip`;
-          document.body.appendChild(aEl);
-          aEl.click();
-          document.body.removeChild(aEl);
-        });
-      setIsLoading(false);
-    }, 10000);
-
-
-  }
+  };
 
   function handleSelectSemesterFilter(data) {
     setSemesterFilter(data);
@@ -381,12 +370,7 @@ function CreateQR() {
         {/* <img src={require('../../img/add.png')} alt='add' /> */}
         <FontAwesomeIcon icon={faPlusCircle} />
       </button>
-      <QRCode
-        id="qrCodeEl"
-        size={150}
-        value={qrCodeText}
-        style={{ display: 'none' }}
-      />
+     
       {dataQR.response.programs.map(programs => (
         <div className='cart-qr-group' key={programs.id}>
           <div className='data-qr'>
