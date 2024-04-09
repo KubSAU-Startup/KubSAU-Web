@@ -15,6 +15,8 @@ import { getDataForQR } from '../../network';
 import { getTextError } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
+import { customStyles, customStylesQR } from '../Select_style/Select_style';
+import { customStylesModal } from '../Select_style/Select_style';
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -22,9 +24,9 @@ function CreateQR() {
   const [isOpen, setOpen] = useState(false);
   const [modalActive, setModalActive] = useState(false);
   const [userStates, setUserStates] = useState({});
-  const [allUsers, setAllUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -43,7 +45,6 @@ function CreateQR() {
   const [semester, setSemester] = useState(-1);
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
-  const [qrCodeText, setQRCodeText] = useState('');
 
   const [semesterFilter, setSemesterFilter] = useState(null);
   const [programFilter, setProgramFilter] = useState(null);
@@ -52,6 +53,11 @@ function CreateQR() {
   const [getDirection, setGetDirection] = useState(null);
   const [getSubject, setGetSubject] = useState(null);
 
+  const [visibleItems, setVisibleItems] = useState(10);
+  const [isPaginationVisible, setIsPaginationVisible] = useState(true);
+
+
+  //загрузка данных с бэка
 
   useEffect(() => {
     getDataForQR((res) => {
@@ -62,51 +68,63 @@ function CreateQR() {
 
       } else {
         setDataQR(res);
+        setSearchResults(res.response.programs);
         setIsLoading(false);
       }
     })
 
-    const fetchData = async () => {
-      try {
-        const response = await fetch(endpoint);
-        const data = await response.json();
-        setAllUsers(data);
-        setFilteredUsers(data);
-
-        const initialUserStates = {};
-        data.forEach(user => {
-          initialUserStates[user.id] = false;
-        });
-        setUserStates(initialUserStates);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
   }, []);
 
-  const handleChange = (e) => {
-    setSearchTerm(e.target.value);
-    const filtered = allUsers.filter(user =>
-      user.address.zipcode.toLowerCase().includes(e.target.value.toLowerCase())
+
+  //поиск программ
+
+  const handleChange = event => {
+    setVisibleItems(10);
+    setSearchTerm(event.target.value);
+    const results = dataQR.response.programs.filter(program =>
+      program.title.toLowerCase().includes(event.target.value.toLowerCase())
     );
-    setFilteredUsers(filtered);
+    setSearchResults(results);
   };
 
-  const handleSettingClick = (userId) => {
-    setUserStates(prevUserStates => ({
-      ...prevUserStates,
-      [userId]: !prevUserStates[userId],
+
+  //скрытие кнопки пагинации, если закончились данные для отображения
+
+  useEffect(() => {
+    if (searchResults.length <= visibleItems) {
+      setIsPaginationVisible(false); // Скрыть кнопку пагинации
+    } else {
+      setIsPaginationVisible(true); // Показать 
+    }
+  }, [searchResults, visibleItems]);
+
+
+  // открытие настроик карточки
+
+  const handleSettingClick = (progId) => {
+    setUserStates(prevProgStates => ({
+      ...prevProgStates,
+      [progId]: !prevProgStates[progId],
     }));
   };
+
+
+  // кнопка выхода из системы
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
   };
+
+
+  // проверка авторизован ли пользователь
+
   if (isAuthenticated == false) {
     return <Navigate to='/Log' />
   }
+
+
+  // установка значений для создание qr
 
   function handleSelectSemester(data) {
     setSemester(data);
@@ -118,6 +136,9 @@ function CreateQR() {
     setGroup(data);
   }
 
+
+  // функция создание qr
+
   const generateQRCode = async (studentId, subjectId) => {
 
     const qrContent = `${studentId},${subjectId}`;
@@ -125,6 +146,9 @@ function CreateQR() {
     return qrUrl;
 
   };
+
+
+  // функция создания папок и архивов
 
   const getQR = async () => {
 
@@ -137,7 +161,7 @@ function CreateQR() {
       if (gr.id === group.value) {
 
         for (const stud of gr.students) {
-          const studentFolder = folder.folder(`${stud.lastName}_${stud.firstName}_${stud.middleName}`);
+          const studentFolder = folder.folder(`${stud.firstName} ${stud.lastName} ${stud.middleName}`);
 
           for (const prog of dataQR.response.programs) {
             if (prog.id === program.value) {
@@ -161,6 +185,9 @@ function CreateQR() {
 
   };
 
+
+  // запись значений фильтров
+
   function handleSelectSemesterFilter(data) {
     setSemesterFilter(data);
   }
@@ -172,6 +199,9 @@ function CreateQR() {
     setGetSemester(data);
   }
 
+
+  // запись значений из модального окна создания программ
+
   function handelGetDirection(data) {
     setGetDirection(data);
   }
@@ -180,72 +210,33 @@ function CreateQR() {
     setGetSubject(data);
   }
 
-  const customStyles = {
-    option: (provided, state) => ({
-      ...provided,
-      fontSize: '14px',
-      color: state.isSelected ? 'white' : 'green',
-      backgroundColor: state.isSelected ? 'green' : 'white',
-      cursor: 'pointer',
-      border: 'none',
-      '&:hover': {
-        backgroundColor: 'green',
-        color: 'white',
-      },
-      ...(state.isActive && {
-        border: 'none',
-        boxShadow: '0 0 0 2px green',
-      }),
-
-    }),
-    control: (provided) => ({
-      ...provided,
-
-      minWidth: '150px',
-      border: 'none',
-      boxShadow: '0 0 0 2px green',
-      margin: '0px 20px 0px 0px'
-    }),
-    menu: (provided) => ({
-      ...provided,
-      width: '100%',
-    }),
+  const loadMore = () => {
+    setVisibleItems(prevVisibleItems => prevVisibleItems + 10);
   };
-  const customStylesModal = {
-    option: (provided, state) => ({
-      ...provided,
-      fontSize: '14px',
-      color: state.isSelected ? 'white' : 'green',
-      backgroundColor: state.isSelected ? 'green' : 'white',
-      cursor: 'pointer',
-      border: 'none',
-      '&:hover': {
-        backgroundColor: 'green',
-        color: 'white',
-      },
-      ...(state.isActive && {
-        border: 'none',
-        boxShadow: '0 0 0 2px green',
-      }),
 
-    }),
-    control: (provided) => ({
-      ...provided,
 
-      width: '400px',
-      border: 'none',
-      boxShadow: '0 0 0 2px green',
-      margin: '20px'
-    }),
-    menu: (provided) => ({
-      ...provided,
-      width: '100%',
-    }),
-  };
+  // массив для семестров
+
+  const dataSemester = [{ value: 1, label: 1 },
+  { value: 2, label: 2 },
+  { value: 3, label: 3 },
+  { value: 4, label: 4 },
+  { value: 5, label: 5 },
+  { value: 6, label: 6 },
+  { value: 7, label: 7 },
+  { value: 8, label: 8 },
+  { value: 9, label: 9 },
+  { value: 10, label: 10 },
+  { value: 11, label: 11 }];
+
+
   return (
     <>
+
+      {/* окно загрузки */}
       <Loading active={isLoading} setActive={setIsLoading} />
 
+      {/* шапка страницы */}
       <div className='ad_main_header'>
         <img className='ad_main_logo' src={require('../../img/logo1.png')} />
         <button className='menu_button' onClick={() => setOpen(!isOpen)}>Журналы
@@ -265,29 +256,20 @@ function CreateQR() {
         <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
         <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
       </div>
+
+      {/* блок создания qr */}
       <div className='qr-options'>
         <div className='create-qr'>
           <h2>Создать QR-код</h2>
           <p>Выберите последовательно:</p>
           <div className='filter-qr'>
             <Select
-              styles={customStyles}
+              styles={customStylesQR}
               placeholder="Семестр"
               value={semester}
               onChange={handleSelectSemester}
               isSearchable={true}
-              options={[{ value: 1, label: 1 },
-              { value: 2, label: 2 },
-              { value: 3, label: 3 },
-              { value: 4, label: 4 },
-              { value: 5, label: 5 },
-              { value: 6, label: 6 },
-              { value: 7, label: 7 },
-              { value: 8, label: 8 },
-              { value: 9, label: 9 },
-              { value: 10, label: 10 },
-              { value: 11, label: 11 }
-              ]}
+              options={dataSemester}
             />
             <Select
               styles={customStyles}
@@ -302,7 +284,7 @@ function CreateQR() {
               }))}
             />
             <Select
-              styles={customStyles}
+              styles={customStylesQR}
               placeholder="Группа"
               value={group}
               onChange={handleSelectGroup}
@@ -320,32 +302,25 @@ function CreateQR() {
             </button>
           </div>
         </div>
+
+        {/* поиск */}
         <div className='data-option'>
           <div className='search'>
             <input type='text'
               value={searchTerm}
               onChange={handleChange}
-              placeholder='Поиск по направлению...' />
+              placeholder='Поиск по программе...' />
           </div>
+
+          {/* фильтры */}
           <div className='filter-data-qr'>
             <Select
-              styles={customStyles}
+              styles={customStylesQR}
               placeholder="Семестр"
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
               isSearchable={true}
-              options={[{ value: 1, label: 1 },
-              { value: 2, label: 2 },
-              { value: 3, label: 3 },
-              { value: 4, label: 4 },
-              { value: 5, label: 5 },
-              { value: 6, label: 6 },
-              { value: 7, label: 7 },
-              { value: 8, label: 8 },
-              { value: 9, label: 9 },
-              { value: 10, label: 10 },
-              { value: 11, label: 11 }
-              ]}
+              options={dataSemester}
             />
             <Select
               styles={customStyles}
@@ -358,20 +333,21 @@ function CreateQR() {
                 label: programs.title,
               }))}
             />
-            {/* onClick={() => setModalActive(true) */}
-
+            {/* задать заначения фильтрам */}
             <button className='get-params-qr' type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
+            {/* очистить фильтры */}
             <button className='delete-params-qr' ><FontAwesomeIcon icon={faUndo} /></button>
-
           </div>
         </div>
       </div>
+
+      {/* кнопка вызова модального окна для создания программы */}
       <button className='add-qr-group' onClick={() => setModalActive(true)}>
-        {/* <img src={require('../../img/add.png')} alt='add' /> */}
         <FontAwesomeIcon icon={faPlusCircle} />
       </button>
-     
-      {dataQR.response.programs.map(programs => (
+
+      {/* все созданные программы */}
+      {searchResults.slice(0, visibleItems).map(programs => (
         <div className='cart-qr-group' key={programs.id}>
           <div className='data-qr'>
             <div className='qr1'>
@@ -385,11 +361,10 @@ function CreateQR() {
                 {programs.disciplines.map(disciplines => (
                   <p> {disciplines.title}</p>
                 ))}
-
               </div>
-
             </div>
           </div>
+          {/* кнопки редактирования и удаления программы */}
           <button
             className='qr-setting'
             onClick={() => handleSettingClick(programs.id)}
@@ -406,6 +381,15 @@ function CreateQR() {
           </div>
         </div>
       ))}
+
+      {/* кнопка пагинации */}
+      {isPaginationVisible && (
+        <button className='btn-loadMore' onClick={loadMore}>
+          Загрузить ещё
+        </button>
+      )}
+
+      {/* модальное окно создания или редактирования программы */}
       <Modal active={modalActive} setActive={setModalActive}>
         <div className='modal-qr'>
           <Select
@@ -414,18 +398,7 @@ function CreateQR() {
             value={getSemester}
             onChange={handelGetSemester}
             isSearchable={true}
-            options={[{ value: 1, label: 1 },
-            { value: 2, label: 2 },
-            { value: 3, label: 3 },
-            { value: 4, label: 4 },
-            { value: 5, label: 5 },
-            { value: 6, label: 6 },
-            { value: 7, label: 7 },
-            { value: 8, label: 8 },
-            { value: 9, label: 9 },
-            { value: 10, label: 10 },
-            { value: 11, label: 11 }
-            ]}
+            options={dataSemester}
           />
           <Select
             styles={customStylesModal}
@@ -453,11 +426,7 @@ function CreateQR() {
         </div>
       </Modal>
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
-
     </>
-
-
-
   )
 }
 

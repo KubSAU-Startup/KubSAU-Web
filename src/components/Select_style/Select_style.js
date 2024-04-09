@@ -30,6 +30,38 @@ const customStyles = {
     }),
   };
 
+  const customStylesQR = {
+    option: (provided, state) => ({
+      ...provided,
+      fontSize: '14px',
+      color: state.isSelected ? 'white' : 'green',
+      backgroundColor: state.isSelected ? 'green' : 'white',
+      cursor: 'pointer',
+      border: 'none',
+      '&:hover': {
+        backgroundColor: 'green',
+        color: 'white',
+      },
+      ...(state.isActive && {
+        border: 'none',
+        boxShadow: '0 0 0 2px green',
+      }),
+
+    }),
+    control: (provided) => ({
+      ...provided,
+
+      minWidth: '130px',
+      border: 'none',
+      boxShadow: '0 0 0 2px green',
+      margin: '0px 10px 0px 0px'
+    }),
+    menu: (provided) => ({
+      ...provided,
+      width: '100%',
+    }),
+  };
+
   const customStylesModal = {
     option: (provided, state) => ({
       ...provided,
@@ -62,4 +94,4 @@ const customStyles = {
     }),
   };
 
-  export {customStyles, customStylesModal}
+  export {customStyles, customStylesModal, customStylesQR}
