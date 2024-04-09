@@ -1,5 +1,6 @@
 {
   "name": "kubsau-web",
+  "repository": "github:KubSAU-Startup/KubSAU-Web",
   "version": "0.1.0",
   "private": false,
   "dependencies": {
