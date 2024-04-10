@@ -60,6 +60,7 @@ function CreateQR() {
   //загрузка данных с бэка
 
   useEffect(() => {
+    setVisibleItems(10);
     getDataForQR((res) => {
       if (res.error) {
         setTextError(getTextError(res.error));
@@ -91,6 +92,7 @@ function CreateQR() {
   //скрытие кнопки пагинации, если закончились данные для отображения
 
   useEffect(() => {
+
     if (searchResults.length <= visibleItems) {
       setIsPaginationVisible(false); // Скрыть кнопку пагинации
     } else {
@@ -128,6 +130,7 @@ function CreateQR() {
 
   function handleSelectSemester(data) {
     setSemester(data);
+    setProgram(null);
   }
   function handleSelectProgram(data) {
     setProgram(data);
@@ -227,7 +230,8 @@ function CreateQR() {
   { value: 8, label: 8 },
   { value: 9, label: 9 },
   { value: 10, label: 10 },
-  { value: 11, label: 11 }];
+  { value: 11, label: 11 },
+  { value: 12, label: 12 }];
 
 
   return (

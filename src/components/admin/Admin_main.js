@@ -18,6 +18,7 @@ function Admin_main() {
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
 
     const [filter, setFilter] = useState({
@@ -39,7 +40,9 @@ function Admin_main() {
             error: null,
             success: true
         }
-    })
+    });
+
+    const [searchResults, setSearchResults] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState({
         response: {
             count: 30,
@@ -57,6 +60,7 @@ function Admin_main() {
     };
 
     useEffect(() => {
+        setVisibleItems(5);
         getDataFilters((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -70,6 +74,17 @@ function Admin_main() {
 
         })
     }, []);
+
+    //скрытие кнопки пагинации, если закончились данные для отображения
+
+    useEffect(() => {
+
+        if (searchResults.length <= visibleItems) {
+            setIsPaginationVisible(false); // Скрыть кнопку пагинации
+        } else {
+            setIsPaginationVisible(true); // Показать 
+        }
+    }, [searchResults, visibleItems]);
 
     const resetFilters = () => {
         setIsLoading(true);
@@ -87,14 +102,14 @@ function Admin_main() {
             workTypeId: null
         }
         getDataAdminJournal(journalParam, (data) => {
-            
+
             if (data.error) {
                 setTextError(getTextError(data.error));
                 setErrorActive(true);
                 setIsLoading(false);
             } else {
                 setMainData(data)
-                setFilteredUsers(data);
+                setSearchResults(data.response.journal);
                 setIsLoading(false);
             }
 
@@ -120,7 +135,7 @@ function Admin_main() {
                 setIsLoading(false);
             } else {
                 setMainData(data)
-                setFilteredUsers(data);
+                setSearchResults(data.response.journal);
                 setIsLoading(false);
             }
         })
@@ -142,25 +157,21 @@ function Admin_main() {
                 setIsLoading(false);
             } else {
                 setMainData(data)
-                setFilteredUsers(data);
+                setSearchResults(data.response.journal);
                 setIsLoading(false);
             }
         })
     }, []);
 
     const handleChange = (e) => {
+        setVisibleItems(5);
         const searchTerm = e.target.value.toLowerCase();
         setSearchTerm(searchTerm);
 
-        const filtered = mainData.response.journal.filter(journal =>
+        const results = mainData.response.journal.filter(journal =>
             journal.student.fullName.toLowerCase().includes(searchTerm)
         );
-        setFilteredUsers({
-            response: {
-                ...filteredUsers.response,
-                journal: filtered
-            }
-        });
+        setSearchResults(results);
     };
 
     function handleSelectDiscipline(data) {
@@ -181,7 +192,7 @@ function Admin_main() {
 
     return (
         <>
-              <Loading active={isLoading} setActive={setIsLoading}/>
+            <Loading active={isLoading} setActive={setIsLoading} />
 
             <Admin_header />
             <div className='admin-main-search'>
@@ -250,7 +261,7 @@ function Admin_main() {
                 <button className='delete-params' onClick={resetFilters}>Сбросить</button>
 
             </div>
-            {filteredUsers.response.journal.slice(0, visibleItems).map(journal => (
+            {searchResults.slice(0, visibleItems).map(journal => (
                 <div className='cart' >
                     <div className='data'>
                         {new Date(journal.work.registrationDate * 1000).toLocaleString("ru-ru")}
@@ -262,7 +273,7 @@ function Admin_main() {
                             <p><span>Тип работы:</span> {journal.work.type.title}</p>
                             <p><span>Статус:</span> {journal.student.status}</p>
                         </div>
-                    
+
                         <div className='col2'>
                             <p><span>Дисциплина:</span> {journal.discipline.title}</p>
                             <p><span>Преподаватель:</span> {journal.teacher.lastName} {journal.teacher.firstName} {journal.teacher.middleName}</p>
@@ -273,7 +284,10 @@ function Admin_main() {
                     </div>
                 </div>
             ))}
-            <button className='btn-loadMore' onClick={loadMore}>Загрузить ещё</button>
+            {isPaginationVisible && (
+                <button className='btn-loadMore' onClick={loadMore}>
+                    Загрузить ещё
+                </button>)}
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
 
         </>
