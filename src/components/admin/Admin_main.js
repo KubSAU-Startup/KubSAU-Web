@@ -20,7 +20,7 @@ function Admin_main() {
     const [isLoading, setIsLoading] = useState(true);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
-
+    // переменная для получения фильтров из бэка
     const [filter, setFilter] = useState({
         response: {
             workTypes: [],
@@ -32,6 +32,7 @@ function Admin_main() {
         success: true
     });
 
+    // переменная для получения данных карточек из бэка
     const [mainData, setMainData] = useState({
         response: {
             count: 30,
@@ -42,23 +43,21 @@ function Admin_main() {
         }
     });
 
+    // переменная поиска
     const [searchResults, setSearchResults] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState({
-        response: {
-            count: 30,
-            offset: 0,
-            journal: [],
-            error: null,
-            success: true
-        }
-    });
-    const [visibleItems, setVisibleItems] = useState(5);
+
+    // переменная количество показываемых элементов пагинации
+    const [visibleItems, setVisibleItems] = useState();
+
+    // перменная запроса на поиск
     const [searchTerm, setSearchTerm] = useState('');
 
+    // функция загрузки данных пагинации
     const loadMore = () => {
         setVisibleItems(prevVisibleItems => prevVisibleItems + 5);
     };
 
+    // получение данных для фильтров с бэка
     useEffect(() => {
         setVisibleItems(5);
         getDataFilters((res) => {
@@ -76,7 +75,6 @@ function Admin_main() {
     }, []);
 
     //скрытие кнопки пагинации, если закончились данные для отображения
-
     useEffect(() => {
 
         if (searchResults.length <= visibleItems) {
@@ -86,6 +84,7 @@ function Admin_main() {
         }
     }, [searchResults, visibleItems]);
 
+    // функция сброса фильтров
     const resetFilters = () => {
         setIsLoading(true);
         setSelectedWorkType(null);
@@ -94,6 +93,7 @@ function Admin_main() {
         setSelectedDepartment(null);
         setSelectedGroup(null);
 
+        // параметры для сброса
         const journalParam = {
             disciplineId: null,
             teacherId: null,
@@ -112,11 +112,10 @@ function Admin_main() {
                 setSearchResults(data.response.journal);
                 setIsLoading(false);
             }
-
         })
-
     };
 
+    // функция фильтрации данных
     const getParams = () => {
         setIsLoading(true);
         const journalParam = {
@@ -141,6 +140,7 @@ function Admin_main() {
         })
     }
 
+    // функция получения данных для заполнения журнала
     useEffect(() => {
         setIsLoading(true);
         const journalParam = {
@@ -163,6 +163,7 @@ function Admin_main() {
         })
     }, []);
 
+    // функция поиска
     const handleChange = (e) => {
         setVisibleItems(5);
         const searchTerm = e.target.value.toLowerCase();
@@ -174,27 +175,28 @@ function Admin_main() {
         setSearchResults(results);
     };
 
+    // получения данных о необходимой фильтрации
     function handleSelectDiscipline(data) {
         setSelectedDiscipline(data);
     }
-
     function handleSelectType(data) {
         setSelectedWorkType(data);
     }
-
     function handleSelectTeacher(data) {
         setSelectedTeacher(data);
     }
-
     function handleSelectGroup(data) {
         setSelectedGroup(data);
     }
 
     return (
         <>
+            {/* окно загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
-
+            {/* шапка страницы */}
             <Admin_header />
+
+            {/* поиск */}
             <div className='admin-main-search'>
                 <input
                     type='text'
@@ -203,6 +205,8 @@ function Admin_main() {
                     placeholder='Поиск по ФИО студента...'
                 />
             </div>
+
+            {/* фильтры */}
             <div className='filters'>
                 <div>
                     <Select
@@ -257,10 +261,12 @@ function Admin_main() {
                     />
                 </div>
 
+                {/* кнопки применить и сбросить */}
                 <button className='get-params' type='submit' onClick={getParams}>Применить</button>
                 <button className='delete-params' onClick={resetFilters}>Сбросить</button>
-
             </div>
+
+            {/* данные о зарегистрированных работах (карточки) */}
             {searchResults.slice(0, visibleItems).map(journal => (
                 <div className='cart' >
                     <div className='data'>
@@ -284,12 +290,15 @@ function Admin_main() {
                     </div>
                 </div>
             ))}
+
+            {/* кнопка пагинации */}
             {isPaginationVisible && (
                 <button className='btn-loadMore' onClick={loadMore}>
                     Загрузить ещё
                 </button>)}
-            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
 
+            {/* модальное окно ошибки */}
+            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
         </>
     );
 }

@@ -18,8 +18,6 @@ import { saveAs } from 'file-saver';
 import { customStyles, customStylesQR } from '../Select_style/Select_style';
 import { customStylesModal } from '../Select_style/Select_style';
 
-const endpoint = 'https://jsonplaceholder.typicode.com/users';
-
 function CreateQR() {
   const [isOpen, setOpen] = useState(false);
   const [modalActive, setModalActive] = useState(false);
@@ -46,19 +44,17 @@ function CreateQR() {
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
 
-  const [semesterFilter, setSemesterFilter] = useState(null);
+  const [semesterFilter, setSemesterFilter] = useState(-1);
   const [programFilter, setProgramFilter] = useState(null);
 
   const [getSemester, setGetSemester] = useState(null);
-  const [getDirection, setGetDirection] = useState(null);
+  const [getProgram, setGetProgram] = useState(null);
   const [getSubject, setGetSubject] = useState(null);
 
   const [visibleItems, setVisibleItems] = useState(10);
   const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
-
   //загрузка данных с бэка
-
   useEffect(() => {
     setVisibleItems(10);
     getDataForQR((res) => {
@@ -76,9 +72,7 @@ function CreateQR() {
 
   }, []);
 
-
   //поиск программ
-
   const handleChange = event => {
     setVisibleItems(10);
     setSearchTerm(event.target.value);
@@ -88,9 +82,7 @@ function CreateQR() {
     setSearchResults(results);
   };
 
-
   //скрытие кнопки пагинации, если закончились данные для отображения
-
   useEffect(() => {
 
     if (searchResults.length <= visibleItems) {
@@ -100,9 +92,7 @@ function CreateQR() {
     }
   }, [searchResults, visibleItems]);
 
-
   // открытие настроик карточки
-
   const handleSettingClick = (progId) => {
     setUserStates(prevProgStates => ({
       ...prevProgStates,
@@ -110,24 +100,18 @@ function CreateQR() {
     }));
   };
 
-
   // кнопка выхода из системы
-
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
   };
 
-
   // проверка авторизован ли пользователь
-
   if (isAuthenticated == false) {
     return <Navigate to='/Log' />
   }
 
-
   // установка значений для создание qr
-
   function handleSelectSemester(data) {
     setSemester(data);
     setProgram(null);
@@ -139,20 +123,15 @@ function CreateQR() {
     setGroup(data);
   }
 
-
   // функция создание qr
-
   const generateQRCode = async (studentId, subjectId) => {
 
     const qrContent = `${studentId},${subjectId}`;
     const qrUrl = await QRCode.toDataURL(qrContent);
     return qrUrl;
-
   };
 
-
   // функция создания папок и архивов
-
   const getQR = async () => {
 
     setIsLoading(true);
@@ -185,12 +164,9 @@ function CreateQR() {
       saveAs(content, `${group.label}.zip`);
     });
     setIsLoading(false);
-
   };
 
-
   // запись значений фильтров
-
   function handleSelectSemesterFilter(data) {
     setSemesterFilter(data);
   }
@@ -198,28 +174,51 @@ function CreateQR() {
     setProgramFilter(data);
   }
 
+  // функция фильтрации данных
+  const getParams = () => {
+    let filteredResults = [...dataQR.response.programs]; // Создаем копию исходных данных для фильтрации
+
+    if (semesterFilter !== -1) {
+      filteredResults = filteredResults.filter(programs => programs.semester === semesterFilter.value);
+    }
+    if (programFilter !== null) {
+      filteredResults = filteredResults.filter(programs => programs.id === programFilter.value);
+    }
+    if (semesterFilter !== -1 && programFilter !== null) {
+      filteredResults = filteredResults.filter(programs => programs.semester === semesterFilter.value);
+      filteredResults = filteredResults.filter(programs => programs.id === programFilter.value);
+    }
+
+    setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
+  }
+
+
+
+
+  // функция сброса фильтров
+  const deleteParams = () => {
+    setSemesterFilter(-1);
+    setProgramFilter(null);
+    setSearchResults(dataQR.response.programs);
+  }
+
+  // запись значений из модального окна создания программ
   function handelGetSemester(data) {
     setGetSemester(data);
   }
-
-
-  // запись значений из модального окна создания программ
-
-  function handelGetDirection(data) {
-    setGetDirection(data);
+  function handelGetProgram(data) {
+    setGetProgram(data);
   }
-
   function handelGetSubject(data) {
     setGetSubject(data);
   }
 
+  // функция пагинации
   const loadMore = () => {
     setVisibleItems(prevVisibleItems => prevVisibleItems + 10);
   };
 
-
   // массив для семестров
-
   const dataSemester = [{ value: 1, label: 1 },
   { value: 2, label: 2 },
   { value: 3, label: 3 },
@@ -233,10 +232,8 @@ function CreateQR() {
   { value: 11, label: 11 },
   { value: 12, label: 12 }];
 
-
   return (
     <>
-
       {/* окно загрузки */}
       <Loading active={isLoading} setActive={setIsLoading} />
 
@@ -254,9 +251,7 @@ function CreateQR() {
             <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
           </ul>
         </nav>
-
         <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link>
-
         <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
         <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
       </div>
@@ -299,7 +294,7 @@ function CreateQR() {
                 label: groups.title,
               }))}
             />
-
+            {/* кнопка создания qr */}
             <button className='btn-create-qr' onClick={getQR} disabled={(semester !== null && program !== null && group !== null) ? false : true}>
               Создать QR
               <img src={require('../../img/qr_white.png')} />
@@ -324,6 +319,7 @@ function CreateQR() {
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
               isSearchable={true}
+              isDisabled={semesterFilter ===-1 && programFilter !== null ? true : false}
               options={dataSemester}
             />
             <Select
@@ -332,15 +328,18 @@ function CreateQR() {
               value={programFilter}
               onChange={handleSelectProgramFilter}
               isSearchable={true}
-              options={dataQR.response.programs.map(programs => ({
+              options={semesterFilter !== -1 ? dataQR.response.programs.filter(programs => programs.semester === semesterFilter.value).map(programs => ({
+                value: programs.id,
+                label: programs.title,
+              })) : dataQR.response.programs.map(programs => ({
                 value: programs.id,
                 label: programs.title,
               }))}
             />
             {/* задать заначения фильтрам */}
-            <button className='get-params-qr' type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
+            <button className='get-params-qr' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
             {/* очистить фильтры */}
-            <button className='delete-params-qr' ><FontAwesomeIcon icon={faUndo} /></button>
+            <button className='delete-params-qr' onClick={deleteParams}><FontAwesomeIcon icon={faUndo} /></button>
           </div>
         </div>
       </div>
@@ -368,6 +367,7 @@ function CreateQR() {
               </div>
             </div>
           </div>
+
           {/* кнопки редактирования и удаления программы */}
           <button
             className='qr-setting'
@@ -407,8 +407,8 @@ function CreateQR() {
           <Select
             styles={customStylesModal}
             placeholder="Программа"
-            value={getDirection}
-            onChange={handelGetDirection}
+            value={getProgram}
+            onChange={handelGetProgram}
             isSearchable={true}
             options={dataQR.response.programs.map(programs => ({
               value: programs.id,
@@ -429,6 +429,8 @@ function CreateQR() {
           />
         </div>
       </Modal>
+
+      {/* модальное окно ошибки */}
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
     </>
   )
