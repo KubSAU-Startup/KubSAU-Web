@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const baseUrl = 'https://testbackend.melod1n.dedyn.io';
+const baseUrl_test = 'https://kubsau-testbackend.melod1n.dedyn.io';
+const baseUrl = 'https://kubsau-backend.melod1n.dedyn.io';
 
 
 axios.interceptors.request.use(async request => {
@@ -70,6 +71,22 @@ async function getDataForQR(callback){
 
 }
 
+// async function getDisciplines(){
+//     fetch(`${baseUrl}/disciplines`).then((response) =>{
+//         return response.json();
+//     })
+// }
+
+
+
+async function getDisciplines(callback){
+    const url = `${baseUrl_test}/disciplines`;
+
+    await axios.get(url).then((res) =>{
+        callback(res.data);
+    })
+}
+
 function getTextError(data){
     let textError = '';
     switch (data.code) {
@@ -82,6 +99,7 @@ function getTextError(data){
         case 103:
             textError = 'Сессия истекла!';
             break;
+        
         default:
             textError = 'Неизвестная ошибка!';
     }
@@ -89,6 +107,6 @@ function getTextError(data){
 }
 
 export {
-    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError, getDataForQR
+    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError, getDataForQR, getDisciplines
 }
 

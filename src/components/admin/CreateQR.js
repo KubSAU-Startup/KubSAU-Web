@@ -4,22 +4,20 @@ import './CreateQR.css'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
 import QRCode from 'qrcode';
-import JSZip, { filter } from "jszip";
+import JSZip, { filter, forEach } from "jszip";
 import Modal from '../Modal/Modal';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import { faUndo } from '@fortawesome/free-solid-svg-icons';
-import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getDataForQR } from '../../network';
-import { getTextError } from '../../network';
+import { getDataForQR, getTextError, getDisciplines } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
-import { customStyles, customStylesQR } from '../Select_style/Select_style';
-import { customStylesModal } from '../Select_style/Select_style';
+import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
+import Empty_modal from '../Modal/Empty_modal';
 
 function CreateQR() {
   const [isOpen, setOpen] = useState(false);
+  const [emptyModalActive, setEmptyModalActive] = useState(false);
   const [modalActive, setModalActive] = useState(false);
   const [userStates, setUserStates] = useState({});
 
@@ -27,6 +25,14 @@ function CreateQR() {
   const [searchResults, setSearchResults] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
+
+  const [addActive, setAddActive] = useState(false);
+  const [editActive, setEditActive] = useState(false);
+  const [dataDisciplines, setDataDisciplines] = useState({
+    response: [],
+    error: null,
+    success: true
+  })
 
   const [dataQR, setDataQR] = useState({
     response: {
@@ -51,6 +57,8 @@ function CreateQR() {
   const [getProgram, setGetProgram] = useState(null);
   const [getSubject, setGetSubject] = useState(null);
 
+  const [getTypeOfWork, setTypeOfWork] = useState(null);
+
   const [visibleItems, setVisibleItems] = useState(10);
   const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
@@ -68,6 +76,18 @@ function CreateQR() {
         setSearchResults(res.response.programs);
         setIsLoading(false);
       }
+    })
+
+    getDisciplines((res) => {
+      // if (res.error) {
+      //   setTextError(getTextError(res.error));
+      //   setErrorActive(true);
+      //   setIsLoading(false);
+
+      // } else {
+      setDataDisciplines(res);
+      setIsLoading(false);
+      // }
     })
 
   }, []);
@@ -143,7 +163,7 @@ function CreateQR() {
       if (gr.id === group.value) {
 
         for (const stud of gr.students) {
-          const studentFolder = folder.folder(`${stud.firstName} ${stud.lastName} ${stud.middleName}`);
+          const studentFolder = folder.folder(`${stud.lastName} ${stud.firstName} ${stud.middleName}`);
 
           for (const prog of dataQR.response.programs) {
             if (prog.id === program.value) {
@@ -211,6 +231,11 @@ function CreateQR() {
   }
   function handelGetSubject(data) {
     setGetSubject(data);
+  }
+
+  // запись значений типа работ
+  function handelGetTypeOfWork(data) {
+    setTypeOfWork(data);
   }
 
   // функция пагинации
@@ -319,7 +344,7 @@ function CreateQR() {
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
               isSearchable={true}
-              isDisabled={semesterFilter ===-1 && programFilter !== null ? true : false}
+              isDisabled={semesterFilter === -1 && programFilter !== null ? true : false}
               options={dataSemester}
             />
             <Select
@@ -345,7 +370,7 @@ function CreateQR() {
       </div>
 
       {/* кнопка вызова модального окна для создания программы */}
-      <button className='add-qr-group' onClick={() => setModalActive(true)}>
+      <button className='add-qr-group' onClick={() => { setEmptyModalActive(true); setAddActive(true); }}>
         <FontAwesomeIcon icon={faPlusCircle} />
       </button>
 
@@ -371,12 +396,12 @@ function CreateQR() {
           {/* кнопки редактирования и удаления программы */}
           <button
             className='qr-setting'
-            onClick={() => handleSettingClick(programs.id)}
+            onClick={() => { handleSettingClick(programs.id) }}
           >
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
           <div className={`button-edit-delete ${userStates[programs.id] ? 'active' : ''}`}>
-            <button>
+            <button onClick={() => { setEditActive(true); setEmptyModalActive(true); }}>
               <img src={require('../../img/edit.png')} alt='edit' />
             </button>
             <button>
@@ -394,40 +419,87 @@ function CreateQR() {
       )}
 
       {/* модальное окно создания или редактирования программы */}
-      <Modal active={modalActive} setActive={setModalActive}>
+      <Empty_modal active={emptyModalActive} setActive={setEmptyModalActive}>
         <div className='modal-qr'>
-          <Select
-            styles={customStylesModal}
-            placeholder="Семестр"
-            value={getSemester}
-            onChange={handelGetSemester}
-            isSearchable={true}
-            options={dataSemester}
-          />
-          <Select
-            styles={customStylesModal}
-            placeholder="Программа"
-            value={getProgram}
-            onChange={handelGetProgram}
-            isSearchable={true}
-            options={dataQR.response.programs.map(programs => ({
-              value: programs.id,
-              label: programs.title
-            }))}
-          />
-          <Select
-            styles={customStylesModal}
-            placeholder="Дисциплины"
-            value={getSubject}
-            onChange={handelGetSubject}
-            isSearchable={true}
-            isMulti={true}
-            options={dataQR.response.programs.map(programs => ({
-              value: programs.id,
-              label: programs.title
-            }))}
-          />
+          <>
+            {addActive && (<>
+              <Select
+                styles={customStylesModal}
+                placeholder="Семестр"
+                value={getSemester}
+                onChange={handelGetSemester}
+                isSearchable={true}
+                options={dataSemester}
+              />
+              <Select
+                styles={customStylesModal}
+                placeholder="Программа"
+                value={getProgram}
+                onChange={handelGetProgram}
+                isSearchable={true}
+                options={dataQR.response.programs.map(programs => ({
+                  value: programs.id,
+                  label: programs.title
+                }))}
+              />
+              <Select
+                styles={customStylesModal}
+                placeholder="Дисциплины"
+                value={getSubject}
+                onChange={handelGetSubject}
+                isSearchable={true}
+                isMulti={true}
+                options={dataDisciplines.response.map(response => ({
+                  value: response.id,
+                  label: response.title
+                }))}
+              />
+            </>)}
+            {editActive && (
+              <p>lftret</p>)
+            }
+
+          </>
         </div>
+
+        <div className='modal-button'>
+          <button onClick={() => setModalActive(true)}>Далее</button>
+          <button onClick={() => { setEmptyModalActive(false); setAddActive(false); setEditActive(false)}}>Отмена</button>
+        </div>
+      </Empty_modal>
+      <Modal active={modalActive} setActive={setModalActive}>
+        <b className='h-discip'>Задайте тип работы выбранным дисциплинам</b>
+
+        {getSubject !== null ? getSubject.map((subject) => (
+          <div className='content-discip' key={subject.value}>
+            <p>{subject.label}</p>
+            <Select
+              styles={customStylesTypeOfWork}
+              placeholder="Тип работы"
+              value={getTypeOfWork[subject.value] || null}
+              onChange={(selectedOption) => handelGetTypeOfWork(selectedOption, subject.value)}
+              isSearchable={true}
+              options={[
+                {
+                  value: 1,
+                  label: "Практика"
+                },
+                {
+                  value: 2,
+                  label: "Курсовая работа"
+                },
+                {
+                  value: 3,
+                  label: "Контрольная работа"
+                }
+              ]}
+            />
+          </div>
+        )) : ''}
+
+
+
+
       </Modal>
 
       {/* модальное окно ошибки */}

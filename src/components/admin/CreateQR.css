@@ -181,3 +181,9 @@
     border-color: #1e971c;
 }
 
+.h-discip{
+    margin-bottom: 200px;
+}
+.content-discip{
+    display: flex;
+}
