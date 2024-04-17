@@ -182,8 +182,13 @@
 }
 
 .h-discip{
-    margin-bottom: 200px;
+    display: block;
+    margin-bottom: 20px;
+    font-size: 18px;
 }
 .content-discip{
+    margin-top: 0px;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

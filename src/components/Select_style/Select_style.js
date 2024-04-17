@@ -115,7 +115,7 @@ const customStyles = {
     control: (provided) => ({
       ...provided,
 
-      width: '200px',
+      width: '220px',
       border: 'none',
       boxShadow: '0 0 0 2px green',
       margin: '10px 0'
