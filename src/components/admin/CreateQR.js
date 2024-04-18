@@ -44,6 +44,7 @@ function CreateQR() {
   });
 
   const [workTypes, setWorkTypes] = useState({});
+  const [editWorkTypes, setEditWorkTypes] = useState({});
 
   const [errorActive, setErrorActive] = useState(false);
   const [textError, setTextError] = useState('');
@@ -60,6 +61,10 @@ function CreateQR() {
   const [getSubject, setGetSubject] = useState(null);
 
   const [getProgId, setGetProgId] = useState(null);
+
+  const [getEditSemester, setGetEditSemester] = useState(null);
+  const [getEditProgram, setGetEditProgram] = useState(null);
+  const [getEditSubject, setGetEditSubject] = useState(null);
 
   const [visibleItems, setVisibleItems] = useState(10);
   const [isPaginationVisible, setIsPaginationVisible] = useState(true);
@@ -233,6 +238,38 @@ function CreateQR() {
     setGetSubject(data);
   }
 
+  function handelGetEditSemester(data) {
+    setGetEditSemester(data);
+  }
+  function handelGetEditProgram(data) {
+    setGetEditProgram(data);
+  }
+  function handelGetEditSubject(data) {
+    setGetEditSubject(data);
+  }
+
+  const editPrograms = () => {
+    setEditActive(true);
+    setEmptyModalActive(true);
+    setGetEditSemester(dataQR.response.programs.find(program => program.id === getProgId) ?
+    {
+      value: dataQR.response.programs.find(program => program.id === getProgId).semester,
+      label: dataQR.response.programs.find(program => program.id === getProgId).semester
+    } : null);
+    setGetEditProgram(dataQR.response.programs.find(program => program.id === getProgId) ?
+    {
+      value: dataQR.response.programs.find(program => program.id === getProgId).id,
+      label: dataQR.response.programs.find(program => program.id === getProgId).title
+    } : null);
+    setGetEditSubject(dataQR.response.programs.find(program => program.id === getProgId) ?
+    dataQR.response.programs.find(program => program.id === getProgId).disciplines.map(discipline => (
+      {
+        value: discipline.id,
+        label: discipline.title
+      }
+    )) : null);
+  }
+
   // функция пагинации
   const loadMore = () => {
     setVisibleItems(prevVisibleItems => prevVisibleItems + 10);
@@ -240,11 +277,15 @@ function CreateQR() {
 
   // задать тип работы для дисциплин
   const handleWorkTypeChange = (selectedOption, subjectId) => {
-    setWorkTypes(prevWorkTypes => ({
+    addActive && (setWorkTypes(prevWorkTypes => ({
       ...prevWorkTypes,
       [subjectId]: selectedOption
-    }));
-    console.log('Выбранные типы работ:', workTypes);
+    })));
+
+    editActive && (setEditWorkTypes(prevWorkTypes => ({
+      ...prevWorkTypes,
+      [subjectId]: selectedOption
+    })));
   }
 
   // массив для семестров
@@ -405,7 +446,7 @@ function CreateQR() {
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
           <div className={`button-edit-delete ${userStates[programs.id] ? 'active' : ''}`}>
-            <button onClick={() => { setEditActive(true); setEmptyModalActive(true); }}>
+            <button onClick={editPrograms}>
               <img src={require('../../img/edit.png')} alt='edit' />
             </button>
             <button>
@@ -464,12 +505,8 @@ function CreateQR() {
                 <Select
                   styles={customStylesModal}
                   placeholder="Семестр"
-                  value={dataQR.response.programs.find(program => program.id === getProgId) ?
-                    {
-                      value: dataQR.response.programs.find(program => program.id === getProgId).semester,
-                      label: dataQR.response.programs.find(program => program.id === getProgId).semester
-                    } : null}
-                  onChange={handelGetSemester}
+                  value={getEditSemester}
+                  onChange={handelGetEditSemester}
                   isSearchable={true}
                   options={dataSemester}
                 />
@@ -477,12 +514,8 @@ function CreateQR() {
                 <Select
                   styles={customStylesModal}
                   placeholder="Программа"
-                  value={dataQR.response.programs.find(program => program.id === getProgId) ?
-                    {
-                      value: dataQR.response.programs.find(program => program.id === getProgId).id,
-                      label: dataQR.response.programs.find(program => program.id === getProgId).title
-                    } : null}
-                  onChange={handelGetProgram}
+                  value={getEditProgram}
+                  onChange={handelGetEditProgram}
                   isSearchable={true}
                   options={dataQR.response.programs.map(programs => ({
                     value: programs.id,
@@ -492,14 +525,8 @@ function CreateQR() {
                 <Select
                   styles={customStylesModal}
                   placeholder="Дисциплины"
-                  value={dataQR.response.programs.find(program => program.id === getProgId) ?
-                    dataQR.response.programs.find(program => program.id === getProgId).disciplines.map(discipline => (
-                      {
-                        value: discipline.id,
-                        label: discipline.title
-                      }
-                    )) : null}
-                  onChange={handelGetSubject}
+                  value={getEditSubject}
+                  onChange={handelGetEditSubject}
                   isSearchable={true}
                   isMulti={true}
                   options={dataDisciplines.response.map(response => ({
@@ -521,8 +548,8 @@ function CreateQR() {
       </Empty_modal>
       <Modal active={modalActive} setActive={setModalActive}>
         <b className='h-discip'>Задайте тип работы выбранным дисциплинам</b>
-
-        {getSubject !== null ? getSubject.map((subject) => (
+        
+        {addActive && (getSubject !== null ? getSubject.map((subject) => (
           <div className='content-discip' key={subject.value}>
             <p>{subject.label}</p>
             <Select
@@ -547,7 +574,35 @@ function CreateQR() {
               ]}
             />
           </div>
-        )) : ''}
+        )) : '')}
+
+        {editActive && (getEditSubject !== null ? getEditSubject.map((subject) => (
+          <div className='content-discip' key={subject.value}>
+            <p>{subject.label}</p>
+            <Select
+              styles={customStylesTypeOfWork}
+              placeholder="Тип работы"
+              value={editWorkTypes[subject.value]}
+              onChange={(selectedOption) => handleWorkTypeChange(selectedOption, subject.options)}
+              isSearchable={true}
+              options={[
+                {
+                  value: 1,
+                  label: "Практика"
+                },
+                {
+                  value: 2,
+                  label: "Курсовая работа"
+                },
+                {
+                  value: 3,
+                  label: "Контрольная работа"
+                }
+              ]}
+            />
+          </div>
+        )) : '')}
+        
 
       </Modal>
 

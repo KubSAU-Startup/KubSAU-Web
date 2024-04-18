@@ -63,7 +63,7 @@ async function getDataAdminJournal(parameter, callback) {
 }
 
 async function getDataForQR(callback){
-    const url = `${baseUrl}/qr`;
+    const url = `${baseUrl_test}/qr`;
 
     await axios.get(url).then((res)=>{
         callback(res.data);
