@@ -9,7 +9,7 @@ import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getDataForQR, getTextError, getDisciplines, getGroups } from '../../network';
+import { getDataForQR, getTextError, getDisciplines, getGroups, getStudents } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
@@ -172,9 +172,9 @@ function CreateQR() {
   }
 
   // функция создание qr
-  const generateQRCode = async (studentId, subjectId) => {
+  const generateQRCode = async (studentId, subjectId, editable) => {
 
-    const qrContent = `${studentId},${subjectId}`;
+    const qrContent = `${studentId},${subjectId},${editable}`;
     const qrUrl = await QRCode.toDataURL(qrContent);
     return qrUrl;
   };
@@ -187,27 +187,30 @@ function CreateQR() {
     const zip = new JSZip();
     const folder = zip.folder(`${group.label}`);
 
-    for (const gr of groupQR.response) {
-      if (gr.id === group.value) {
+    getStudents(group.value, (res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+        setIsLoading(false);
 
-        for (const stud of gr.students) {
-          const studentFolder = folder.folder(`${stud.lastName} ${stud.firstName} ${stud.middleName}`);
+      } else {
+        setStudQR(res);
+      }
+    })
 
-          for (const prog of programQR.response) {
-            if (prog.id === program.value) {
-
-              for (const disc of prog.disciplines) {
-                const qrCodeUrl = await generateQRCode(stud.id, disc.id);
-                const response = await fetch(qrCodeUrl);
-                const qrCodeBlob = await response.blob();
-
-                studentFolder.file(`${disc.title}.png`, qrCodeBlob);
-              }
-            }
-          }
+    for (const stud of studQR.response) {
+      const studentFolder = folder.folder(`${stud.lastName} ${stud.firstName} ${stud.middleName}`);
+      const discResp = dataDisciplines.response.filter(discipline => discipline.programId === program.value);
+      for (const disc of discResp) {
+        for (const d of disc.disciplines) {
+          const qrCodeUrl = await generateQRCode(stud.id, d.discipline.id, d.workType.isEditable);
+          const response = await fetch(qrCodeUrl);
+          const qrCodeBlob = await response.blob();
+          studentFolder.file(`${d.discipline.title}.png`, qrCodeBlob);
         }
       }
     }
+    
     zip.generateAsync({ type: "blob" }).then(function (content) {
       saveAs(content, `${group.label}.zip`);
     });
