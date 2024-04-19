@@ -9,7 +9,7 @@ import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getDataForQR, getTextError, getDisciplines } from '../../network';
+import { getDataForQR, getTextError, getDisciplines, getGroups } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
@@ -32,13 +32,22 @@ function CreateQR() {
     response: [],
     error: null,
     success: true
-  })
+  });
 
-  const [dataQR, setDataQR] = useState({
-    response: {
-      programs: [],
-      groups: []
-    },
+  const [programQR, setProgramQR] = useState({
+    response: [],
+    error: null,
+    success: true
+  });
+
+  const [groupQR, setGroupQR] = useState({
+    response: [],
+    error: null,
+    success: true
+  });
+
+  const [studQR, setStudQR] = useState({
+    response: [],
     error: null,
     success: true
   });
@@ -79,32 +88,43 @@ function CreateQR() {
         setIsLoading(false);
 
       } else {
-        setDataQR(res);
-        setSearchResults(res.response.programs);
+        setProgramQR(res);
+        setSearchResults(res.response);
         setIsLoading(false);
       }
     })
 
     getDisciplines((res) => {
-      // if (res.error) {
-      //   setTextError(getTextError(res.error));
-      //   setErrorActive(true);
-      //   setIsLoading(false);
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+        setIsLoading(false);
 
-      // } else {
-      setDataDisciplines(res);
-      setIsLoading(false);
-      // }
+      } else {
+        setDataDisciplines(res);
+        setIsLoading(false);
+      }
     })
 
+    getGroups((res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+        setIsLoading(false);
+
+      } else {
+        setGroupQR(res);
+        setIsLoading(false);
+      }
+    })
   }, []);
 
   //поиск программ
   const handleChange = event => {
     setVisibleItems(10);
     setSearchTerm(event.target.value);
-    const results = dataQR.response.programs.filter(program =>
-      program.title.toLowerCase().includes(event.target.value.toLowerCase())
+    const results = programQR.response.filter(response =>
+      response.title.toLowerCase().includes(event.target.value.toLowerCase())
     );
     setSearchResults(results);
   };
@@ -167,13 +187,13 @@ function CreateQR() {
     const zip = new JSZip();
     const folder = zip.folder(`${group.label}`);
 
-    for (const gr of dataQR.response.groups) {
+    for (const gr of groupQR.response) {
       if (gr.id === group.value) {
 
         for (const stud of gr.students) {
           const studentFolder = folder.folder(`${stud.lastName} ${stud.firstName} ${stud.middleName}`);
 
-          for (const prog of dataQR.response.programs) {
+          for (const prog of programQR.response) {
             if (prog.id === program.value) {
 
               for (const disc of prog.disciplines) {
@@ -204,7 +224,7 @@ function CreateQR() {
 
   // функция фильтрации данных
   const getParams = () => {
-    let filteredResults = [...dataQR.response.programs]; // Создаем копию исходных данных для фильтрации
+    let filteredResults = [...programQR.response]; // Создаем копию исходных данных для фильтрации
 
     if (semesterFilter !== -1) {
       filteredResults = filteredResults.filter(programs => programs.semester === semesterFilter.value);
@@ -224,7 +244,7 @@ function CreateQR() {
   const deleteParams = () => {
     setSemesterFilter(-1);
     setProgramFilter(null);
-    setSearchResults(dataQR.response.programs);
+    setSearchResults(programQR.response);
   }
 
   // запись значений из модального окна создания программ
@@ -251,23 +271,23 @@ function CreateQR() {
   const editPrograms = () => {
     setEditActive(true);
     setEmptyModalActive(true);
-    setGetEditSemester(dataQR.response.programs.find(program => program.id === getProgId) ?
-    {
-      value: dataQR.response.programs.find(program => program.id === getProgId).semester,
-      label: dataQR.response.programs.find(program => program.id === getProgId).semester
-    } : null);
-    setGetEditProgram(dataQR.response.programs.find(program => program.id === getProgId) ?
-    {
-      value: dataQR.response.programs.find(program => program.id === getProgId).id,
-      label: dataQR.response.programs.find(program => program.id === getProgId).title
-    } : null);
-    setGetEditSubject(dataQR.response.programs.find(program => program.id === getProgId) ?
-    dataQR.response.programs.find(program => program.id === getProgId).disciplines.map(discipline => (
-      {
-        value: discipline.id,
-        label: discipline.title
-      }
-    )) : null);
+    // setGetEditSemester(programQR.response.find(program => program.id === getProgId) ?
+    //   {
+    //     value: dataQR.response.programs.find(program => program.id === getProgId).semester,
+    //     label: dataQR.response.programs.find(program => program.id === getProgId).semester
+    //   } : null);
+    // setGetEditProgram(programQR.response.find(program => program.id === getProgId) ?
+    //   {
+    //     value: dataQR.response.programs.find(program => program.id === getProgId).id,
+    //     label: dataQR.response.programs.find(program => program.id === getProgId).title
+    //   } : null);
+    // setGetEditSubject(dataQR.response.programs.find(program => program.id === getProgId) ?
+    //   dataQR.response.programs.find(program => program.id === getProgId).disciplines.map(discipline => (
+    //     {
+    //       value: discipline.id,
+    //       label: discipline.title
+    //     }
+    //   )) : null);
   }
 
   // функция пагинации
@@ -347,9 +367,9 @@ function CreateQR() {
               onChange={handleSelectProgram}
               isSearchable={true}
               isDisabled={semester !== -1 ? false : true}
-              options={dataQR.response.programs.filter(programs => programs.semester === semester.value).map(programs => ({
-                value: programs.id,
-                label: programs.title,
+              options={programQR.response.filter(response => response.semester === semester.value).map(response => ({
+                value: response.id,
+                label: response.title,
               }))}
             />
             <Select
@@ -359,7 +379,7 @@ function CreateQR() {
               onChange={handleSelectGroup}
               isSearchable={true}
               isDisabled={(semester !== -1 && program !== null) ? false : true}
-              options={dataQR.response.groups.map(groups => ({
+              options={groupQR.response.map(groups => ({
                 value: groups.id,
                 label: groups.title,
               }))}
@@ -398,12 +418,12 @@ function CreateQR() {
               value={programFilter}
               onChange={handleSelectProgramFilter}
               isSearchable={true}
-              options={semesterFilter !== -1 ? dataQR.response.programs.filter(programs => programs.semester === semesterFilter.value).map(programs => ({
-                value: programs.id,
-                label: programs.title,
-              })) : dataQR.response.programs.map(programs => ({
-                value: programs.id,
-                label: programs.title,
+              options={semesterFilter !== -1 ? programQR.response.filter(response => response.semester === semesterFilter.value).map(response => ({
+                value: response.id,
+                label: response.title,
+              })) : programQR.response.map(response => ({
+                value: response.id,
+                label: response.title,
               }))}
             />
             {/* задать заначения фильтрам */}
@@ -420,20 +440,24 @@ function CreateQR() {
       </button>
 
       {/* все созданные программы */}
-      {searchResults.slice(0, visibleItems).map(programs => (
-        <div className='cart-qr-group' key={programs.id}>
+      {searchResults.slice(0, visibleItems).map(value => (
+        <div className='cart-qr-group' key={value.id}>
           <div className='data-qr'>
             <div className='qr1'>
-              <p><span>Семестр: </span>{programs.semester}</p>
-              <p><span>Программа: </span>{programs.title}</p>
+              <p><span>Семестр: </span>{value.semester}</p>
+              <p><span>Программа: </span>{value.title}</p>
             </div>
 
             <div className='qr2'>
               <span>Дисциплины: </span>
               <div className='dicip'>
-                {programs.disciplines.map(disciplines => (
-                  <p> {disciplines.title}</p>
-                ))}
+                {dataDisciplines.response
+                  .filter(resp => resp.programId === value.id)
+                  .map(resp => (
+                    resp.disciplines && resp.disciplines.map(disc => (
+                      <p key={disc.discipline.id}>{disc.discipline.title}</p>
+                    ))
+                  ))}
               </div>
             </div>
           </div>
@@ -441,11 +465,11 @@ function CreateQR() {
           {/* кнопки редактирования и удаления программы */}
           <button
             className='qr-setting'
-            onClick={() => { handleSettingClick(programs.id) }}
+            onClick={() => { handleSettingClick(value.id) }}
           >
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
-          <div className={`button-edit-delete ${userStates[programs.id] ? 'active' : ''}`}>
+          <div className={`button-edit-delete ${userStates[value.id] ? 'active' : ''}`}>
             <button onClick={editPrograms}>
               <img src={require('../../img/edit.png')} alt='edit' />
             </button>
@@ -482,9 +506,9 @@ function CreateQR() {
                 value={getProgram}
                 onChange={handelGetProgram}
                 isSearchable={true}
-                options={dataQR.response.programs.map(programs => ({
-                  value: programs.id,
-                  label: programs.title
+                options={programQR.response.map(response => ({
+                  value: response.id,
+                  label: response.title
                 }))}
               />
               <Select
@@ -517,11 +541,12 @@ function CreateQR() {
                   value={getEditProgram}
                   onChange={handelGetEditProgram}
                   isSearchable={true}
-                  options={dataQR.response.programs.map(programs => ({
-                    value: programs.id,
-                    label: programs.title
+                  options={programQR.response.map(response => ({
+                    value: response.id,
+                    label: response.title
                   }))}
                 />
+
                 <Select
                   styles={customStylesModal}
                   placeholder="Дисциплины"
@@ -548,7 +573,7 @@ function CreateQR() {
       </Empty_modal>
       <Modal active={modalActive} setActive={setModalActive}>
         <b className='h-discip'>Задайте тип работы выбранным дисциплинам</b>
-        
+
         {addActive && (getSubject !== null ? getSubject.map((subject) => (
           <div className='content-discip' key={subject.value}>
             <p>{subject.label}</p>
@@ -602,7 +627,7 @@ function CreateQR() {
             />
           </div>
         )) : '')}
-        
+
 
       </Modal>
 

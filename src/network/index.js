@@ -10,7 +10,7 @@ axios.interceptors.request.use(async request => {
 })
 
 async function loginAxios(loginInfo, callback) {
-   const url = `${baseUrl}/auth`
+    const url = `${baseUrl}/auth`
 
     console.log(url)
 
@@ -30,8 +30,8 @@ async function checkAccount(callback) {
     await axios.get(url).then((res) => {
         callback(res.data)
     })
-    
-   
+
+
 }
 
 async function getDataFilters(callback) {
@@ -62,32 +62,56 @@ async function getDataAdminJournal(parameter, callback) {
     })
 }
 
-async function getDataForQR(callback){
-    const url = `${baseUrl_test}/qr`;
+async function getDataForQR(callback) {
+    const url = `${baseUrl_test}/programs`;
 
-    await axios.get(url).then((res)=>{
+    await axios.get(url).then((res) => {
         callback(res.data);
     })
 
 }
 
-// async function getDisciplines(){
-//     fetch(`${baseUrl}/disciplines`).then((response) =>{
-//         return response.json();
+// async function getDisciplinesByPrograms(progId, callback) {
+//     const url = `${baseUrl_test}/qr/programs/disciplines`;
+//     await axios.get(url, {
+//         params: {
+//             programIds: progId,
+//             extended: true
+//         }
+//     }).then((res) => {
+//         callback(res.data);
 //     })
 // }
 
+async function getDisciplines(callback) {
+    const url = `${baseUrl_test}/qr/programs/disciplines`;
 
-
-async function getDisciplines(callback){
-    const url = `${baseUrl_test}/disciplines`;
-
-    await axios.get(url).then((res) =>{
+    await axios.get(url, {
+                params: {
+                    extended: true
+                }
+            }).then((res) => {
         callback(res.data);
     })
 }
 
-function getTextError(data){
+async function getGroups(callback) {
+    const url = `${baseUrl_test}/qr/groups`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    })
+}
+
+async function getStudents(groupId, callback) {
+    const url = `${baseUrl_test}/qr/groups/${groupId}/students`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    })
+}
+
+function getTextError(data) {
     let textError = '';
     switch (data.code) {
         case 101:
@@ -99,7 +123,7 @@ function getTextError(data){
         case 103:
             textError = 'Сессия истекла!';
             break;
-        
+
         default:
             textError = 'Неизвестная ошибка!';
     }
@@ -107,6 +131,6 @@ function getTextError(data){
 }
 
 export {
-    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError, getDataForQR, getDisciplines
+    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError, getDataForQR, getDisciplines, getGroups, getStudents
 }
 
