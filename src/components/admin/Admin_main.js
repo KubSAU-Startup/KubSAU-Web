@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './Admin_main.css';
 import Admin_header from './Admin_header';
-import { getDataFilters } from '../../network';
-import { getDataAdminJournal } from '../../network';
+import { getDataFilters, getAllDepartments, getDataAdminJournal, getTextError } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
-import { getTextError } from '../../network';
 import { customStyles } from '../Select_style/Select_style';
 import Loading from '../Modal/Loading';
 
@@ -41,6 +39,13 @@ function Admin_main() {
             error: null,
             success: true
         }
+    });
+
+    // переменная для получения списка кафедр
+    const [allDepartments, setAllDepartments] = useState({
+        response: [],
+        error: null,
+        success: true
     });
 
     // переменная поиска
@@ -158,6 +163,17 @@ function Admin_main() {
             } else {
                 setMainData(data)
                 setSearchResults(data.response.journal);
+                setIsLoading(false);
+            }
+        })
+
+        getAllDepartments((data) => {
+            if (data.error) {
+                setTextError(getTextError(data.error));
+                setErrorActive(true);
+                setIsLoading(false);
+            } else {
+                setAllDepartments(data)
                 setIsLoading(false);
             }
         })
@@ -283,7 +299,7 @@ function Admin_main() {
                         <div className='col2'>
                             <p><span>Дисциплина:</span> {journal.discipline.title}</p>
                             <p><span>Преподаватель:</span> {journal.teacher.lastName} {journal.teacher.firstName} {journal.teacher.middleName}</p>
-                            <p><span>Кафедра:</span> {journal.teacher.fullName}</p>
+                            <p><span>Кафедра:</span> {allDepartments.response.filter(res=>res.id === journal.teacher.departmentId).map(result=>result.title)}</p>
                             {journal.work.title && <p><span>Название:</span> {journal.work.title}</p>}
 
                         </div>

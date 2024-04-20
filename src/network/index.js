@@ -62,6 +62,15 @@ async function getDataAdminJournal(parameter, callback) {
     })
 }
 
+async function getAllDepartments(callback) {
+    const url = `${baseUrl}/departments`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    })
+
+}
+
 async function getDataForQR(callback) {
     const url = `${baseUrl_test}/programs`;
 
@@ -83,14 +92,14 @@ async function getDataForQR(callback) {
 //     })
 // }
 
-async function getDisciplines(callback) {
+async function getDisciplinesForPrograms(callback) {
     const url = `${baseUrl_test}/qr/programs/disciplines`;
 
     await axios.get(url, {
-                params: {
-                    extended: true
-                }
-            }).then((res) => {
+        params: {
+            extended: true
+        }
+    }).then((res) => {
         callback(res.data);
     })
 }
@@ -105,6 +114,22 @@ async function getGroups(callback) {
 
 async function getStudents(groupId, callback) {
     const url = `${baseUrl_test}/qr/groups/${groupId}/students`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    })
+}
+
+async function getAllDisciplines(callback) {
+    const url = `${baseUrl_test}/disciplines`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    })
+}
+
+async function getAllWorkTypes(callback) {
+    const url = `${baseUrl_test}/worktypes`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -131,6 +156,8 @@ function getTextError(data) {
 }
 
 export {
-    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError, getDataForQR, getDisciplines, getGroups, getStudents
+    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError,
+    getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
+    getAllWorkTypes, getAllDepartments
 }
 

@@ -9,7 +9,7 @@ import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getDataForQR, getTextError, getDisciplines, getGroups, getStudents } from '../../network';
+import { getDataForQR, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
@@ -29,6 +29,18 @@ function CreateQR() {
   const [addActive, setAddActive] = useState(false);
   const [editActive, setEditActive] = useState(false);
   const [dataDisciplines, setDataDisciplines] = useState({
+    response: [],
+    error: null,
+    success: true
+  });
+
+  const [allDisciplines, setAllDisciplines] = useState({
+    response: [],
+    error: null,
+    success: true
+  });
+
+  const [allWorkTypes, setAllWorkTypes] = useState({
     response: [],
     error: null,
     success: true
@@ -94,7 +106,7 @@ function CreateQR() {
       }
     })
 
-    getDisciplines((res) => {
+    getDisciplinesForPrograms((res) => {
       if (res.error) {
         setTextError(getTextError(res.error));
         setErrorActive(true);
@@ -114,6 +126,30 @@ function CreateQR() {
 
       } else {
         setGroupQR(res);
+        setIsLoading(false);
+      }
+    })
+
+    getAllDisciplines((res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+        setIsLoading(false);
+
+      } else {
+        setAllDisciplines(res);
+        setIsLoading(false);
+      }
+    })
+
+    getAllWorkTypes((res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+        setIsLoading(false);
+
+      } else {
+        setAllWorkTypes(res);
         setIsLoading(false);
       }
     })
@@ -210,7 +246,7 @@ function CreateQR() {
         }
       }
     }
-    
+
     zip.generateAsync({ type: "blob" }).then(function (content) {
       saveAs(content, `${group.label}.zip`);
     });
@@ -274,23 +310,57 @@ function CreateQR() {
   const editPrograms = () => {
     setEditActive(true);
     setEmptyModalActive(true);
-    // setGetEditSemester(programQR.response.find(program => program.id === getProgId) ?
-    //   {
-    //     value: dataQR.response.programs.find(program => program.id === getProgId).semester,
-    //     label: dataQR.response.programs.find(program => program.id === getProgId).semester
-    //   } : null);
-    // setGetEditProgram(programQR.response.find(program => program.id === getProgId) ?
-    //   {
-    //     value: dataQR.response.programs.find(program => program.id === getProgId).id,
-    //     label: dataQR.response.programs.find(program => program.id === getProgId).title
-    //   } : null);
-    // setGetEditSubject(dataQR.response.programs.find(program => program.id === getProgId) ?
-    //   dataQR.response.programs.find(program => program.id === getProgId).disciplines.map(discipline => (
-    //     {
-    //       value: discipline.id,
-    //       label: discipline.title
-    //     }
-    //   )) : null);
+    setGetEditSemester(programQR.response.find(program => program.id === getProgId) ?
+      {
+        value: programQR.response.find(program => program.id === getProgId).semester,
+        label: programQR.response.find(program => program.id === getProgId).semester
+      } : null);
+    setGetEditProgram(programQR.response.find(program => program.id === getProgId) ?
+      {
+        value: programQR.response.find(program => program.id === getProgId).id,
+        label: programQR.response.find(program => program.id === getProgId).title
+      } : null);
+    setGetEditSubject(dataDisciplines.response
+      .filter(resp => resp.programId === getProgId) ?
+      dataDisciplines.response
+        .filter(resp => resp.programId === getProgId)
+        .flatMap(resp =>
+          resp.disciplines && resp.disciplines.map(disc => ({
+            value: disc.discipline.id,
+            label: disc.discipline.title
+          }))
+        ) : null
+    );
+
+    setEditWorkTypes(dataDisciplines.response
+      .filter(resp => resp.programId === getProgId) ?
+      dataDisciplines.response
+        .filter(resp => resp.programId === getProgId)
+        .flatMap(resp =>
+          resp.disciplines && resp.disciplines.map(disc => ({
+            value: disc.workType.id,
+            label: disc.workType.title
+          }))
+        ) : null)
+
+    setEditWorkTypes(
+      dataDisciplines.response.filter(resp => resp.programId === getProgId) ? () => {
+        let result = {};
+        console.log(dataDisciplines.response)
+        dataDisciplines.response
+        .filter(resp => resp.programId === getProgId)
+        .forEach((resp) => {
+          resp.disciplines && resp.disciplines.forEach((disc) => {
+            result[disc.discipline.id] = {
+              value: disc.workType.id,
+              label: disc.workType.title
+            }
+          })
+        })
+        return result
+      } : null
+    )
+
   }
 
   // функция пагинации
@@ -305,10 +375,12 @@ function CreateQR() {
       [subjectId]: selectedOption
     })));
 
-    editActive && (setEditWorkTypes(prevWorkTypes => ({
-      ...prevWorkTypes,
-      [subjectId]: selectedOption
-    })));
+    editActive && (
+
+      setEditWorkTypes(prevWorkTypes => ({
+        ...prevWorkTypes,
+        [subjectId]: selectedOption
+      })));
   }
 
   // массив для семестров
@@ -521,7 +593,7 @@ function CreateQR() {
                 onChange={handelGetSubject}
                 isSearchable={true}
                 isMulti={true}
-                options={dataDisciplines.response.map(response => ({
+                options={allDisciplines.response.map(response => ({
                   value: response.id,
                   label: response.title
                 }))}
@@ -557,7 +629,7 @@ function CreateQR() {
                   onChange={handelGetEditSubject}
                   isSearchable={true}
                   isMulti={true}
-                  options={dataDisciplines.response.map(response => ({
+                  options={allDisciplines.response.map(response => ({
                     value: response.id,
                     label: response.title
                   }))}
@@ -586,50 +658,33 @@ function CreateQR() {
               value={workTypes[subject.value]}
               onChange={(selectedOption) => handleWorkTypeChange(selectedOption, subject.options)}
               isSearchable={true}
-              options={[
-                {
-                  value: 1,
-                  label: "Практика"
-                },
-                {
-                  value: 2,
-                  label: "Курсовая работа"
-                },
-                {
-                  value: 3,
-                  label: "Контрольная работа"
-                }
-              ]}
+              options={allWorkTypes.response.map(res => ({
+                value: res.id,
+                label: res.title
+              }
+              ))}
             />
           </div>
         )) : '')}
 
         {editActive && (getEditSubject !== null ? getEditSubject.map((subject) => (
           <div className='content-discip' key={subject.value}>
+            
             <p>{subject.label}</p>
             <Select
               styles={customStylesTypeOfWork}
               placeholder="Тип работы"
-              value={editWorkTypes[subject.value]}
-              onChange={(selectedOption) => handleWorkTypeChange(selectedOption, subject.options)}
+              value={editWorkTypes[subject.value]} // Используйте значение из editWorkTypes для соответствующей дисциплины
+              onChange={(selectedOption) => handleWorkTypeChange(selectedOption, subject.value)}
               isSearchable={true}
-              options={[
-                {
-                  value: 1,
-                  label: "Практика"
-                },
-                {
-                  value: 2,
-                  label: "Курсовая работа"
-                },
-                {
-                  value: 3,
-                  label: "Контрольная работа"
-                }
-              ]}
+              options={allWorkTypes.response.map(res => ({
+                value: res.id,
+                label: res.title
+              }))}
             />
           </div>
         )) : '')}
+
 
 
       </Modal>

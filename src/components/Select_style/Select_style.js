@@ -20,6 +20,7 @@ const customStyles = {
       ...provided,
 
       minWidth: '200px',
+      maxWidth: '200px',
       border: 'none',
       boxShadow: '0 0 0 2px green',
       margin: '0px 10px 0px 0px'
@@ -52,6 +53,7 @@ const customStyles = {
       ...provided,
 
       minWidth: '130px',
+      maxWidth: '130px',
       border: 'none',
       boxShadow: '0 0 0 2px green',
       margin: '0px 10px 0px 0px'
