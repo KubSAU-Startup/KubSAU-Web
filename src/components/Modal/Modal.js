@@ -7,7 +7,7 @@ function Modal({ active, setActive, children, setAdd, setEdit }) {
             <div className='modal-content'>
                 {children}
                 <div className='modal-button'>
-                    <button>Сохранить</button>
+                    <button onClick={() => {setActive(false);}}>Сохранить</button>
                     <button onClick={() => {setActive(false);}}>Отмена</button>
                 </div>
 

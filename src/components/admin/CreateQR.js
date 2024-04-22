@@ -159,6 +159,15 @@ function CreateQR() {
   const handleChange = event => {
     setVisibleItems(10);
     setSearchTerm(event.target.value);
+
+  //   const searchDisciplines = dataDisciplines.response.map(resp => (
+  //     resp.disciplines.find(disc => 
+  //         disc.discipline.title.toLowerCase().includes(event.target.value.toLowerCase())
+  //     )
+  // ));
+  
+  
+  //   console.log(searchDisciplines)
     const results = programQR.response.filter(response =>
       response.title.toLowerCase().includes(event.target.value.toLowerCase())
     );
@@ -332,16 +341,16 @@ function CreateQR() {
         ) : null
     );
 
-    setEditWorkTypes(dataDisciplines.response
-      .filter(resp => resp.programId === getProgId) ?
-      dataDisciplines.response
-        .filter(resp => resp.programId === getProgId)
-        .flatMap(resp =>
-          resp.disciplines && resp.disciplines.map(disc => ({
-            value: disc.workType.id,
-            label: disc.workType.title
-          }))
-        ) : null)
+    // setEditWorkTypes(dataDisciplines.response
+    //   .filter(resp => resp.programId === getProgId) ?
+    //   dataDisciplines.response
+    //     .filter(resp => resp.programId === getProgId)
+    //     .flatMap(resp =>
+    //       resp.disciplines && resp.disciplines.map(disc => ({
+    //         value: disc.workType.id,
+    //         label: disc.workType.title
+    //       }))
+    //     ) : null)
 
     setEditWorkTypes(
       dataDisciplines.response.filter(resp => resp.programId === getProgId) ? () => {

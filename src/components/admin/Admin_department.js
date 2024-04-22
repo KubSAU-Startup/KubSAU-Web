@@ -2,57 +2,77 @@ import React, { useEffect, useState } from 'react';
 import Admin_header from './Admin_header';
 import './Admin_department.css'
 import Modal from '../Modal/Modal';
+import Loading from '../Modal/Loading';
+import Error_modal from '../Modal/Error_modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { addNewDepartment, getAllDepartments, getTextError } from '../../network';
+import Empty_modal from '../Modal/Empty_modal';
 
-
-const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
 function Admin_department() {
     const [modalActive, setModalActive] = useState(false);
-    const [userStates, setUserStates] = useState({});
-    const [allUsers, setAllUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [allDepartments, setAllDepartments] = useState({
+        response: [],
+        error: null,
+        success: true
+    });
+    const [searchResults, setSearchResults] = useState([]);
+    // const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorActive, setErrorActive] = useState(false);
+    const [textError, setTextError] = useState('');
+    const [getProgId, setGetProgId] = useState(null);
+    const [cartStates, setCartStates] = useState({});
+    const [titleDepartment, setTitleDepartment] = useState(null);
+    const [phoneDepartment, setPhoneDepartment] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                setAllUsers(data);
-                setFilteredUsers(data);
+        getAllDepartments((res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+                setIsLoading(false);
 
-                const initialUserStates = {};
-                data.forEach(user => {
-                    initialUserStates[user.id] = false;
-                });
-                setUserStates(initialUserStates);
-            } catch (error) {
-                console.error('Error fetching data:', error);
+            } else {
+                setAllDepartments(res);
+                setSearchResults(res.response);
+                setIsLoading(false);
             }
-        };
+        })
 
-        fetchData();
     }, []);
 
     const handleChange = (e) => {
         setSearchTerm(e.target.value);
-        const filtered = allUsers.filter(user =>
-            user.address.street.toLowerCase().includes(e.target.value.toLowerCase())
+        const filtered = allDepartments.response.filter(dep =>
+            dep.title.toLowerCase().includes(e.target.value.toLowerCase())
         );
-        setFilteredUsers(filtered);
+        setSearchResults(filtered);
     };
 
-    const handleSettingClick = (userId) => {
-        setUserStates(prevUserStates => ({
-            ...prevUserStates,
-            [userId]: !prevUserStates[userId],
+    const handleSettingClick = (cartId) => {
+        setCartStates(prevCartStates => ({
+            ...prevCartStates,
+            [cartId]: !prevCartStates[cartId],
         }));
     };
 
+    const addDepartment = () => {
+        addNewDepartment(titleDepartment, phoneDepartment, (res) => {
+            console.log(res)
+        })
+    }
+
     return (
         <>
+            {/* окно загрузки */}
+            <Loading active={isLoading} setActive={setIsLoading} />
+
+            {/* модальное окно ошибки */}
+            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+
             <Admin_header />
             <div className='search-add'>
                 <div className='admin-main-search'>
@@ -64,24 +84,23 @@ function Admin_department() {
                     />
                 </div>
                 <button className='add-department' onClick={() => setModalActive(true)}>
-                    {/* <img src={require('../../img/add.png')} alt='add' /> */}
-                    <FontAwesomeIcon icon={faPlusCircle}/>
+                    <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
             </div>
 
-            {filteredUsers.map(user => (
-                <div className='cart-department' key={user.id}>
+            {searchResults.map(res => (
+                <div className='cart-department' key={res.id}>
                     <div className='data-department'>
-                        <p><span>Кафедра: </span>{user.address.street}</p>
-                        <p><span>Номер телефона: </span>{user.address.zipcode}</p>
+                        <p><span>Кафедра: </span>{res.title}</p>
+                        <p><span>Номер телефона: </span>{res.phone}</p>
                     </div>
                     <button
                         className='department-setting'
-                        onClick={() => handleSettingClick(user.id)}
+                        onClick={() => handleSettingClick(res.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
-                    <div className={`button-edit-delete ${userStates[user.id] ? 'active' : ''}`}>
+                    <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}>
                         <button>
                             <img src={require('../../img/edit.png')} alt='edit' />
                         </button>
@@ -91,18 +110,22 @@ function Admin_department() {
                     </div>
                 </div>
             ))}
-            <Modal active={modalActive} setActive={setModalActive}>
+            <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-department'>
                     <div className='input-conteiner'>
-                        <input type='text' className='name-dapartment' placeholder=' ' />
+                        <input type='text' className='name-dapartment' placeholder=' ' value={titleDepartment} onChange={e => setTitleDepartment(e.target.value)} />
                         <label className='label-name'>Название кафедры</label>
                     </div>
                     <div className='input-conteiner'>
-                        <input type='text' className='phone-dapartment' placeholder=' ' />
+                        <input type='text' className='phone-dapartment' placeholder=' ' value={phoneDepartment} onChange={e => setPhoneDepartment(e.target.value)} />
                         <label className='label-name'>Номер телефона</label>
                     </div>
                 </div>
-            </Modal>
+                <div className='modal-button'>
+                    <button onClick={() => { addDepartment(); setModalActive(false); }}>Сохранить</button>
+                    <button onClick={() => { setModalActive(false); }}>Отмена</button>
+                </div>
+            </Empty_modal>
         </>
     )
 }

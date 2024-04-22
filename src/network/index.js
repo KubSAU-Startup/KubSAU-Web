@@ -136,6 +136,21 @@ async function getAllWorkTypes(callback) {
     })
 }
 
+async function addNewDepartment(dapartmentTitle, departmentPhone) {
+    const url = `${baseUrl_test}/departments/`;
+    await axios.post(url, {
+        
+            title: dapartmentTitle,
+            phone: departmentPhone
+        
+    }).then((res) => {
+        console.log(res);
+        return res;
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
 function getTextError(data) {
     let textError = '';
     switch (data.code) {
@@ -158,6 +173,6 @@ function getTextError(data) {
 export {
     checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError,
     getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
-    getAllWorkTypes, getAllDepartments
+    getAllWorkTypes, getAllDepartments, addNewDepartment
 }
 
