@@ -63,7 +63,7 @@ async function getDataAdminJournal(parameter, callback) {
 }
 
 async function getAllDepartments(callback) {
-    const url = `${baseUrl}/departments`;
+    const url = `${baseUrl_test}/departments`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -137,13 +137,39 @@ async function getAllWorkTypes(callback) {
 }
 
 async function addNewDepartment(dapartmentTitle, departmentPhone) {
-    const url = `${baseUrl_test}/departments/`;
+    const url = `${baseUrl_test}/departments`;
     await axios.post(url, {
-        
-            title: dapartmentTitle,
-            phone: departmentPhone
-        
+        title: dapartmentTitle,
+        phone: departmentPhone
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
+        console.log(res);
+        return res;
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function editDepartment(id, dapartmentTitle, departmentPhone) {
+    const url = `${baseUrl_test}/departments/${id}`;
+    console.log(id,dapartmentTitle,departmentPhone)
+    await axios.patch(url, {
+        title: dapartmentTitle,
+        phone: departmentPhone
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        return res;
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function deleteDepartment(index) {
+    const url = `${baseUrl_test}/departments/${index}`;
+    await axios.delete(url).then((res) => {
         console.log(res);
         return res;
     }).catch((error) => {
@@ -173,6 +199,6 @@ function getTextError(data) {
 export {
     checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError,
     getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
-    getAllWorkTypes, getAllDepartments, addNewDepartment
+    getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment
 }
 
