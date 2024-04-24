@@ -103,7 +103,7 @@ function Admin_department() {
             console.log(res);
 
         });
-        // window.location.reload()
+        window.location.reload();
     }
 
     async function deleteData(index) {

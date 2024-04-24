@@ -153,13 +153,14 @@ async function addNewDepartment(dapartmentTitle, departmentPhone) {
 
 async function editDepartment(id, dapartmentTitle, departmentPhone) {
     const url = `${baseUrl_test}/departments/${id}`;
-    console.log(id,dapartmentTitle,departmentPhone)
+    console.log(id, dapartmentTitle, departmentPhone)
     await axios.patch(url, {
         title: dapartmentTitle,
         phone: departmentPhone
     }, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
-    }).then((res) => {
+    }
+    ).then((res) => {
         console.log(res);
         return res;
     }).catch((error) => {
