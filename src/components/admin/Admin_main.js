@@ -146,15 +146,15 @@ function Admin_main() {
             groupId: null,
             workTypeId: null
         }
-        getDataAdminJournal((res) => {
+        getDataAdminJournal(journalParam, (res) => {
 
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
                 setIsLoading(false);
             } else {
-                setMainData(res.response)
-                setSearchResults(res.response);
+                setMainData(res.response.journal)
+                setSearchResults(res.response.journal);
                 setIsLoading(false);
             }
         })
@@ -172,14 +172,14 @@ function Admin_main() {
         };
 
         console.log(journalParam)
-        getDataAdminJournal((res) => {
+        getDataAdminJournal(journalParam, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
                 setIsLoading(false);
             } else {
-                setMainData(res.response)
-                setSearchResults(res.response);
+                setMainData(res.response.journal)
+                setSearchResults(res.response.journal);
                 setIsLoading(false);
             }
         })
@@ -195,28 +195,17 @@ function Admin_main() {
             groupId: null,
             workTypeId: null
         }
-        getDataAdminJournal((res) => {
+        getDataAdminJournal(journalParam, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
                 setIsLoading(false);
             } else {
-                setMainData(res.response)
-                setSearchResults(res.response);
+                setMainData(res.response.journal)
+                setSearchResults(res.response.journal);
                 setIsLoading(false);
             }
         })
-
-        // getAllDepartments((data) => {
-        //     if (data.error) {
-        //         setTextError(getTextError(data.error));
-        //         setErrorActive(true);
-        //         setIsLoading(false);
-        //     } else {
-        //         setAllDepartments(data)
-        //         setIsLoading(false);
-        //     }
-        // })
     }, []);
 
     // функция поиска
@@ -339,36 +328,24 @@ function Admin_main() {
             </div>
 
             {/* данные о зарегистрированных работах (карточки) */}
+            {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
             {searchResults.slice(0, visibleItems).map(journal => (
                 <div className='cart' >
                     <div className='data'>
-                        {new Date(journal.registrationDate * 1000).toLocaleString("ru-ru")}
+                        {new Date(journal.work.registrationDate * 1000).toLocaleString("ru-ru")}
                     </div>
                     <div className='content'>
                         <div className='col1'>
-                            {allStudent.find((res) => res.id === journal.studentId) && (
-                                <p><span>ФИО:</span> {allStudent.find((res) => res.id === journal.studentId).lastName + ' ' + allStudent.find((res) => res.id === journal.studentId).firstName + ' ' + allStudent.find((res) => res.id === journal.studentId).middleName}</p>
-                            )}
-
-                            {filterGroup.find((res)=> res.id === allStudent.find((res) => res.id === journal.studentId).groupId) && (
-                                <p><span>Группа:</span> {filterGroup.find((res)=> res.id === allStudent.find((res) => res.id === journal.studentId).groupId).title}</p>
-                            )}
-
-                            {filterWorkType.find((res) => res.id === journal.workTypeId) && (
-                                <p><span>Тип работы:</span> {filterWorkType.find((res) => res.id === journal.workTypeId).title}</p>
-                            )}
-                            <p><span>Статус:</span> {journal.studentId}</p>
+                            <p><span>ФИО:</span> {journal.student.fullName}</p>
+                            <p><span>Группа:</span> {journal.group.title}</p>
+                            <p><span>Тип работы:</span> {journal.work.type.title}</p>
+                            <p><span>Статус:</span> {journal.student.status.title}</p>
                         </div>
-
                         <div className='col2'>
-                            {filterDiscipline.find((res) => res.id === journal.disciplineId) && (
-                                <p><span>Дисциплина:</span> {filterDiscipline.find((res) => res.id === journal.disciplineId).title}</p>
-                            )}
-
-                            {/* <p><span>Преподаватель:</span> {journal.teacher.lastName} {journal.teacher.firstName} {journal.teacher.middleName}</p> */}
-                            {/* <p><span>Кафедра:</span> {allDepartments.response.filter(res => res.id === journal.teacher.departmentId).map(result => result.title)}</p> */}
-                            {journal.title && <p><span>Название:</span> {journal.title}</p>}
-
+                            <p><span>Дисциплина:</span> {journal.discipline.title}</p>
+                            <p><span>Преподаватель:</span> {journal.employee.lastName} {journal.employee.firstName} {journal.employee.middleName}</p>
+                            <p><span>Кафедра:</span> {journal.department.title}</p>
+                            {journal.work.title && <p><span>Название:</span> {journal.work.title}</p>}
                         </div>
                     </div>
                 </div>

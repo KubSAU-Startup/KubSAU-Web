@@ -40,7 +40,7 @@ async function checkAccount(callback) {
 }
 
 async function getFilterWorkType(callback) {
-    const url = `${baseUrl_test}/journals/filters/worktypes`;
+    const url = `${baseUrl_test}/works/latest/filters/worktypes`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -49,7 +49,7 @@ async function getFilterWorkType(callback) {
     })
 }
 async function getFilterDiscipline(callback) {
-    const url = `${baseUrl_test}/journals/filters/disciplines`;
+    const url = `${baseUrl_test}/works/latest/filters/disciplines`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -58,7 +58,7 @@ async function getFilterDiscipline(callback) {
     })
 }
 async function getFilterEmployees(callback) {
-    const url = `${baseUrl_test}/journals/filters/employees`;
+    const url = `${baseUrl_test}/works/latest/filters/employees`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -67,7 +67,7 @@ async function getFilterEmployees(callback) {
     })
 }
 async function getFilterGroups(callback) {
-    const url = `${baseUrl_test}/journals/filters/groups`;
+    const url = `${baseUrl_test}/works/latest/filters/groups`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -76,7 +76,7 @@ async function getFilterGroups(callback) {
     })
 }
 async function getFilterDepartments(callback) {
-    const url = `${baseUrl_test}/journals/filters/departments`;
+    const url = `${baseUrl_test}/works/latest/filters/departments`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -85,10 +85,18 @@ async function getFilterDepartments(callback) {
     })
 }
 
-async function getDataAdminJournal(callback) {
-    const url = `${baseUrl_test}/works`;
+async function getDataAdminJournal(par, callback) {
+    const url = `${baseUrl_test}/works/latest`;
 
-    await axios.get(url).then((res) => {
+    await axios.get(url, {
+        params:{
+            workTypeId: par.workTypeId,
+            disciplineId: par.disciplineId,
+            employeeId: par.teacherId,
+            departmentId: par.departmentId,
+            groupId: par.groupId
+        }
+    }).then((res) => {
         callback(res.data);
     }).catch((error) => {
         console.log(error)
