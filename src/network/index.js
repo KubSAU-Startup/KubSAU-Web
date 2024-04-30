@@ -10,56 +10,100 @@ axios.interceptors.request.use(async request => {
 })
 
 async function loginAxios(loginInfo, callback) {
-    const url = `${baseUrl}/auth`
+    const url = `${baseUrl_test}/auth`
 
-    console.log(url)
+    console.log(loginInfo)
 
-    await axios.get(url, {
-        params: {
+    await axios.post(url, {
             login: loginInfo.email,
             password: loginInfo.password
-        }
+        
+    },{
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
-        callback(res.data)
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 }
 
 async function checkAccount(callback) {
-    const url = `${baseUrl}/account`;
+    const url = `${baseUrl_test}/account`;
 
     await axios.get(url).then((res) => {
         callback(res.data)
+    }).catch((error) => {
+        console.log(error)
     })
 
 
 }
 
-async function getDataFilters(callback) {
-    const url = `${baseUrl}/journals/filters`;
+async function getFilterWorkType(callback) {
+    const url = `${baseUrl_test}/journals/filters/worktypes`;
 
     await axios.get(url).then((res) => {
-        callback(res.data)
-        console.log(res.data);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+async function getFilterDiscipline(callback) {
+    const url = `${baseUrl_test}/journals/filters/disciplines`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+async function getFilterEmployees(callback) {
+    const url = `${baseUrl_test}/journals/filters/employees`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+async function getFilterGroups(callback) {
+    const url = `${baseUrl_test}/journals/filters/groups`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+async function getFilterDepartments(callback) {
+    const url = `${baseUrl_test}/journals/filters/departments`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 }
 
-async function getDataAdminJournal(parameter, callback) {
-    const url = `${baseUrl}/journals`;
+async function getDataAdminJournal(callback) {
+    const url = `${baseUrl_test}/works`;
 
-    await axios.get(url, {
-        params: {
-
-            disciplineId: parameter.disciplineId,
-            teacherId: parameter.teacherId,
-            departmentId: parameter.departmentId,
-            groupId: parameter.groupId,
-            workTypeId: parameter.workTypeId
-
-        },
-    }).then((res) => {
-        callback(res.data)
-        console.log(res.data);
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
+}
+
+async function getAllStudents(callback) {
+    const url = `${baseUrl_test}/students`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+
 }
 
 async function getAllDepartments(callback) {
@@ -67,6 +111,8 @@ async function getAllDepartments(callback) {
 
     await axios.get(url).then((res) => {
         callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 
 }
@@ -76,6 +122,8 @@ async function getDataForQR(callback) {
 
     await axios.get(url).then((res) => {
         callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 
 }
@@ -101,6 +149,8 @@ async function getDisciplinesForPrograms(callback) {
         }
     }).then((res) => {
         callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 }
 
@@ -109,6 +159,8 @@ async function getGroups(callback) {
 
     await axios.get(url).then((res) => {
         callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 }
 
@@ -117,6 +169,8 @@ async function getStudents(groupId, callback) {
 
     await axios.get(url).then((res) => {
         callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 }
 
@@ -125,6 +179,8 @@ async function getAllDisciplines(callback) {
 
     await axios.get(url).then((res) => {
         callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 }
 
@@ -133,6 +189,8 @@ async function getAllWorkTypes(callback) {
 
     await axios.get(url).then((res) => {
         callback(res.data);
+    }).catch((error) => {
+        console.log(error)
     })
 }
 
@@ -198,8 +256,8 @@ function getTextError(data) {
 }
 
 export {
-    checkAccount, getDataFilters, loginAxios, getDataAdminJournal, getTextError,
-    getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
+    checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal, 
+    getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment
 }
 

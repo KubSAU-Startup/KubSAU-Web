@@ -23,7 +23,9 @@ function Log() {
 
     const onSubmit = (data) => {
         setIsLoading(true);
+        
         loginAxios(data, (res) => {
+            console.log('before')
             if (res.success) {
                 const token = res.response.accessToken
                 localStorage.setItem('token', token)
