@@ -85,11 +85,13 @@ async function getFilterDepartments(callback) {
     })
 }
 
-async function getDataAdminJournal(par, callback) {
+async function getDataAdminJournal(offset, limit, par, callback) {
     const url = `${baseUrl_test}/works/latest`;
 
     await axios.get(url, {
         params:{
+            offset: offset,
+            limit: limit,
             workTypeId: par.workTypeId,
             disciplineId: par.disciplineId,
             employeeId: par.teacherId,

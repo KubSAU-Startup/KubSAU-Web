@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Admin_main.css';
 import Admin_header from './Admin_header';
-import { getAllDepartments, getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, getAllStudents } from '../../network';
+import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, getAllStudents } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
 import { customStyles } from '../Select_style/Select_style';
@@ -16,7 +16,6 @@ function Admin_main() {
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
     // переменные для получения фильтров из бэка
     const [filterWorkType, setFilterWorkType] = useState([]);
@@ -34,20 +33,23 @@ function Admin_main() {
     // переменная поиска
     const [searchResults, setSearchResults] = useState([]);
 
-    // переменная количество показываемых элементов пагинации
-    const [visibleItems, setVisibleItems] = useState();
-
     // перменная запроса на поиск
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [hasMoreData, setHasMoreData] = useState(true);
+
+
+    const [offset, setOffset] = useState(0);
+    const limit = 30; // Количество элементов на странице
+
     // функция загрузки данных пагинации
     const loadMore = () => {
-        setVisibleItems(prevVisibleItems => prevVisibleItems + 5);
+        setOffset(prevOffset => prevOffset + limit);
     };
+
 
     // получение данных для фильтров с бэка
     useEffect(() => {
-        setVisibleItems(5);
         getFilterWorkType((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -98,15 +100,6 @@ function Admin_main() {
         });
     }, []);
 
-    //скрытие кнопки пагинации, если закончились данные для отображения
-    useEffect(() => {
-
-        if (searchResults.length <= visibleItems) {
-            setIsPaginationVisible(false); // Скрыть кнопку пагинации
-        } else {
-            setIsPaginationVisible(true); // Показать 
-        }
-    }, [searchResults, visibleItems]);
 
     // функция сброса фильтров
     const resetFilters = () => {
@@ -126,10 +119,10 @@ function Admin_main() {
             groupId: null,
             workTypeId: null
         })
-        
+
     };
 
-    
+
     // Функция для получения данных с сервера и выполнения поиска
     const getParams = () => {
         setIsLoading(true);
@@ -146,7 +139,7 @@ function Admin_main() {
     useEffect(() => {
         setIsLoading(true);
         const filteredResults = mainData.filter(item => {
-            
+
             // Проверяем условие для каждого поля, по которому хотим искать
             return (
                 item.student.fullName.toLowerCase().includes(searchTerm) ||
@@ -163,45 +156,48 @@ function Admin_main() {
         setIsLoading(false);
     }, [mainData])
 
-// Функция поиска
-const handleChange = (e) => {
-    const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
-    setSearchTerm(e.target.value);
-    setIsLoading(true);
-    const filteredResults = mainData.filter(item => {
+    // Функция поиска
+    const handleChange = (e) => {
+        const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
+        setSearchTerm(e.target.value);
+        setIsLoading(true);
+        const filteredResults = mainData.filter(item => {
 
-        // Проверяем условие для каждого поля, по которому хотим искать
-        return (
-            item.student.fullName.toLowerCase().includes(searchTerm) ||
-            item.group.title.toLowerCase().includes(searchTerm) ||
-            item.work.type.title.toLowerCase().includes(searchTerm) ||
-            item.student.status.title.toLowerCase().includes(searchTerm) ||
-            item.discipline.title.toLowerCase().includes(searchTerm) ||
-            `${item.employee.lastName} ${item.employee.firstName} ${item.employee.middleName}`.toLowerCase().includes(searchTerm) ||
-            item.department.title.toLowerCase().includes(searchTerm) ||
-            (item.work.title && item.work.title.toLowerCase().includes(searchTerm))
-        );
-    });
-    setSearchResults(filteredResults);
-    setIsLoading(false);
-};
+            // Проверяем условие для каждого поля, по которому хотим искать
+            return (
+                item.student.fullName.toLowerCase().includes(searchTerm) ||
+                item.group.title.toLowerCase().includes(searchTerm) ||
+                item.work.type.title.toLowerCase().includes(searchTerm) ||
+                item.student.status.title.toLowerCase().includes(searchTerm) ||
+                item.discipline.title.toLowerCase().includes(searchTerm) ||
+                `${item.employee.lastName} ${item.employee.firstName} ${item.employee.middleName}`.toLowerCase().includes(searchTerm) ||
+                item.department.title.toLowerCase().includes(searchTerm) ||
+                (item.work.title && item.work.title.toLowerCase().includes(searchTerm))
+            );
+        });
+        setSearchResults(filteredResults);
+        setIsLoading(false);
+    };
 
     // функция получения данных для заполнения журнала
     useEffect(() => {
         setIsLoading(true);
-        
-        getDataAdminJournal(journalParam, (res) => {
+
+        getDataAdminJournal(offset, limit, journalParam, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
             } else {
-                setMainData(res.response.journal)
-                setSearchResults(res.response.journal);
-               
-            } 
+                if (res.response.journal.length < limit) {
+                    setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
+                }
+                setMainData(prevData => [...prevData, ...res.response.journal]); // Добавляем новые данные к существующим
+                setSearchResults(prevResults => [...prevResults, ...res.response.journal]); // Обновляем результаты поиска
+            }
             setIsLoading(false);
         })
-    }, [journalParam]);
+    }, [offset, limit, journalParam]);
+
 
     // получения данных о необходимой фильтрации
     function handleSelectDiscipline(data) {
@@ -312,8 +308,8 @@ const handleChange = (e) => {
 
             {/* данные о зарегистрированных работах (карточки) */}
             {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
-            
-            {searchResults.slice(0, visibleItems).map(journal => (
+
+            {searchResults.map(journal => (
                 <div className='cart' >
                     <div className='data'>
                         {new Date(journal.work.registrationDate * 1000).toLocaleString("ru-ru")}
@@ -336,10 +332,13 @@ const handleChange = (e) => {
             ))}
 
             {/* кнопка пагинации */}
-            {isPaginationVisible && (
+
+            {hasMoreData && (
                 <button className='btn-loadMore' onClick={loadMore}>
                     Загрузить ещё
-                </button>)}
+                </button>
+            )}
+
 
             {/* модальное окно ошибки */}
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
