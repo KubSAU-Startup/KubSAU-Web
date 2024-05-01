@@ -14,11 +14,7 @@ function Admin_department() {
     const [modalActive, setModalActive] = useState(false);
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
-    const [allDepartments, setAllDepartments] = useState({
-        response: [],
-        error: null,
-        success: true
-    });
+    const [allDepartments, setAllDepartments] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
     // const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +35,8 @@ function Admin_department() {
     const [visibleItems, setVisibleItems] = useState(10);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
+    const [newDepartment, setNewDepartment] = useState({});
+
     useEffect(() => {
         setVisibleItems(10);
 
@@ -47,25 +45,31 @@ function Admin_department() {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
-
             } else {
-                setAllDepartments(res);
+                setAllDepartments(res.response);
                 setSearchResults(res.response.reverse());
-                setIsLoading(false);
-                console.log(res);
+                console.log(searchResults);
             }
-        })
+            setIsLoading(false);
+        });
 
     }, []);
 
+    // Функция поиска
     const handleChange = (e) => {
-        setVisibleItems(10);
+        const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
         setSearchTerm(e.target.value);
-        const filtered = allDepartments.response.filter(dep =>
-            dep.title.toLowerCase().includes(e.target.value.toLowerCase())
-        );
-        setSearchResults(filtered);
+        setIsLoading(true);
+        const filteredResults = allDepartments.filter(item => {
+
+            // Проверяем условие для каждого поля, по которому хотим искать
+            return (
+                item.title.toLowerCase().includes(searchTerm) ||
+                item.phone.toLowerCase().includes(searchTerm)
+            );
+        });
+        setSearchResults(filteredResults);
+        setIsLoading(false);
     };
 
     const handleSettingClick = (cartId) => {
@@ -75,13 +79,76 @@ function Admin_department() {
             [cartId]: !prevCartStates[cartId],
         }));
     };
-
-    const addDepartment = () => {
-        addNewDepartment(titleDepartment, phoneDepartment, (res) => {
-            console.log(res)
-        })
-        window.location.reload();
+    async function addDepartment() {
+        await addNewDepartment(titleDepartment, phoneDepartment,(res) => {
+            if (res.success) {
+                // console.log('rfquhjweoruiqew', res.response);
+                // console.log('rfquhjweoruiqew', allDepartments);
+                setAllDepartments(prevData => [res.response, ...prevData]);             
+            } else {
+                console.log(res);
+            }
+        });
     }
+    
+    useEffect(() => {
+        setSearchResults(allDepartments)
+    }, [allDepartments])
+
+    async function editData(index, title, phone) {
+        await editDepartment(index, title, phone, (response) => {
+            if (response.success) {
+                console.log(response.data);
+
+
+            } else {
+                console.log(response.data);
+            }
+        });
+        getAllDepartments((res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                setAllDepartments(res.response);
+                setSearchResults(res.response.reverse());
+                console.log(searchResults);
+            }
+            setIsLoading(false);
+        });
+    }
+
+    async function deleteData(index) {
+        await deleteDepartment(index, (response) => {
+            if (response.success) {
+                console.log(response.data);
+
+
+            } else {
+                console.log(response.data);
+            }
+        });
+        getAllDepartments((res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                setAllDepartments(res.response);
+                setSearchResults(res.response.reverse());
+                console.log(searchResults);
+            }
+            setIsLoading(false);
+        });
+    }
+
+
+    // const addDepartment = () => {
+    //     addNewDepartment(titleDepartment, phoneDepartment, (res) => {
+    //         console.log(res)
+    //     })
+
+
+    // }
 
     // функция пагинации
     const loadMore = () => {
@@ -98,21 +165,21 @@ function Admin_department() {
         }
     }, [searchResults, visibleItems]);
 
-    function editData(index, title, phone) {
-        editDepartment(index, title, phone, (res) => {
-            console.log(res);
+    // function editData(index, title, phone) {
+    //     editDepartment(index, title, phone, (res) => {
+    //         console.log(res);
 
-        });
-        window.location.reload();
-    }
+    //     });
 
-    async function deleteData(index) {
-        await deleteDepartment(index, (res) => {
-            console.log(res.data.success);
+    // }
 
-        });
-        window.location.reload()
-    }
+    // async function deleteData(index) {
+    //     await deleteDepartment(index, (res) => {
+    //         console.log(res.data.success);
+
+    //     });
+
+    // }
 
     return (
         <>
@@ -129,7 +196,7 @@ function Admin_department() {
                         type='text'
                         value={searchTerm}
                         onChange={handleChange}
-                        placeholder='Поиск по названию...'
+                        placeholder='Поиск...'
                     />
                 </div>
                 <button className='add-department' onClick={() => setModalActive(true)}>
@@ -153,8 +220,8 @@ function Admin_department() {
                         <button onClick={() => {
                             setModalEditActive(true);
                             setEditId(res.id);
-                            allDepartments.response.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
-                            allDepartments.response.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
+                            allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
+                            allDepartments.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
                         }}>
                             <img src={require('../../img/edit.png')} alt='edit' />
                         </button>
@@ -182,7 +249,7 @@ function Admin_department() {
                     </div>
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { addDepartment(); setModalActive(false); }}>Сохранить</button>
+                    <button onClick={() => { addDepartment(); setModalActive(false); setTitleDepartment(''); setPhoneDepartment(''); }}>Сохранить</button>
                     <button onClick={() => { setModalActive(false); }}>Отмена</button>
                 </div>
             </Empty_modal>

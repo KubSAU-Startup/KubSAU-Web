@@ -236,7 +236,7 @@ async function getAllWorkTypes(callback) {
     })
 }
 
-async function addNewDepartment(dapartmentTitle, departmentPhone) {
+async function addNewDepartment(dapartmentTitle, departmentPhone, callback) {
     const url = `${baseUrl_test}/departments`;
     await axios.post(url, {
         title: dapartmentTitle,
@@ -245,7 +245,7 @@ async function addNewDepartment(dapartmentTitle, departmentPhone) {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
         console.log(res);
-        return res;
+        callback(res.data);
     }).catch((error) => {
         console.log(error)
     })

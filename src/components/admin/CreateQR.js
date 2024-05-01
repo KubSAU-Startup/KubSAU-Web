@@ -453,7 +453,7 @@ function CreateQR() {
               isSearchable={true}
               options={dataSemester}
             />
-            {/* <Select
+            {/*<Select
               styles={customStyles}
               placeholder="Программа"
               value={program}
@@ -465,7 +465,7 @@ function CreateQR() {
                 label: response.title,
               }))}
             />
-            <Select
+             <Select
               styles={customStylesQR}
               placeholder="Группа"
               value={group}
