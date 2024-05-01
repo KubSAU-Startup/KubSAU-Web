@@ -105,6 +105,38 @@ async function getDataAdminJournal(offset, limit, par, callback) {
     })
 }
 
+async function getDataPrograms(offset, limit, callback) {
+    const url = `${baseUrl_test}/programs`;
+
+    await axios.get(url, {
+        params:{
+            offset: offset,
+            limit: limit,
+            extended: true
+        }
+    }).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function getDirectivitiesPrograms(callback){
+    const url = `${baseUrl_test}/directivities`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+
+
+
+
+
+
 async function getAllStudents(callback) {
     const url = `${baseUrl_test}/students`;
 
@@ -268,6 +300,6 @@ function getTextError(data) {
 export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal, 
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
-    getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment
+    getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms
 }
 
