@@ -29,7 +29,7 @@ function Admin_main() {
     const [mainData, setMainData] = useState([]);
 
     // переменная для получения всех студентов из бэка
-    const [allStudent, setAllStudent] = useState([]);
+    const [journalParam, setJournalParam] = useState({});
 
     // переменная поиска
     const [searchResults, setSearchResults] = useState([]);
@@ -52,71 +52,50 @@ function Admin_main() {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
-
             } else {
                 setFilterWorkType(res.response);
-                setIsLoading(false);
             }
+            setIsLoading(false);
         });
 
         getFilterDiscipline((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
-
             } else {
                 setFilterDiscipline(res.response);
-                setIsLoading(false);
             }
+            setIsLoading(false);
         });
 
         getFilterEmployees((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
-
             } else {
                 setFilterEmployees(res.response);
-                setIsLoading(false);
             }
+            setIsLoading(false);
         });
 
         getFilterGroups((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
-
             } else {
                 setFilterGroup(res.response);
-                setIsLoading(false);
             }
+            setIsLoading(false);
         });
         getFilterDepartments((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
-
             } else {
                 setFilterDepartments(res.response);
-                setIsLoading(false);
             }
+            setIsLoading(false);
         });
-        getAllStudents((res) => {
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-                setIsLoading(false);
-
-            } else {
-                setAllStudent(res.response);
-                setIsLoading(false);
-            }
-        })
     }, []);
 
     //скрытие кнопки пагинации, если закончились данные для отображения
@@ -137,88 +116,92 @@ function Admin_main() {
         setSelectedTeacher(null);
         setSelectedDepartment(null);
         setSelectedGroup(null);
+        setSearchTerm('');
 
         // параметры для сброса
-        const journalParam = {
+        setJournalParam({
             disciplineId: null,
             teacherId: null,
             departmentId: null,
             groupId: null,
             workTypeId: null
-        }
-        getDataAdminJournal(journalParam, (res) => {
-
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-                setIsLoading(false);
-            } else {
-                setMainData(res.response.journal)
-                setSearchResults(res.response.journal);
-                setIsLoading(false);
-            }
         })
+        
     };
 
-    // функция фильтрации данных
+    
+    // Функция для получения данных с сервера и выполнения поиска
     const getParams = () => {
         setIsLoading(true);
-        const journalParam = {
+        setJournalParam({
             disciplineId: selectedDiscipline ? selectedDiscipline.value : null,
             teacherId: selectedTeacher ? selectedTeacher.value : null,
             departmentId: selectedDepartment ? selectedDepartment.value : null,
             groupId: selectedGroup ? selectedGroup.value : null,
             workTypeId: selectedWorkType ? selectedWorkType.value : null,
-        };
+        });
 
-        console.log(journalParam)
-        getDataAdminJournal(journalParam, (res) => {
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-                setIsLoading(false);
-            } else {
-                setMainData(res.response.journal)
-                setSearchResults(res.response.journal);
-                setIsLoading(false);
-            }
-        })
-    }
+    };
+
+    useEffect(() => {
+        setIsLoading(true);
+        const filteredResults = mainData.filter(item => {
+            
+            // Проверяем условие для каждого поля, по которому хотим искать
+            return (
+                item.student.fullName.toLowerCase().includes(searchTerm) ||
+                item.group.title.toLowerCase().includes(searchTerm) ||
+                item.work.type.title.toLowerCase().includes(searchTerm) ||
+                item.student.status.title.toLowerCase().includes(searchTerm) ||
+                item.discipline.title.toLowerCase().includes(searchTerm) ||
+                `${item.employee.lastName} ${item.employee.firstName} ${item.employee.middleName}`.toLowerCase().includes(searchTerm) ||
+                item.department.title.toLowerCase().includes(searchTerm) ||
+                (item.work.title && item.work.title.toLowerCase().includes(searchTerm))
+            );
+        });
+        setSearchResults(filteredResults);
+        setIsLoading(false);
+    }, [mainData])
+
+// Функция поиска
+const handleChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
+    setSearchTerm(e.target.value);
+    setIsLoading(true);
+    const filteredResults = mainData.filter(item => {
+
+        // Проверяем условие для каждого поля, по которому хотим искать
+        return (
+            item.student.fullName.toLowerCase().includes(searchTerm) ||
+            item.group.title.toLowerCase().includes(searchTerm) ||
+            item.work.type.title.toLowerCase().includes(searchTerm) ||
+            item.student.status.title.toLowerCase().includes(searchTerm) ||
+            item.discipline.title.toLowerCase().includes(searchTerm) ||
+            `${item.employee.lastName} ${item.employee.firstName} ${item.employee.middleName}`.toLowerCase().includes(searchTerm) ||
+            item.department.title.toLowerCase().includes(searchTerm) ||
+            (item.work.title && item.work.title.toLowerCase().includes(searchTerm))
+        );
+    });
+    setSearchResults(filteredResults);
+    setIsLoading(false);
+};
 
     // функция получения данных для заполнения журнала
     useEffect(() => {
         setIsLoading(true);
-        const journalParam = {
-            disciplineId: null,
-            teacherId: null,
-            departmentId: null,
-            groupId: null,
-            workTypeId: null
-        }
+        
         getDataAdminJournal(journalParam, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
             } else {
                 setMainData(res.response.journal)
                 setSearchResults(res.response.journal);
-                setIsLoading(false);
-            }
+               
+            } 
+            setIsLoading(false);
         })
-    }, []);
-
-    // функция поиска
-    const handleChange = (e) => {
-        setVisibleItems(5);
-        const searchTerm = e.target.value.toLowerCase();
-        setSearchTerm(searchTerm);
-
-        const results = mainData.response.journal.filter(journal =>
-            journal.student.fullName.toLowerCase().includes(searchTerm)
-        );
-        setSearchResults(results);
-    };
+    }, [journalParam]);
 
     // получения данных о необходимой фильтрации
     function handleSelectDiscipline(data) {
@@ -250,7 +233,7 @@ function Admin_main() {
                     type='text'
                     value={searchTerm}
                     onChange={handleChange}
-                    placeholder='Поиск по ФИО студента...'
+                    placeholder='Поиск...'
                 />
             </div>
 
@@ -329,6 +312,7 @@ function Admin_main() {
 
             {/* данные о зарегистрированных работах (карточки) */}
             {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
+            
             {searchResults.slice(0, visibleItems).map(journal => (
                 <div className='cart' >
                     <div className='data'>
