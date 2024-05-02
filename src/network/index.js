@@ -251,7 +251,7 @@ async function addNewDepartment(dapartmentTitle, departmentPhone, callback) {
     })
 }
 
-async function editDepartment(id, dapartmentTitle, departmentPhone) {
+async function editDepartment(id, dapartmentTitle, departmentPhone, callback) {
     const url = `${baseUrl_test}/departments/${id}`;
     console.log(id, dapartmentTitle, departmentPhone)
     await axios.patch(url, {
@@ -262,17 +262,17 @@ async function editDepartment(id, dapartmentTitle, departmentPhone) {
     }
     ).then((res) => {
         console.log(res);
-        return res;
+        callback(res.data);
     }).catch((error) => {
         console.log(error)
     })
 }
 
-async function deleteDepartment(index) {
+async function deleteDepartment(index, callback) {
     const url = `${baseUrl_test}/departments/${index}`;
     await axios.delete(url).then((res) => {
         console.log(res);
-        return res;
+        callback(res.data);
     }).catch((error) => {
         console.log(error)
     })

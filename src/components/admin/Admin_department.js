@@ -96,49 +96,42 @@ function Admin_department() {
     }, [allDepartments])
 
     async function editData(index, title, phone) {
-        await editDepartment(index, title, phone, (response) => {
-            if (response.success) {
-                console.log(response.data);
-
-
+        await editDepartment(index, title, phone, (res) => {
+            if (res.success) {
+               
+                const editDepartments = allDepartments.map(elem => {
+                    if(elem.id === index) {
+                        return {
+                            ...elem, // копируем все свойства из исходного объекта
+                            title: title, // обновляем поле title
+                            phone: phone // обновляем поле phone
+                        };
+                    } else {
+                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                    }
+                });
+                
+                setAllDepartments(editDepartments);
+                
             } else {
-                console.log(response.data);
+                console.log(res.response);
             }
         });
-        getAllDepartments((res) => {
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-            } else {
-                setAllDepartments(res.response);
-                setSearchResults(res.response.reverse());
-                console.log(searchResults);
-            }
-            setIsLoading(false);
-        });
+        
     }
 
     async function deleteData(index) {
-        await deleteDepartment(index, (response) => {
-            if (response.success) {
-                console.log(response.data);
-
+        await deleteDepartment(index, (res) => {
+            if (res.success) {
+                console.log(res.response);
+                // setArtists(artists.filter((a) => a.id !== artist.id));
+                setAllDepartments(allDepartments.filter((a)=> a.id !== index));
 
             } else {
-                console.log(response.data);
+                console.log(res.response);
             }
         });
-        getAllDepartments((res) => {
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-            } else {
-                setAllDepartments(res.response);
-                setSearchResults(res.response.reverse());
-                console.log(searchResults);
-            }
-            setIsLoading(false);
-        });
+        
     }
 
 
