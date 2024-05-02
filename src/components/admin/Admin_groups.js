@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import Admin_header from './Admin_header';
+import Select from 'react-select';
 import './Admin_department.css'
 import Modal from '../Modal/Modal';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { addNewDepartment, deleteDepartment, editDepartment, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
+import { addNewDepartment, addNewGroup, deleteDepartment, editDepartment, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
 import Empty_modal from '../Modal/Empty_modal';
+import { customStylesModal, customStylesTypeOfWork } from '../Select_style/Select_style';
 
 function Admin_groups() {
     const [modalActive, setModalActive] = useState(false);
@@ -26,11 +28,16 @@ function Admin_groups() {
     const [textError, setTextError] = useState('');
     // const [getProgId, setGetProgId] = useState(null);
     const [cartStates, setCartStates] = useState({});
-    const [titleDepartment, setTitleDepartment] = useState(null);
+    const [numberGroup, setNumberGroup] = useState('');
     const [phoneDepartment, setPhoneDepartment] = useState(null);
 
     const [newTitle, setNewTitle] = useState(null);
     const [newPhone, setNewPhone] = useState(null);
+
+    const [head, setHead] = useState(null);
+    const [direction, setDirection] = useState(null);
+
+    const [abbGroup, setAbbGroup] = useState('');
 
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
@@ -86,7 +93,7 @@ function Admin_groups() {
             return (
                 item.title.toLowerCase().includes(searchTerm) ||
                 allDirectivities.find((el) => el.id === item.directivityId).title.toLowerCase().includes(searchTerm) ||
-                allHeads.find((head)=> head.id === allDirectivities.find((el) => el.id === item.directivityId).headId ).title.toLowerCase().includes(searchTerm)
+                allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === item.directivityId).headId).title.toLowerCase().includes(searchTerm)
             );
         });
         setSearchResults(filteredResults);
@@ -100,21 +107,23 @@ function Admin_groups() {
             [cartId]: !prevCartStates[cartId],
         }));
     };
-    // async function addDepartment() {
-    //     await addNewDepartment(titleDepartment, phoneDepartment,(res) => {
-    //         if (res.success) {
-    //             // console.log('rfquhjweoruiqew', res.response);
-    //             // console.log('rfquhjweoruiqew', allGroups);
-    //             setAllGroups(prevData => [res.response, ...prevData]);             
-    //         } else {
-    //             console.log(res);
-    //         }
-    //     });
-    // }
+    async function addGroup() {
+        const group = abbGroup + numberGroup;
+        const dir = direction.value;
+        await addNewGroup(group, dir,(res) => {
+            if (res.success) {
+                console.log('rfquhjweoruiqew', res.response);
+                // console.log('rfquhjweoruiqew', allGroups);
+                setAllGroups(prevData => [res.response, ...prevData]);             
+            } else {
+                console.log(res);
+            }
+        });
+    }
 
-    // useEffect(() => {
-    //     setSearchResults(allGroups)
-    // }, [allGroups])
+    useEffect(() => {
+        setSearchResults(allGroups)
+    }, [allGroups])
 
     // async function editData(index, title, phone) {
     //     await editDepartment(index, title, phone, (res) => {
@@ -169,6 +178,14 @@ function Admin_groups() {
         }
     }, [searchResults, visibleItems]);
 
+    function handleHeadChange(data) {
+        setHead(data);
+        setAbbGroup(allHeads.find((el)=>el.id === data.value).abbreviation)
+        setDirection(null);
+    }
+    function handleDirectionChange(data) {
+        setDirection(data);
+    }
 
     return (
         <>
@@ -199,8 +216,8 @@ function Admin_groups() {
                         <div className='col1'>
                             <p><span>Группа: </span>{res.title}</p>
                             <p><span>Наравление: </span>{allDirectivities.find((el) => el.id === res.directivityId)
-                             && allHeads.find((head)=> head.id === allDirectivities.find((el) => el.id === res.directivityId).headId)
-                              && allHeads.find((head)=> head.id === allDirectivities.find((el) => el.id === res.directivityId).headId ).title}</p>
+                                && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId)
+                                && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).title}</p>
                         </div>
                         <div className='col2'>
                             <p><span>Направленность: </span>{allDirectivities.find((el) => el.id === res.directivityId) && allDirectivities.find((el) => el.id === res.directivityId).title}</p>
@@ -235,18 +252,45 @@ function Admin_groups() {
             )}
             <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-department'>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-dapartment' placeholder=' ' value={titleDepartment} onChange={e => setTitleDepartment(e.target.value)} />
-                        <label className='label-name'>Название кафедры</label>
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Направление"
+                        value={head}
+                        onChange={handleHeadChange}
+                        isSearchable={true}
+                        isClearable={true}
+                        options={allHeads.map(res => ({
+                            value: res.id,
+                            label: res.title
+                        }
+                        ))}
+                    />
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Направленность"
+                        value={direction}
+                        onChange={handleDirectionChange}
+                        isSearchable={true}
+                        isClearable={true}
+                        isDisabled={head ? false : true}
+                        options={head && allDirectivities.filter((el) => el.headId === head.value).map(res => ({
+                            value: res.id,
+                            label: res.title
+                        }))}
+
+                    />
+                    <div className='value-input'>
+                        {head !== null &&  <p>{abbGroup}</p>}
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-dapartment' placeholder=' ' value={numberGroup} onChange={e => setNumberGroup(e.target.value)} />
+                            <label className='label-name'>Номер группы</label>
+                        </div>
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='phone-dapartment' placeholder=' ' value={phoneDepartment} onChange={e => setPhoneDepartment(e.target.value)} />
-                        <label className='label-name'>Номер телефона</label>
-                    </div>
+
                 </div>
                 <div className='modal-button'>
-                    {/* <button onClick={() => { addDepartment(); setModalActive(false); setTitleDepartment(''); setPhoneDepartment(''); }}>Сохранить</button>
-                    <button onClick={() => { setModalActive(false); }}>Отмена</button> */}
+                    <button onClick={() => { addGroup(); setModalActive(false); setHead(null); setDirection(null); setAbbGroup(''); setNumberGroup(''); }}>Сохранить</button>
+                    <button onClick={() => { setModalActive(false); }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >

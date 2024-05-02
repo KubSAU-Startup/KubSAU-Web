@@ -98,3 +98,12 @@
 .btn-to-log:active{
     background-color: #1e971c;
 }
+
+.value-input{
+    display: flex;
+    align-items: baseline;
+}
+
+.value-input > p{
+    margin-right: 20px;
+}

@@ -216,6 +216,20 @@ async function getAllHeads(callback) {
 
 }
 
+async function addNewGroup(gropTitle, directId, callback) {
+    const url = `${baseUrl_test}/groups`;
+    await axios.post(url, {
+        title: gropTitle,
+        directivityId: directId
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
 
 
 
@@ -338,6 +352,6 @@ export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
-    getAllGroups, getAllDirectivities, getAllHeads
+    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup
 }
 
