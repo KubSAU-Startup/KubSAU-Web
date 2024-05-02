@@ -16,6 +16,7 @@ import User_account from './components/users/User_account';
 import User_main from './components/users/User_main';
 import User_subject from './components/users/User_subject';
 import User_prof from './components/users/User_prof';
+import Admin_groups from './components/admin/Admin_groups';
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
         <Route path='CreateQR' element={<CreateQR />} />
         <Route path='AdminDepartment' element={<Admin_department />} />
         <Route path='AdminStud' element={<Admin_students />} />
+        <Route path='AdminGroup' element={<Admin_groups />} />
         <Route path='AdminDirection' element={<Admin_direction />} />
         <Route path='AdminAccount' element={<Admin_account />} />
         <Route path='AdminUsers' element={<Admin_users />} />

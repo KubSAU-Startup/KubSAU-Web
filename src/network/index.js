@@ -15,10 +15,10 @@ async function loginAxios(loginInfo, callback) {
     console.log(loginInfo)
 
     await axios.post(url, {
-            login: loginInfo.email,
-            password: loginInfo.password
-        
-    },{
+        login: loginInfo.email,
+        password: loginInfo.password
+
+    }, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
         callback(res.data);
@@ -89,7 +89,7 @@ async function getDataAdminJournal(offset, limit, par, callback) {
     const url = `${baseUrl_test}/works/latest`;
 
     await axios.get(url, {
-        params:{
+        params: {
             offset: offset,
             limit: limit,
             workTypeId: par.workTypeId,
@@ -109,7 +109,7 @@ async function getDataPrograms(offset, limit, callback) {
     const url = `${baseUrl_test}/programs`;
 
     await axios.get(url, {
-        params:{
+        params: {
             offset: offset,
             limit: limit,
             extended: true
@@ -121,7 +121,7 @@ async function getDataPrograms(offset, limit, callback) {
     })
 }
 
-async function getDirectivitiesPrograms(callback){
+async function getDirectivitiesPrograms(callback) {
     const url = `${baseUrl_test}/directivities`;
 
     await axios.get(url).then((res) => {
@@ -130,6 +130,92 @@ async function getDirectivitiesPrograms(callback){
         console.log(error)
     })
 }
+
+async function getAllDepartments(callback) {
+    const url = `${baseUrl_test}/departments`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+
+}
+async function addNewDepartment(dapartmentTitle, departmentPhone, callback) {
+    const url = `${baseUrl_test}/departments`;
+    await axios.post(url, {
+        title: dapartmentTitle,
+        phone: departmentPhone
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function editDepartment(id, dapartmentTitle, departmentPhone, callback) {
+    const url = `${baseUrl_test}/departments/${id}`;
+    console.log(id, dapartmentTitle, departmentPhone)
+    await axios.patch(url, {
+        title: dapartmentTitle,
+        phone: departmentPhone
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }
+    ).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function deleteDepartment(index, callback) {
+    const url = `${baseUrl_test}/departments/${index}`;
+    await axios.delete(url).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function getAllGroups(callback) {
+    const url = `${baseUrl_test}/groups`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+
+}
+
+async function getAllDirectivities(callback) {
+    const url = `${baseUrl_test}/directivities`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+
+}
+
+async function getAllHeads(callback) {
+    const url = `${baseUrl_test}/heads`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+
+}
+
 
 
 
@@ -148,16 +234,7 @@ async function getAllStudents(callback) {
 
 }
 
-async function getAllDepartments(callback) {
-    const url = `${baseUrl_test}/departments`;
 
-    await axios.get(url).then((res) => {
-        callback(res.data);
-    }).catch((error) => {
-        console.log(error)
-    })
-
-}
 
 async function getDataForQR(callback) {
     const url = `${baseUrl_test}/programs`;
@@ -236,47 +313,7 @@ async function getAllWorkTypes(callback) {
     })
 }
 
-async function addNewDepartment(dapartmentTitle, departmentPhone, callback) {
-    const url = `${baseUrl_test}/departments`;
-    await axios.post(url, {
-        title: dapartmentTitle,
-        phone: departmentPhone
-    }, {
-        headers: { 'content-type': 'application/x-www-form-urlencoded' }
-    }).then((res) => {
-        console.log(res);
-        callback(res.data);
-    }).catch((error) => {
-        console.log(error)
-    })
-}
 
-async function editDepartment(id, dapartmentTitle, departmentPhone, callback) {
-    const url = `${baseUrl_test}/departments/${id}`;
-    console.log(id, dapartmentTitle, departmentPhone)
-    await axios.patch(url, {
-        title: dapartmentTitle,
-        phone: departmentPhone
-    }, {
-        headers: { 'content-type': 'application/x-www-form-urlencoded' }
-    }
-    ).then((res) => {
-        console.log(res);
-        callback(res.data);
-    }).catch((error) => {
-        console.log(error)
-    })
-}
-
-async function deleteDepartment(index, callback) {
-    const url = `${baseUrl_test}/departments/${index}`;
-    await axios.delete(url).then((res) => {
-        console.log(res);
-        callback(res.data);
-    }).catch((error) => {
-        console.log(error)
-    })
-}
 
 function getTextError(data) {
     let textError = '';
@@ -298,8 +335,9 @@ function getTextError(data) {
 }
 
 export {
-    checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal, 
+    checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
-    getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms
+    getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
+    getAllGroups, getAllDirectivities, getAllHeads
 }
 

@@ -6,15 +6,18 @@ import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { addNewDepartment, deleteDepartment, editDepartment, getAllDepartments, getTextError } from '../../network';
+import { addNewDepartment, deleteDepartment, editDepartment, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
 import Empty_modal from '../Modal/Empty_modal';
 
-
-function Admin_department() {
+function Admin_groups() {
     const [modalActive, setModalActive] = useState(false);
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
-    const [allDepartments, setAllDepartments] = useState([]);
+    const [allGroups, setAllGroups] = useState([]);
+    const [allDirectivities, setAllDirectivities] = useState([]);
+    const [allHeads, setAllHeads] = useState([]);
+
+
     const [searchResults, setSearchResults] = useState([]);
     // const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,16 +42,33 @@ function Admin_department() {
 
     useEffect(() => {
         setVisibleItems(10);
-
-
-        getAllDepartments((res) => {
+        getAllGroups((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
             } else {
-                setAllDepartments(res.response);
+                setAllGroups(res.response);
                 setSearchResults(res.response.reverse());
-                console.log(searchResults);
+            }
+            setIsLoading(false);
+        });
+
+        getAllDirectivities((res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                setAllDirectivities(res.response.directivities);
+            }
+            setIsLoading(false);
+        });
+
+        getAllHeads((res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                setAllHeads(res.response.heads);
             }
             setIsLoading(false);
         });
@@ -60,12 +80,13 @@ function Admin_department() {
         const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
         setSearchTerm(e.target.value);
         setIsLoading(true);
-        const filteredResults = allDepartments.filter(item => {
+        const filteredResults = allGroups.filter(item => {
 
             // Проверяем условие для каждого поля, по которому хотим искать
             return (
                 item.title.toLowerCase().includes(searchTerm) ||
-                item.phone.toLowerCase().includes(searchTerm)
+                allDirectivities.find((el) => el.id === item.directivityId).title.toLowerCase().includes(searchTerm) ||
+                allHeads.find((head)=> head.id === allDirectivities.find((el) => el.id === item.directivityId).headId ).title.toLowerCase().includes(searchTerm)
             );
         });
         setSearchResults(filteredResults);
@@ -79,66 +100,57 @@ function Admin_department() {
             [cartId]: !prevCartStates[cartId],
         }));
     };
-    async function addDepartment() {
-        await addNewDepartment(titleDepartment, phoneDepartment,(res) => {
-            if (res.success) {
-                // console.log('rfquhjweoruiqew', res.response);
-                // console.log('rfquhjweoruiqew', allDepartments);
-                setAllDepartments(prevData => [res.response, ...prevData]);             
-            } else {
-                console.log(res);
-            }
-        });
-    }
-    
-    useEffect(() => {
-        setSearchResults(allDepartments)
-    }, [allDepartments])
+    // async function addDepartment() {
+    //     await addNewDepartment(titleDepartment, phoneDepartment,(res) => {
+    //         if (res.success) {
+    //             // console.log('rfquhjweoruiqew', res.response);
+    //             // console.log('rfquhjweoruiqew', allGroups);
+    //             setAllGroups(prevData => [res.response, ...prevData]);             
+    //         } else {
+    //             console.log(res);
+    //         }
+    //     });
+    // }
 
-    async function editData(index, title, phone) {
-        await editDepartment(index, title, phone, (res) => {
-            if (res.success) {
-               
-                const editDepartments = allDepartments.map(elem => {
-                    if(elem.id === index) {
-                        return {
-                            ...elem, // копируем все свойства из исходного объекта
-                            title: title, // обновляем поле title
-                            phone: phone // обновляем поле phone
-                        };
-                    } else {
-                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-                    }
-                });
-                
-                setAllDepartments(editDepartments);
-                
-            } else {
-                console.log(res.response);
-            }
-        });
-        
-    }
+    // useEffect(() => {
+    //     setSearchResults(allGroups)
+    // }, [allGroups])
 
-    async function deleteData(index) {
-        await deleteDepartment(index, (res) => {
-            if (res.success) {
-                console.log(res.response);
-                setAllDepartments(allDepartments.filter((a)=> a.id !== index));
+    // async function editData(index, title, phone) {
+    //     await editDepartment(index, title, phone, (res) => {
+    //         if (res.success) {
 
-            } else {
-                console.log(res.response);
-            }
-        });
-        
-    }
+    //             const editDepartments = allGroups.map(elem => {
+    //                 if(elem.id === index) {
+    //                     return {
+    //                         ...elem, // копируем все свойства из исходного объекта
+    //                         title: title, // обновляем поле title
+    //                         phone: phone // обновляем поле phone
+    //                     };
+    //                 } else {
+    //                     return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+    //                 }
+    //             });
 
+    //             setAllGroups(editDepartments);
 
-    // const addDepartment = () => {
-    //     addNewDepartment(titleDepartment, phoneDepartment, (res) => {
-    //         console.log(res)
-    //     })
+    //         } else {
+    //             console.log(res.response);
+    //         }
+    //     });
 
+    // }
+
+    // async function deleteData(index) {
+    //     await deleteDepartment(index, (res) => {
+    //         if (res.success) {
+    //             console.log(res.response);
+    //             setAllGroups(allGroups.filter((a)=> a.id !== index));
+
+    //         } else {
+    //             console.log(res.response);
+    //         }
+    //     });
 
     // }
 
@@ -157,21 +169,6 @@ function Admin_department() {
         }
     }, [searchResults, visibleItems]);
 
-    // function editData(index, title, phone) {
-    //     editDepartment(index, title, phone, (res) => {
-    //         console.log(res);
-
-    //     });
-
-    // }
-
-    // async function deleteData(index) {
-    //     await deleteDepartment(index, (res) => {
-    //         console.log(res.data.success);
-
-    //     });
-
-    // }
 
     return (
         <>
@@ -197,13 +194,20 @@ function Admin_department() {
             </div>
 
             {searchResults.slice(0, visibleItems).map(res => (
-                <div className='cart-department' key={res.id}>
-                    <div className='data-department'>
-                        <p><span>Кафедра: </span>{res.title}</p>
-                        <p><span>Номер телефона: </span>{res.phone}</p>
+                <div className='cart-stud' key={res.id}>
+                    <div className='content'>
+                        <div className='col1'>
+                            <p><span>Группа: </span>{res.title}</p>
+                            <p><span>Наравление: </span>{allDirectivities.find((el) => el.id === res.directivityId)
+                             && allHeads.find((head)=> head.id === allDirectivities.find((el) => el.id === res.directivityId).headId)
+                              && allHeads.find((head)=> head.id === allDirectivities.find((el) => el.id === res.directivityId).headId ).title}</p>
+                        </div>
+                        <div className='col2'>
+                            <p><span>Направленность: </span>{allDirectivities.find((el) => el.id === res.directivityId) && allDirectivities.find((el) => el.id === res.directivityId).title}</p>
+                        </div>
                     </div>
                     <button
-                        className='department-setting'
+                        className='student-setting'
                         onClick={() => handleSettingClick(res.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
@@ -212,8 +216,8 @@ function Admin_department() {
                         <button onClick={() => {
                             setModalEditActive(true);
                             setEditId(res.id);
-                            allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
-                            allDepartments.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
+                            allGroups.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
+                            allGroups.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
                         }}>
                             <img src={require('../../img/edit.png')} alt='edit' />
                         </button>
@@ -241,8 +245,8 @@ function Admin_department() {
                     </div>
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { addDepartment(); setModalActive(false); setTitleDepartment(''); setPhoneDepartment(''); }}>Сохранить</button>
-                    <button onClick={() => { setModalActive(false); }}>Отмена</button>
+                    {/* <button onClick={() => { addDepartment(); setModalActive(false); setTitleDepartment(''); setPhoneDepartment(''); }}>Сохранить</button>
+                    <button onClick={() => { setModalActive(false); }}>Отмена</button> */}
                 </div>
             </Empty_modal>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
@@ -257,16 +261,16 @@ function Admin_department() {
                     </div>
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { editData(editId, newTitle, newPhone); setModalEditActive(false); }}>Сохранить</button>
-                    <button onClick={() => { setModalEditActive(false); }}>Отмена</button>
+                    {/* <button onClick={() => { editData(editId, newTitle, newPhone); setModalEditActive(false); }}>Сохранить</button>
+                    <button onClick={() => { setModalEditActive(false); }}>Отмена</button> */}
                 </div>
             </Empty_modal>
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
-                        <button onClick={() => { deleteData(deleteId); setModalDeleteActive(false); }}>Удалить</button>
-                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
+                        {/* <button onClick={() => { deleteData(deleteId); setModalDeleteActive(false); }}>Удалить</button>
+                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button> */}
                     </div>
                 </div>
             </Empty_modal>
@@ -274,4 +278,5 @@ function Admin_department() {
     )
 }
 
-export default Admin_department;
+
+export default Admin_groups;

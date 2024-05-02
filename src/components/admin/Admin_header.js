@@ -25,6 +25,7 @@ function Admin_header() {
                     <Link to="/AdminMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
                     <Link to="/AdminDepartment" className='link-to'><li className='menu_item'>Кафедры</li></Link>
                     <Link to="/AdminStud" className='link-to'><li className='menu_item'>Студенты</li></Link>
+                    <Link to="/AdminGroup" className='link-to'><li className='menu_item'>Группы</li></Link>
                     <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
                 </ul>
             </nav>
