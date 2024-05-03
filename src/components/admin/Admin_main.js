@@ -110,6 +110,7 @@ function Admin_main() {
         setSelectedDepartment(null);
         setSelectedGroup(null);
         setSearchTerm('');
+        setOffset(0);
 
         // параметры для сброса
         setJournalParam({
@@ -126,6 +127,7 @@ function Admin_main() {
     // Функция для получения данных с сервера и выполнения поиска
     const getParams = () => {
         setIsLoading(true);
+        setOffset(0);
         setJournalParam({
             disciplineId: selectedDiscipline ? selectedDiscipline.value : null,
             teacherId: selectedTeacher ? selectedTeacher.value : null,
@@ -179,10 +181,9 @@ function Admin_main() {
         setIsLoading(false);
     };
 
-    // функция получения данных для заполнения журнала
     useEffect(() => {
         setIsLoading(true);
-
+        setHasMoreData(true)
         getDataAdminJournal(offset, limit, journalParam, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -191,12 +192,22 @@ function Admin_main() {
                 if (res.response.journal.length < limit) {
                     setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
                 }
-                setMainData(prevData => [...prevData, ...res.response.journal]); // Добавляем новые данные к существующим
-                setSearchResults(prevResults => [...prevResults, ...res.response.journal]); // Обновляем результаты поиска
+    
+                // Если это первая страница, просто устанавливаем новые данные
+                if (offset === 0) {
+                    setMainData(res.response.journal);
+                    setSearchResults(res.response.journal);
+                } else {
+                    // Иначе обновляем данные
+                    setMainData(prevData => [...prevData, ...res.response.journal]);
+                    setSearchResults(prevResults => [...prevResults, ...res.response.journal]);
+                }
             }
             setIsLoading(false);
         })
     }, [offset, limit, journalParam]);
+    
+
 
 
     // получения данных о необходимой фильтрации
