@@ -231,6 +231,22 @@ async function addNewGroup(gropTitle, directId, callback) {
     })
 }
 
+async function editGroup(id, groupAbb, groupNumber, groupDirectivity, callback) {
+    const url = `${baseUrl_test}/groups/${id}`;
+    // console.log(id, dapartmentTitle, departmentPhone)
+    await axios.patch(url, {
+        title: groupAbb+groupNumber,
+        directivityId: groupDirectivity
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }
+    ).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
 
 
 
@@ -352,6 +368,6 @@ export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
-    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup
+    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup
 }
 

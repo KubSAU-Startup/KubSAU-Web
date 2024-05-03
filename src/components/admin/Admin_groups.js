@@ -7,7 +7,7 @@ import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { addNewDepartment, addNewGroup, deleteDepartment, editDepartment, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
+import { addNewGroup, editGroup, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
 import Empty_modal from '../Modal/Empty_modal';
 import { customStylesModal, customStylesTypeOfWork } from '../Select_style/Select_style';
 
@@ -29,15 +29,21 @@ function Admin_groups() {
     // const [getProgId, setGetProgId] = useState(null);
     const [cartStates, setCartStates] = useState({});
     const [numberGroup, setNumberGroup] = useState('');
+    const [newNumberGroup, setNewNumberGroup] = useState(null);
+
     const [phoneDepartment, setPhoneDepartment] = useState(null);
 
-    const [newTitle, setNewTitle] = useState(null);
-    const [newPhone, setNewPhone] = useState(null);
+    const [newTitle, setNewNumber] = useState(null);
+    const [newDirectivity, setNewDirectivity] = useState(null);
+    const [newHead, setNewHead] = useState(null);
+
 
     const [head, setHead] = useState(null);
-    const [direction, setDirection] = useState(null);
+    const [directivity, setDirectivity] = useState(null);
 
     const [abbGroup, setAbbGroup] = useState('');
+    const [newAbbGroup, setNewAbbGroup] = useState('');
+
 
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
@@ -107,14 +113,14 @@ function Admin_groups() {
             [cartId]: !prevCartStates[cartId],
         }));
     };
-    async function addGroup() {
+    async function addData() {
         const group = abbGroup + numberGroup;
-        const dir = direction.value;
-        await addNewGroup(group, dir,(res) => {
+        const dir = directivity.value;
+        await addNewGroup(group, dir, (res) => {
             if (res.success) {
                 console.log('rfquhjweoruiqew', res.response);
                 // console.log('rfquhjweoruiqew', allGroups);
-                setAllGroups(prevData => [res.response, ...prevData]);             
+                setAllGroups(prevData => [res.response, ...prevData]);
             } else {
                 console.log(res);
             }
@@ -125,30 +131,31 @@ function Admin_groups() {
         setSearchResults(allGroups)
     }, [allGroups])
 
-    // async function editData(index, title, phone) {
-    //     await editDepartment(index, title, phone, (res) => {
-    //         if (res.success) {
+    async function editData(index, abb, num, dir) {
+        await editGroup(index, abb, num, dir, (res) => {
+            if (res.success) {
+                console.log(res.response);
 
-    //             const editDepartments = allGroups.map(elem => {
-    //                 if(elem.id === index) {
-    //                     return {
-    //                         ...elem, // копируем все свойства из исходного объекта
-    //                         title: title, // обновляем поле title
-    //                         phone: phone // обновляем поле phone
-    //                     };
-    //                 } else {
-    //                     return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-    //                 }
-    //             });
+                const editGroup = allGroups.map(elem => {
+                    if (elem.id === index) {
+                        return {
+                            ...elem, // копируем все свойства из исходного объекта
+                            title: abb+num, // обновляем поле title
+                            directivityId: dir // обновляем поле phone
+                        };
+                    } else {
+                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                    }
+                });
 
-    //             setAllGroups(editDepartments);
+                setAllGroups(editGroup);
 
-    //         } else {
-    //             console.log(res.response);
-    //         }
-    //     });
+            } else {
+                console.log(res.response);
+            }
+        });
 
-    // }
+    }
 
     // async function deleteData(index) {
     //     await deleteDepartment(index, (res) => {
@@ -180,11 +187,24 @@ function Admin_groups() {
 
     function handleHeadChange(data) {
         setHead(data);
-        setAbbGroup(allHeads.find((el)=>el.id === data.value).abbreviation)
-        setDirection(null);
+        if (data !== null) {
+            setAbbGroup(allHeads.find((el) => el.id === data.value).abbreviation);
+        }
+        setDirectivity(null);
     }
-    function handleDirectionChange(data) {
-        setDirection(data);
+
+    function handledirectivityChange(data) {
+        setDirectivity(data);
+    }
+    function handleNewHeadChange(data) {
+        setNewHead(data);
+        if (data !== null) {
+            setNewAbbGroup(allHeads.find((el) => el.id === data.value).abbreviation)
+        }
+        setNewDirectivity(null);
+    }
+    function handleNewDirectivityChange(data) {
+        setNewDirectivity(data);
     }
 
     return (
@@ -233,8 +253,18 @@ function Admin_groups() {
                         <button onClick={() => {
                             setModalEditActive(true);
                             setEditId(res.id);
-                            allGroups.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
-                            allGroups.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
+                            allGroups.filter(el => el.id === res.id).map(r => {
+                                setNewAbbGroup(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation);
+                                setNewNumberGroup(r.title.replace(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation, ''));
+                            });
+                            allHeads.filter((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).map(r => setNewHead({
+                                value: r.id,
+                                label: r.title
+                            }))
+                            allDirectivities.filter((el) => el.id === res.directivityId).map(r => setNewDirectivity({
+                                value: r.id,
+                                label: r.title
+                            }));
                         }}>
                             <img src={require('../../img/edit.png')} alt='edit' />
                         </button>
@@ -268,8 +298,8 @@ function Admin_groups() {
                     <Select
                         styles={customStylesModal}
                         placeholder="Направленность"
-                        value={direction}
-                        onChange={handleDirectionChange}
+                        value={directivity}
+                        onChange={handledirectivityChange}
                         isSearchable={true}
                         isClearable={true}
                         isDisabled={head ? false : true}
@@ -280,7 +310,7 @@ function Admin_groups() {
 
                     />
                     <div className='value-input'>
-                        {head !== null &&  <p>{abbGroup}</p>}
+                        {head !== null && <p>{abbGroup}</p>}
                         <div className='input-conteiner'>
                             <input type='text' className='name-dapartment' placeholder=' ' value={numberGroup} onChange={e => setNumberGroup(e.target.value)} />
                             <label className='label-name'>Номер группы</label>
@@ -289,24 +319,48 @@ function Admin_groups() {
 
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { addGroup(); setModalActive(false); setHead(null); setDirection(null); setAbbGroup(''); setNumberGroup(''); }}>Сохранить</button>
+                    <button onClick={() => { addData(); setModalActive(false); setHead(null); setDirectivity(null); setAbbGroup(''); setNumberGroup(''); }}>Сохранить</button>
                     <button onClick={() => { setModalActive(false); }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
-                <div className='modal-department'>
+                <Select
+                    styles={customStylesModal}
+                    placeholder="Направление"
+                    value={newHead}
+                    onChange={handleNewHeadChange}
+                    isSearchable={true}
+                    isClearable={true}
+                    options={allHeads.map(res => ({
+                        value: res.id,
+                        label: res.title
+                    }
+                    ))}
+                />
+                <Select
+                    styles={customStylesModal}
+                    placeholder="Направленность"
+                    value={newDirectivity}
+                    onChange={handleNewDirectivityChange}
+                    isSearchable={true}
+                    isClearable={true}
+                    isDisabled={newHead ? false : true}
+                    options={newHead && allDirectivities.filter((el) => el.headId === newHead.value).map(res => ({
+                        value: res.id,
+                        label: res.title
+                    }))}
+
+                />
+                <div className='value-input'>
+                    {newHead !== null && <p>{newAbbGroup}</p>}
                     <div className='input-conteiner'>
-                        <input type='text' className='name-dapartment' placeholder=' ' value={newTitle} onChange={e => setNewTitle(e.target.value)} />
-                        <label className='label-name'>Название кафедры</label>
-                    </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} />
-                        <label className='label-name'>Номер телефона</label>
+                        <input type='text' className='name-dapartment' placeholder=' ' value={newNumberGroup} onChange={e => setNewNumberGroup(e.target.value)} />
+                        <label className='label-name'>Номер группы</label>
                     </div>
                 </div>
                 <div className='modal-button'>
-                    {/* <button onClick={() => { editData(editId, newTitle, newPhone); setModalEditActive(false); }}>Сохранить</button>
-                    <button onClick={() => { setModalEditActive(false); }}>Отмена</button> */}
+                    <button onClick={() => { editData(editId, newAbbGroup, newNumberGroup, newDirectivity.value); setModalEditActive(false); setNewDirectivity(null); setNewAbbGroup(null); setNewHead(null); setNewNumberGroup(null)}}>Сохранить</button>
+                    <button onClick={() => { setModalEditActive(false); }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
