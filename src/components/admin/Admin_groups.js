@@ -21,19 +21,15 @@ function Admin_groups() {
 
 
     const [searchResults, setSearchResults] = useState([]);
-    // const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-    // const [getProgId, setGetProgId] = useState(null);
     const [cartStates, setCartStates] = useState({});
     const [numberGroup, setNumberGroup] = useState('');
     const [newNumberGroup, setNewNumberGroup] = useState(null);
 
-    const [phoneDepartment, setPhoneDepartment] = useState(null);
 
-    const [newTitle, setNewNumber] = useState(null);
     const [newDirectivity, setNewDirectivity] = useState(null);
     const [newHead, setNewHead] = useState(null);
 
@@ -51,7 +47,6 @@ function Admin_groups() {
     const [visibleItems, setVisibleItems] = useState(10);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
-    const [newDepartment, setNewDepartment] = useState({});
 
     useEffect(() => {
         setVisibleItems(10);
@@ -66,7 +61,7 @@ function Admin_groups() {
             setIsLoading(false);
         });
 
-        getAllDirectivities((res) => {
+        getAllDirectivities(false, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);

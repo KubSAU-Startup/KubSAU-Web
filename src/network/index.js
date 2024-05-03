@@ -48,6 +48,7 @@ async function getFilterWorkType(callback) {
         console.log(error)
     })
 }
+
 async function getFilterDiscipline(callback) {
     const url = `${baseUrl_test}/works/latest/filters/disciplines`;
 
@@ -57,6 +58,7 @@ async function getFilterDiscipline(callback) {
         console.log(error)
     })
 }
+
 async function getFilterEmployees(callback) {
     const url = `${baseUrl_test}/works/latest/filters/employees`;
 
@@ -66,6 +68,7 @@ async function getFilterEmployees(callback) {
         console.log(error)
     })
 }
+
 async function getFilterGroups(callback) {
     const url = `${baseUrl_test}/works/latest/filters/groups`;
 
@@ -75,6 +78,7 @@ async function getFilterGroups(callback) {
         console.log(error)
     })
 }
+
 async function getFilterDepartments(callback) {
     const url = `${baseUrl_test}/works/latest/filters/departments`;
 
@@ -141,6 +145,7 @@ async function getAllDepartments(callback) {
     })
 
 }
+
 async function addNewDepartment(dapartmentTitle, departmentPhone, callback) {
     const url = `${baseUrl_test}/departments`;
     await axios.post(url, {
@@ -194,10 +199,14 @@ async function getAllGroups(callback) {
 
 }
 
-async function getAllDirectivities(callback) {
+async function getAllDirectivities(ext, callback) {
     const url = `${baseUrl_test}/directivities`;
 
-    await axios.get(url).then((res) => {
+    await axios.get(url,{
+        params:{
+            extended: ext
+        }
+    }).then((res) => {
         callback(res.data);
     }).catch((error) => {
         console.log(error)
@@ -257,20 +266,25 @@ async function deleteGroup(index, callback) {
     })
 }
 
+async function getAllStudents(off, lim, callback) {
+    const url = `${baseUrl_test}/students?extended=true`;
 
-
-
-
-async function getAllStudents(callback) {
-    const url = `${baseUrl_test}/students`;
-
-    await axios.get(url).then((res) => {
+    await axios.get(url, {
+        params:{
+            offset: off,
+            limit: lim
+        }
+    }).then((res) => {
         callback(res.data);
     }).catch((error) => {
         console.log(error)
     })
 
 }
+
+
+
+
 
 
 

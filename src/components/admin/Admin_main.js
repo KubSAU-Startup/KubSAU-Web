@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Admin_main.css';
 import Admin_header from './Admin_header';
-import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, getAllStudents } from '../../network';
+import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
 import { customStyles } from '../Select_style/Select_style';

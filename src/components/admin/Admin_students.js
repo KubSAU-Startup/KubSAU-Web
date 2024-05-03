@@ -7,6 +7,7 @@ import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../Modal/Modal';
+import { getAllDirectivities, getAllGroups, getAllStudents, getTextError } from '../../network';
 
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
@@ -16,7 +17,6 @@ function Admin_students() {
     const [userStates, setUserStates] = useState({});
     const [allUsers, setAllUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
 
     const [filterGroup, setFilterGroup] = useState(null);
     const [filterDirectioin, setFilterDirection] = useState(null);
@@ -27,7 +27,108 @@ function Admin_students() {
     const [modalDirectivity, setModalDirectivity] = useState(null);
     const [modalProgram, setModalProgram] = useState(null);
 
+    const [modalEditActive, setModalEditActive] = useState(false);
+    const [modalDeleteActive, setModalDeleteActive] = useState(false);
+    const [allStudents, setAllStudents] = useState([]);
+    const [allStatus, setAllStatus] = useState([]);
+    const [allDirectivities, setAllDirectivities] = useState({
+        directivities: [],
+        heads: [],
+        grades: []
+    });
+    const [allHeads, setAllHeads] = useState([]);
+
+
+    const [searchResults, setSearchResults] = useState([]);
+    const [hasMoreData, setHasMoreData] = useState(true);
+
+    const [allGroups, setAllGroups] = useState([]);
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorActive, setErrorActive] = useState(false);
+    const [textError, setTextError] = useState('');
+    const [cartStates, setCartStates] = useState({});
+    const [numberGroup, setNumberGroup] = useState('');
+    const [newNumberGroup, setNewNumberGroup] = useState(null);
+
+
+    const [newDirectivity, setNewDirectivity] = useState(null);
+    const [newHead, setNewHead] = useState(null);
+
+
+    const [head, setHead] = useState(null);
+    const [directivity, setDirectivity] = useState(null);
+
+    const [abbGroup, setAbbGroup] = useState('');
+    const [newAbbGroup, setNewAbbGroup] = useState('');
+
+
+    const [editId, setEditId] = useState(null);
+    const [deleteId, setDeleteId] = useState(null);
+
+    const [visibleItems, setVisibleItems] = useState(10);
+    const [isPaginationVisible, setIsPaginationVisible] = useState(true);
+
+    const [offset, setOffset] = useState(0);
+    const limit = 30; // Количество элементов на странице
+
+    // функция загрузки данных пагинации
+    const loadMore = () => {
+        setOffset(prevOffset => prevOffset + limit);
+    };
+
     useEffect(() => {
+        getAllStudents(offset, limit, (res) => {
+            setIsLoading(true);
+            setHasMoreData(true);
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                if (res.response.students.length < limit) {
+                    setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
+                }
+
+                // Если это первая страница, просто устанавливаем новые данные
+                if (offset === 0) {
+                    setAllStudents(res.response.students);
+                    setAllStatus(res.response.statuses)
+                    setSearchResults(res.response.students);
+                } else {
+                    // Иначе обновляем данные
+                    setAllStudents(prevData => [...prevData, ...res.response.students]);
+                    setAllStatus(prevData => [...prevData, ...res.response.statuses])
+
+                    setSearchResults(prevResults => [...prevResults, ...res.response.students]);
+                }
+            }
+            setIsLoading(false);
+        });
+    }, [offset, limit])
+
+    useEffect(() => {
+        getAllDirectivities(true, (res) => {
+            setIsLoading(true);
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                setAllDirectivities(res.response);
+            }
+            setIsLoading(false);
+        })
+
+        getAllGroups((res) => {
+            setIsLoading(true);
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                setAllGroups(res.response);
+            }
+            setIsLoading(false);
+        })
         const fetchData = async () => {
             try {
                 const response = await fetch(endpoint);
@@ -143,31 +244,41 @@ function Admin_students() {
             <button className='add-student' onClick={() => setModalActive(true)}>
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button>
+            {searchResults.map(res => (
 
-            {filteredUsers.map(user => (
-                <div className='cart-stud' key={user.id}>
+                <div className='cart-stud'>
                     {/* <div className='data'>
                         {user.id}
                     </div> */}
                     <div className='content'>
                         <div className='col1'>
-                            <p><span>ФИО:</span> {user.name}</p>
-                            <p><span>Направление:</span> {user.address.suite}</p>
-                            <p><span>Направленность:</span> {user.company.name}</p>
+                            <p><span>ФИО:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
+                            <p><span>Группа:</span> {allGroups.find(el => el.id === res.groupId).title}</p>
+                            <p><span>Степень образования:</span> {allStatus.find(el => el.id === res.statusId).title}</p>
+
                         </div>
                         <div className='col2'>
-                            <p><span>Группа:</span> {user.address.city}</p>
-                            <p><span>Программа:</span> {user.email}</p>
+                            {allDirectivities.heads.find(el => el.id === allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId).headId) &&
+                                allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId) &&
+                                allGroups.find(el => el.id === res.groupId) &&
+                                <p><span>Направление:</span> {allDirectivities.heads.find(el => el.id === allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId).headId).title}</p>
+
+                            }
+                            {console.log(allGroups.find(el => el.id === res.groupId).directivityId)}
+                            {allGroups.find(el => el.id === res.groupId).directivityId &&
+                                allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId) &&
+                                <p><span>Направленность:</span> {allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId).title}</p>
+                            }
 
                         </div>
                     </div>
                     <button
                         className='student-setting'
-                        onClick={() => handleSettingClick(user.id)}
+                        onClick={() => handleSettingClick(res.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
-                    <div className={`button-edit-delete ${userStates[user.id] ? 'active' : ''}`}>
+                    <div className={`button-edit-delete ${userStates[res.id] ? 'active' : ''}`}>
                         <button>
                             <img src={require('../../img/edit.png')} alt='edit' />
                         </button>
@@ -177,6 +288,12 @@ function Admin_students() {
                     </div>
                 </div>
             ))}
+            {hasMoreData && (
+                <button className='btn-loadMore' onClick={loadMore}>
+                    Загрузить ещё
+                </button>
+            )}
+
             <Modal active={modalActive} setActive={setModalActive}>
                 <div className='modal-students'>
                     <div className='input-conteiner'>
