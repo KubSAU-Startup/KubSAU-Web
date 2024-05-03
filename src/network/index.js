@@ -247,7 +247,15 @@ async function editGroup(id, groupAbb, groupNumber, groupDirectivity, callback) 
         console.log(error)
     })
 }
-
+async function deleteGroup(index, callback) {
+    const url = `${baseUrl_test}/groups/${index}`;
+    await axios.delete(url).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
 
 
 
@@ -368,6 +376,6 @@ export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
-    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup
+    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup
 }
 

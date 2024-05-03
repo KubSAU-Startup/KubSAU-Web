@@ -7,7 +7,7 @@ import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { addNewGroup, editGroup, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
+import { addNewGroup, editGroup, deleteGroup, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
 import Empty_modal from '../Modal/Empty_modal';
 import { customStylesModal, customStylesTypeOfWork } from '../Select_style/Select_style';
 
@@ -157,18 +157,18 @@ function Admin_groups() {
 
     }
 
-    // async function deleteData(index) {
-    //     await deleteDepartment(index, (res) => {
-    //         if (res.success) {
-    //             console.log(res.response);
-    //             setAllGroups(allGroups.filter((a)=> a.id !== index));
+    async function deleteData(index) {
+        await deleteGroup(index, (res) => {
+            if (res.success) {
+                console.log(res.response);
+                setAllGroups(allGroups.filter((a)=> a.id !== index));
 
-    //         } else {
-    //             console.log(res.response);
-    //         }
-    //     });
+            } else {
+                console.log(res.response);
+            }
+        });
 
-    // }
+    }
 
     // функция пагинации
     const loadMore = () => {
@@ -367,8 +367,8 @@ function Admin_groups() {
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
-                        {/* <button onClick={() => { deleteData(deleteId); setModalDeleteActive(false); }}>Удалить</button>
-                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button> */}
+                        <button onClick={() => { deleteData(deleteId); setModalDeleteActive(false); }}>Удалить</button>
+                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>
