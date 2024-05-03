@@ -254,20 +254,51 @@ function Admin_students() {
                         <div className='col1'>
                             <p><span>ФИО:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
                             <p><span>Группа:</span> {allGroups.find(el => el.id === res.groupId).title}</p>
-                            <p><span>Степень образования:</span> {allStatus.find(el => el.id === res.statusId).title}</p>
+                            {res.groupId &&
+                                <p>
+                                    <span>Степень образования:</span> {
+                                        allDirectivities.grades.find(grade =>
+                                            grade.id === allDirectivities.directivities.find(directivity =>
+                                                directivity.id === allGroups.find(group =>
+                                                    group.id === allStudents.find(student =>
+                                                        student.id === res.groupId
+                                                    ).groupId
+                                                ).directivityId
+                                            ).gradeId
+                                        )?.title
+                                    }
+                                </p>
+                            }
+
 
                         </div>
                         <div className='col2'>
-                            {allDirectivities.heads.find(el => el.id === allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId).headId) &&
-                                allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId) &&
-                                allGroups.find(el => el.id === res.groupId) &&
-                                <p><span>Направление:</span> {allDirectivities.heads.find(el => el.id === allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId).headId).title}</p>
-
+                            {res.groupId &&
+                                <p>
+                                    <span>Направление:</span> {
+                                        allDirectivities.heads.find(head =>
+                                            head.id === allDirectivities.directivities.find(directivity =>
+                                                directivity.id === allGroups.find(group =>
+                                                    group.id === allStudents.find(student =>
+                                                        student.id === res.groupId
+                                                    ).groupId
+                                                ).directivityId
+                                            ).headId
+                                        )?.title
+                                    }
+                                </p>
                             }
+
                             {console.log(allGroups.find(el => el.id === res.groupId).directivityId)}
-                            {allGroups.find(el => el.id === res.groupId).directivityId &&
-                                allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId) &&
-                                <p><span>Направленность:</span> {allDirectivities.directivities.find(r => r.id === allGroups.find(el => el.id === res.groupId).directivityId).title}</p>
+                            {res.groupId &&
+                                <p><span>Направленность:</span> {
+                                    allDirectivities.directivities.find(r =>
+                                        r.id === allGroups.find(el =>
+                                            el.id === res.groupId
+                                        ).directivityId
+                                    )?.title
+                                }
+                                </p>
                             }
 
                         </div>
