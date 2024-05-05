@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './Admin_header.css';
 import './CreateQR.css'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
@@ -80,6 +80,7 @@ function CreateQR() {
   const [getSubject, setGetSubject] = useState(null);
 
   const [getProgId, setGetProgId] = useState(null);
+  const [setting, setSetting] = useState(null);
 
   const [getEditSemester, setGetEditSemester] = useState(null);
   const [getEditProgram, setGetEditProgram] = useState(null);
@@ -87,10 +88,44 @@ function CreateQR() {
 
   const [visibleItems, setVisibleItems] = useState(10);
   const [hasMoreData, setHasMoreData] = useState(true);
-
+  const menuRef = useRef(null);
+ 
 
   const [offset, setOffset] = useState(0);
   const limit = 30; // Количество элементов на странице
+  const [isSetOpen, setIsSetOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const modalRef = useRef(null);
+
+  const openModal = (itemId) => {
+    setSelectedItemId(itemId);
+    // console.log('modal_opened')
+    setIsSetOpen(true);
+  };
+
+  const closeModal = () => {
+    // console.log('modal_closed')
+    setIsSetOpen(false);
+  };
+
+  // Обработчик клика вне модального окна
+  // const handleClickOutside = (event) => {
+  //   if (modalRef.current && !modalRef.current.contains(event.target)) {
+  //     closeModal();
+  //   }
+  // };
+  // useEffect(() => {
+  //   // Добавляем обработчик клика вне модального окна при открытии модального окна
+  //   if (isSetOpen) {
+  //     document.addEventListener('click', handleClickOutside);
+  //   } else {
+  //     document.removeEventListener('click', handleClickOutside);
+  //   }
+  //   // Очищаем обработчик при размонтировании компонента
+  //   return () => {
+  //     document.removeEventListener('click', handleClickOutside);
+  //   };
+  // }, [isSetOpen]);
 
   //загрузка данных с бэка
   useEffect(() => {
@@ -109,6 +144,8 @@ function CreateQR() {
       }
       setIsLoading(false);
     })
+
+
 
 
     // getDisciplinesForPrograms((res) => {
@@ -159,11 +196,38 @@ function CreateQR() {
     //   }
     // })
   }, [offset, limit]);
+  useEffect(() => {
+    // Функция, которая будет вызываться при клике вне меню
+    const handleClickOutside = (event) => {
+      console.log('document handler', isSetOpen)
+      // Проверяем, имеет ли меню атрибут open
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpen(false); // Закрыть меню, если клик был вне его и меню не было уже открыто
+      }
+      // console.log(event.target)
+      // console.log(event.srcElement.offsetParent.key)
+      console.log(modalRef.current)
+      // console.log(modalRef.current.firstChild, event.target)
+      if (!(event.srcElement.offsetParent.className === 'qr-setting')) {
+        closeModal();
+        console.log('я долбаеб')
+      }
+    };
+    
+    // Добавление обработчика события клика для всего документа
+    document.addEventListener("click", handleClickOutside);
 
-  useEffect(()=>{
+    // Очистка обработчика при размонтировании компонента
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  
+  useEffect(() => {
     setIsLoading(true);
-    getDirectivitiesPrograms((res) =>{
-      if(res.error){
+    getDirectivitiesPrograms((res) => {
+      if (res.error) {
         setTextError(getTextError(res.error));
         setErrorActive(true);
       } else {
@@ -171,7 +235,7 @@ function CreateQR() {
       }
       setIsLoading(false);
     })
-  },[]);
+  }, []);
 
   //поиск программ
   const handleChange = event => {
@@ -194,12 +258,15 @@ function CreateQR() {
 
 
   // открытие настроик карточки
-  const handleSettingClick = (progId) => {
-    setGetProgId(progId);
+  const handleSettingClick = (event, progId) => {
+   
+      setGetProgId(progId);
     setUserStates(prevProgStates => ({
-      ...prevProgStates,
+     
       [progId]: !prevProgStates[progId],
     }));
+    
+    
   };
 
   // кнопка выхода из системы
@@ -423,7 +490,7 @@ function CreateQR() {
       {/* шапка страницы */}
       <div className='ad_main_header'>
         <img className='ad_main_logo' src={require('../../img/logo1.png')} />
-        <button className='menu_button' onClick={() => setOpen(!isOpen)}>Журналы
+        <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
           <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
         </button>
         <nav className={`menu ${isOpen ? "active" : ""}`}>
@@ -539,33 +606,45 @@ function CreateQR() {
           <div className='data-qr'>
             <div className='qr1'>
               <p><span>Семестр: </span>{value.program.semester}</p>
-              <p><span>Направленность: </span>{directivitiesPrograms.find((res)=>res.id === value.program.directivityId).title}</p>
+              <p><span>Направленность: </span>{directivitiesPrograms.find((res) => res.id === value.program.directivityId).title}</p>
             </div>
             <div className='qr2'>
               <span>Дисциплины: </span>
               <div className='dicip'>
                 {value.program && value.disciplineIds && value.disciplineIds.map((res) => (
-                <p>{disciplinesPrograms.find(val => val.discipline.id === res).discipline.title}</p>
-              ))}
+                  <p>{disciplinesPrograms.find(val => val.discipline.id === res).discipline.title}</p>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* кнопки редактирования и удаления программы */}
           <button
             className='qr-setting'
-            onClick={() => { handleSettingClick(value.program.id) }}
+            onClick={() => { 
+              if (isSetOpen === true && value.program.id !== selectedItemId) {
+                closeModal();
+                openModal(value.program.id);
+              }
+              else if (isSetOpen === true) {
+                closeModal();
+              }
+              else {
+                openModal(value.program.id);
+              }
+            }}
           >
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
-          <div className={`button-edit-delete ${userStates[value.program.id] ? 'active' : ''}`}>
-            <button onClick={editPrograms}>
-              <img src={require('../../img/edit.png')} alt='edit' />
-            </button>
-            <button>
-              <img src={require('../../img/delete.png')} alt='delete' />
-            </button>
-          </div>
+          {isSetOpen && selectedItemId === value.program.id && (
+            <div className={`button-edit-delete active`}>
+              <button onClick={editPrograms}>
+                <img src={require('../../img/edit.png')} alt='edit' />
+              </button>
+              <button>
+                <img src={require('../../img/delete.png')} alt='delete' />
+              </button>
+            </div>
+          )}
         </div>
       ))}
 
