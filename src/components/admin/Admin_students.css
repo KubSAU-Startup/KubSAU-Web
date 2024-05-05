@@ -78,14 +78,17 @@
 .modal-students {
     display: grid;
     justify-content: left;
+    grid-gap: -40px; 
+
 }
 
 .input-conteiner {
     display: flex;
     justify-content: left;
     position: relative;
-    margin: 20px 0;
-    margin-bottom: 10px;
+    /* top: -20px; */
+    /* margin: 0px 0;
+    margin-bottom: 0px; */
 }
 
 .label-name {
@@ -107,6 +110,7 @@
     font-size: 16px;
     color: #000;
     background: none;
+    top: -50px
 }
 
 .name-stud:focus,
@@ -125,3 +129,4 @@
     font-size: 12px;
     color: #4a4a4a;
 }
+

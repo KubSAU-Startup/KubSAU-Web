@@ -6,7 +6,7 @@ import { customStyles } from '../Select_style/Select_style';
 import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import Modal from '../Modal/Modal';
+import Empty_modal from '../Modal/Empty_modal'
 import { getAllDirectivities, getAllGroups, getAllStudents, getTextError } from '../../network';
 
 
@@ -14,6 +14,7 @@ const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
 function Admin_students() {
     const [modalActive, setModalActive] = useState(false);
+    const [modalContActive, setModalContActive] = useState(false);
     const [userStates, setUserStates] = useState({});
     const [allUsers, setAllUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
@@ -25,7 +26,7 @@ function Admin_students() {
     const [modalGroup, setModalGroup] = useState(null);
     const [modalDirectioin, setModalDirection] = useState(null);
     const [modalDirectivity, setModalDirectivity] = useState(null);
-    const [modalProgram, setModalProgram] = useState(null);
+    const [modalStatus, setModalStatus] = useState(null);
 
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
@@ -148,6 +149,13 @@ function Admin_students() {
 
         fetchData();
     }, []);
+    useEffect(() => {
+        if (modalActive || modalContActive) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
+    }, [modalActive, modalContActive]);
 
     const handleChange = (e) => {
         setSearchTerm(e.target.value);
@@ -178,6 +186,7 @@ function Admin_students() {
 
     function handleModalGroup(data) {
         setModalGroup(data);
+        setModalDirectivity(null);
     }
 
     function handleModalDirection(data) {
@@ -188,8 +197,8 @@ function Admin_students() {
         setModalDirectivity(data);
     }
 
-    function handleModalProgram(data) {
-        setModalProgram(data);
+    function handleModalStatus(data) {
+        setModalStatus(data);
     }
     return (
         <>
@@ -253,7 +262,8 @@ function Admin_students() {
                     <div className='content'>
                         <div className='col1'>
                             <p><span>ФИО:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
-                            <p><span>Группа:</span> {allGroups.find(el => el.id === res.groupId).title}</p>
+                            {res.groupId &&
+                                <p><span>Группа:</span> {allGroups.find(el => el.id === res.groupId)?.title}</p>}
                             {res.groupId &&
                                 <p>
                                     <span>Степень образования:</span> {
@@ -289,7 +299,6 @@ function Admin_students() {
                                 </p>
                             }
 
-                            {console.log(allGroups.find(el => el.id === res.groupId).directivityId)}
                             {res.groupId &&
                                 <p><span>Направленность:</span> {
                                     allDirectivities.directivities.find(r =>
@@ -300,6 +309,11 @@ function Admin_students() {
                                 }
                                 </p>
                             }
+                            {res.id && <p><span>Статус: </span>{
+                                allStatus.find(el=>
+                                    el.id === allStudents.find(r=>
+                                        r.id === res.id).statusId)?.title
+                            }</p>}
 
                         </div>
                     </div>
@@ -325,63 +339,117 @@ function Admin_students() {
                 </button>
             )}
 
-            <Modal active={modalActive} setActive={setModalActive}>
+            <Empty_modal active={modalActive} setActive={setModalActive}>
+
                 <div className='modal-students'>
                     <div className='input-conteiner'>
                         <input type='text' className='name-stud' placeholder=' ' />
-                        <label className='label-name'>ФИО</label>
+                        <label className='label-name'>Фамилия</label>
+                    </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' />
+                        <label className='label-name'>Имя</label>
+                    </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' />
+                        <label className='label-name'>Отчество</label>
                     </div>
                     <div className='input-conteiner'>
                         <input type='text' className='name-course' placeholder=' ' />
                         <label className='label-name'>Курс</label>
                     </div>
+
                     <Select
                         styles={customStylesModal}
                         placeholder="Группа"
                         value={modalGroup}
+                        maxMenuHeight={120}
                         onChange={handleModalGroup}
                         isSearchable={true}
-                        options={allUsers.map(user => ({
-                            value: user.address.suite,
-                            label: user.address.suite,
+                        options={allGroups.map(el => ({
+                            value: el.id,
+                            label: el.title,
                         }))}
                     />
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Направление"
-                        value={modalDirectioin}
-                        onChange={handleModalDirection}
-                        isSearchable={true}
-                        options={allUsers.map(user => ({
-                            value: user.address.city,
-                            label: user.address.city,
-                        }))}
-                    />
-                    <Select
+                    {/* {console.log(allGroups.find(el => el.id === modalGroup).directivityId)} */}
+
+                    {/* <Select
                         styles={customStylesModal}
                         placeholder="Направленность"
                         value={modalDirectivity}
+                        maxMenuHeight={100}
                         onChange={handleModalDirectivity}
+                        isDisabled={modalGroup !== null ? false : true}
                         isSearchable={true}
-                        options={allUsers.map(user => ({
-                            value: user.address.city,
-                            label: user.address.city,
-                        }))}
-                    />
+                        options={modalGroup && allDirectivities.directivities.filter(r =>
+                            r.id === allGroups.find(el =>
+                                el.id === modalGroup.value)?.directivityId).map(res =>
+                                ({
+                                    value: res.id,
+                                    label: res.title
+                                }))}
+                    /> */}
                     <Select
                         styles={customStylesModal}
-                        placeholder="Программа"
-                        value={modalProgram}
-                        onChange={handleModalProgram}
+                        placeholder="Статус"
+                        value={modalStatus}
+                        maxMenuHeight={120}
+                        onChange={handleModalStatus}
                         isSearchable={true}
-                        options={allUsers.map(user => ({
-                            value: user.email,
-                            label: user.email,
+                        options={allStatus.map(el =>
+                        ({
+                            value: el.id,
+                            label: el.title
                         }))}
                     />
+                    <div className='modal-button'>
+                        <button onClick={() => { }}>Сохранить</button>
+                        <button onClick={() => { setModalActive(false) }}>Отмена</button>
+                    </div>
 
                 </div>
-            </Modal>
+            </Empty_modal>
+
+            <Empty_modal active={modalContActive} setActive={setModalContActive}>
+                <Select
+                    styles={customStylesModal}
+                    placeholder="Группа"
+                    value={modalGroup}
+                    onChange={handleModalGroup}
+                    isSearchable={true}
+                    options={allUsers.map(user => ({
+                        value: user.address.suite,
+                        label: user.address.suite,
+                    }))}
+                />
+                <Select
+                    styles={customStylesModal}
+                    placeholder="Направление"
+                    value={modalDirectioin}
+                    onChange={handleModalDirection}
+                    isSearchable={true}
+                    options={allUsers.map(user => ({
+                        value: user.address.city,
+                        label: user.address.city,
+                    }))}
+                />
+                <Select
+                    styles={customStylesModal}
+                    placeholder="Направленность"
+                    value={modalDirectivity}
+                    onChange={handleModalDirectivity}
+                    isSearchable={true}
+                    options={allUsers.map(user => ({
+                        value: user.address.city,
+                        label: user.address.city,
+                    }))}
+                />
+
+                <div className='modal-button'>
+                    <button onClick={() => { }}>Сохранить</button>
+                    <button onClick={() => { setModalContActive(false) }}>Отмена</button>
+                </div>
+            </Empty_modal>
         </>
 
     );
