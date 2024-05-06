@@ -37,6 +37,35 @@ function Admin_department() {
 
     const [newDepartment, setNewDepartment] = useState({});
 
+    const [isSetOpen, setIsSetOpen] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
+
+    const openModal = (itemId) => {
+        setSelectedItemId(itemId);
+        setIsSetOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsSetOpen(false);
+    };
+
+    useEffect(() => {
+        // Функция, которая вызывается при клике вне меню
+        const handleClickOutside = (event) => {
+            if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
+                closeModal();
+            }
+        };
+
+        // Добавление обработчика события клика для всего документа
+        document.addEventListener("click", handleClickOutside);
+
+        // Очистка обработчика при размонтировании компонента
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
+
     useEffect(() => {
         setVisibleItems(10);
 
@@ -80,17 +109,17 @@ function Admin_department() {
         }));
     };
     async function addDepartment() {
-        await addNewDepartment(titleDepartment, phoneDepartment,(res) => {
+        await addNewDepartment(titleDepartment, phoneDepartment, (res) => {
             if (res.success) {
                 // console.log('rfquhjweoruiqew', res.response);
                 // console.log('rfquhjweoruiqew', allDepartments);
-                setAllDepartments(prevData => [res.response, ...prevData]);             
+                setAllDepartments(prevData => [res.response, ...prevData]);
             } else {
                 console.log(res);
             }
         });
     }
-    
+
     useEffect(() => {
         setSearchResults(allDepartments)
     }, [allDepartments])
@@ -98,9 +127,9 @@ function Admin_department() {
     async function editData(index, title, phone) {
         await editDepartment(index, title, phone, (res) => {
             if (res.success) {
-               
+
                 const editDepartments = allDepartments.map(elem => {
-                    if(elem.id === index) {
+                    if (elem.id === index) {
                         return {
                             ...elem, // копируем все свойства из исходного объекта
                             title: title, // обновляем поле title
@@ -110,27 +139,27 @@ function Admin_department() {
                         return elem; // если элемент не подлежит изменению, возвращаем его без изменений
                     }
                 });
-                
+
                 setAllDepartments(editDepartments);
-                
+
             } else {
                 console.log(res.response);
             }
         });
-        
+
     }
 
     async function deleteData(index) {
         await deleteDepartment(index, (res) => {
             if (res.success) {
                 console.log(res.response);
-                setAllDepartments(allDepartments.filter((a)=> a.id !== index));
+                setAllDepartments(allDepartments.filter((a) => a.id !== index));
 
             } else {
                 console.log(res.response);
             }
         });
-        
+
     }
 
 
@@ -203,24 +232,39 @@ function Admin_department() {
                         <p><span>Номер телефона: </span>{res.phone}</p>
                     </div>
                     <button
-                        className='department-setting'
-                        onClick={() => handleSettingClick(res.id)}
+                        className='qr-setting'
+                        onClick={() => {
+                            if (isSetOpen === true && res.id !== selectedItemId) {
+                                closeModal();
+                                openModal(res.id);
+                            }
+                            else if (isSetOpen === true) {
+                                closeModal();
+                            }
+                            else {
+                                openModal(res.id);
+                            }
+                        }}
+                    // className='department-setting'
+                    // onClick={() => handleSettingClick(res.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
-                    <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}>
-                        <button onClick={() => {
-                            setModalEditActive(true);
-                            setEditId(res.id);
-                            allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
-                            allDepartments.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
-                        }}>
-                            <img src={require('../../img/edit.png')} alt='edit' />
-                        </button>
-                        <button onClick={() => { setModalDeleteActive(true); setDeleteId(res.id) }}>
-                            <img src={require('../../img/delete.png')} alt='delete' />
-                        </button>
-                    </div>
+                    {isSetOpen && selectedItemId === res.id && (
+                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                            {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
+                            <button onClick={() => {
+                                setModalEditActive(true);
+                                setEditId(res.id);
+                                allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
+                                allDepartments.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
+                            }}>
+                                <img src={require('../../img/edit.png')} alt='edit' />
+                            </button>
+                            <button onClick={() => { setModalDeleteActive(true); setDeleteId(res.id) }}>
+                                <img src={require('../../img/delete.png')} alt='delete' />
+                            </button>
+                        </div>)}
                 </div>
             ))}
             {/* кнопка пагинации */}

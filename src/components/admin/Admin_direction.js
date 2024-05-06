@@ -26,6 +26,36 @@ function Admin_direction() {
     const [modalDirectivity, setModalDirectivity] = useState(null);
     const [modalProgram, setModalProgram] = useState(null);
 
+    const [isSetOpen, setIsSetOpen] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
+
+    const openModal = (itemId) => {
+        setSelectedItemId(itemId);
+        setIsSetOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsSetOpen(false);
+    };
+
+    useEffect(() => {
+        // Функция, которая вызывается при клике вне меню
+        const handleClickOutside = (event) => {
+            if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
+                closeModal();
+            }
+        };
+
+        // Добавление обработчика события клика для всего документа
+        document.addEventListener("click", handleClickOutside);
+
+        // Очистка обработчика при размонтировании компонента
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
+
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -156,23 +186,38 @@ function Admin_direction() {
                         </div>
                     </div>
                     <button
-                        className='direction-setting'
-                        onClick={() => handleSettingClick(user.id)}
+                        className='qr-setting'
+                        onClick={() => {
+                            if (isSetOpen === true && user.id !== selectedItemId) {
+                                closeModal();
+                                openModal(user.id);
+                            }
+                            else if (isSetOpen === true) {
+                                closeModal();
+                            }
+                            else {
+                                openModal(user.id);
+                            }
+                        }}
+                    // className='direction-setting'
+                    // onClick={() => handleSettingClick(user.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
-                    <div className={`button-edit-delete ${userStates[user.id] ? 'active' : ''}`}>
+                    {isSetOpen && selectedItemId === user.id && (
+                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === user.id ? 'active' : ''}`}>
+                    {/* <div className={`button-edit-delete ${userStates[user.id] ? 'active' : ''}`}> */}
                         <button>
                             <img src={require('../../img/edit.png')} alt='edit' />
                         </button>
                         <button>
                             <img src={require('../../img/delete.png')} alt='delete' />
                         </button>
-                    </div>
+                    </div>)}
                 </div>
             ))}
             <Modal active={modalActive} setActive={setModalActive}>
-            <div className='input-conteiner'>
+                <div className='input-conteiner'>
                     <input type='text' className='name-direction' placeholder=' ' />
                     <label className='label-name'>Название направления</label>
                 </div>
@@ -184,7 +229,7 @@ function Admin_direction() {
                     <input type='text' className='name-direction' placeholder=' ' />
                     <label className='label-name'>Аббревиатура направления</label>
                 </div>
-                
+
                 <Select
                     styles={customStylesModal}
                     placeholder="Программа"

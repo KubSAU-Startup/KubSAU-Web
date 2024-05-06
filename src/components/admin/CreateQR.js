@@ -89,7 +89,7 @@ function CreateQR() {
   const [visibleItems, setVisibleItems] = useState(10);
   const [hasMoreData, setHasMoreData] = useState(true);
   const menuRef = useRef(null);
- 
+
 
   const [offset, setOffset] = useState(0);
   const limit = 30; // Количество элементов на странице
@@ -99,12 +99,10 @@ function CreateQR() {
 
   const openModal = (itemId) => {
     setSelectedItemId(itemId);
-    // console.log('modal_opened')
     setIsSetOpen(true);
   };
 
   const closeModal = () => {
-    // console.log('modal_closed')
     setIsSetOpen(false);
   };
 
@@ -196,24 +194,18 @@ function CreateQR() {
     //   }
     // })
   }, [offset, limit]);
+
   useEffect(() => {
-    // Функция, которая будет вызываться при клике вне меню
+    // Функция, которая вызывается при клике вне меню
     const handleClickOutside = (event) => {
-      console.log('document handler', isSetOpen)
-      // Проверяем, имеет ли меню атрибут open
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpen(false); // Закрыть меню, если клик был вне его и меню не было уже открыто
+        setOpen(false);
       }
-      // console.log(event.target)
-      // console.log(event.srcElement.offsetParent.key)
-      console.log(modalRef.current)
-      // console.log(modalRef.current.firstChild, event.target)
-      if (!(event.srcElement.offsetParent.className === 'qr-setting')) {
+      if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
         closeModal();
-        console.log('я долбаеб')
       }
     };
-    
+
     // Добавление обработчика события клика для всего документа
     document.addEventListener("click", handleClickOutside);
 
@@ -223,7 +215,7 @@ function CreateQR() {
     };
   }, []);
 
-  
+
   useEffect(() => {
     setIsLoading(true);
     getDirectivitiesPrograms((res) => {
@@ -259,14 +251,14 @@ function CreateQR() {
 
   // открытие настроик карточки
   const handleSettingClick = (event, progId) => {
-   
-      setGetProgId(progId);
+
+    setGetProgId(progId);
     setUserStates(prevProgStates => ({
-     
+
       [progId]: !prevProgStates[progId],
     }));
-    
-    
+
+
   };
 
   // кнопка выхода из системы
@@ -620,7 +612,7 @@ function CreateQR() {
 
           <button
             className='qr-setting'
-            onClick={() => { 
+            onClick={() => {
               if (isSetOpen === true && value.program.id !== selectedItemId) {
                 closeModal();
                 openModal(value.program.id);
@@ -636,7 +628,7 @@ function CreateQR() {
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
           {isSetOpen && selectedItemId === value.program.id && (
-            <div className={`button-edit-delete active`}>
+            <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
               <button onClick={editPrograms}>
                 <img src={require('../../img/edit.png')} alt='edit' />
               </button>
@@ -644,7 +636,7 @@ function CreateQR() {
                 <img src={require('../../img/delete.png')} alt='delete' />
               </button>
             </div>
-          )}
+          )} 
         </div>
       ))}
 

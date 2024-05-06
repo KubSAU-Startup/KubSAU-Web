@@ -46,6 +46,34 @@ function Admin_groups() {
 
     const [visibleItems, setVisibleItems] = useState(10);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
+    const [isSetOpen, setIsSetOpen] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
+
+    const openModal = (itemId) => {
+        setSelectedItemId(itemId);
+        setIsSetOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsSetOpen(false);
+    };
+
+    useEffect(() => {
+        // Функция, которая вызывается при клике вне меню
+        const handleClickOutside = (event) => {
+            if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
+                closeModal();
+            }
+        };
+
+        // Добавление обработчика события клика для всего документа
+        document.addEventListener("click", handleClickOutside);
+
+        // Очистка обработчика при размонтировании компонента
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
 
 
     useEffect(() => {
@@ -135,7 +163,7 @@ function Admin_groups() {
                     if (elem.id === index) {
                         return {
                             ...elem, // копируем все свойства из исходного объекта
-                            title: abb+num, // обновляем поле title
+                            title: abb + num, // обновляем поле title
                             directivityId: dir // обновляем поле phone
                         };
                     } else {
@@ -156,7 +184,7 @@ function Admin_groups() {
         await deleteGroup(index, (res) => {
             if (res.success) {
                 console.log(res.response);
-                setAllGroups(allGroups.filter((a)=> a.id !== index));
+                setAllGroups(allGroups.filter((a) => a.id !== index));
 
             } else {
                 console.log(res.response);
@@ -239,34 +267,49 @@ function Admin_groups() {
                         </div>
                     </div>
                     <button
-                        className='student-setting'
-                        onClick={() => handleSettingClick(res.id)}
+                        className='qr-setting'
+                        onClick={() => {
+                            if (isSetOpen === true && res.id !== selectedItemId) {
+                                closeModal();
+                                openModal(res.id);
+                            }
+                            else if (isSetOpen === true) {
+                                closeModal();
+                            }
+                            else {
+                                openModal(res.id);
+                            }
+                        }}
+                    // className='student-setting'
+                    // onClick={() => handleSettingClick(res.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
-                    <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}>
-                        <button onClick={() => {
-                            setModalEditActive(true);
-                            setEditId(res.id);
-                            allGroups.filter(el => el.id === res.id).map(r => {
-                                setNewAbbGroup(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation);
-                                setNewNumberGroup(r.title.replace(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation, ''));
-                            });
-                            allHeads.filter((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).map(r => setNewHead({
-                                value: r.id,
-                                label: r.title
-                            }))
-                            allDirectivities.filter((el) => el.id === res.directivityId).map(r => setNewDirectivity({
-                                value: r.id,
-                                label: r.title
-                            }));
-                        }}>
-                            <img src={require('../../img/edit.png')} alt='edit' />
-                        </button>
-                        <button onClick={() => { setModalDeleteActive(true); setDeleteId(res.id) }}>
-                            <img src={require('../../img/delete.png')} alt='delete' />
-                        </button>
-                    </div>
+                    {isSetOpen && selectedItemId === res.id && (
+                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                            {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
+                            <button onClick={() => {
+                                setModalEditActive(true);
+                                setEditId(res.id);
+                                allGroups.filter(el => el.id === res.id).map(r => {
+                                    setNewAbbGroup(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation);
+                                    setNewNumberGroup(r.title.replace(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation, ''));
+                                });
+                                allHeads.filter((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).map(r => setNewHead({
+                                    value: r.id,
+                                    label: r.title
+                                }))
+                                allDirectivities.filter((el) => el.id === res.directivityId).map(r => setNewDirectivity({
+                                    value: r.id,
+                                    label: r.title
+                                }));
+                            }}>
+                                <img src={require('../../img/edit.png')} alt='edit' />
+                            </button>
+                            <button onClick={() => { setModalDeleteActive(true); setDeleteId(res.id) }}>
+                                <img src={require('../../img/delete.png')} alt='delete' />
+                            </button>
+                        </div>)}
                 </div>
             ))}
             {/* кнопка пагинации */}
@@ -354,7 +397,7 @@ function Admin_groups() {
                     </div>
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { editData(editId, newAbbGroup, newNumberGroup, newDirectivity.value); setModalEditActive(false); setNewDirectivity(null); setNewAbbGroup(null); setNewHead(null); setNewNumberGroup(null)}}>Сохранить</button>
+                    <button onClick={() => { editData(editId, newAbbGroup, newNumberGroup, newDirectivity.value); setModalEditActive(false); setNewDirectivity(null); setNewAbbGroup(null); setNewHead(null); setNewNumberGroup(null) }}>Сохранить</button>
                     <button onClick={() => { setModalEditActive(false); }}>Отмена</button>
                 </div>
             </Empty_modal>

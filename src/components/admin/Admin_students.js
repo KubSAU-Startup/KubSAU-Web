@@ -78,6 +78,34 @@ function Admin_students() {
     const loadMore = () => {
         setOffset(prevOffset => prevOffset + limit);
     };
+    const [isSetOpen, setIsSetOpen] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
+
+    const openModal = (itemId) => {
+        setSelectedItemId(itemId);
+        setIsSetOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsSetOpen(false);
+    };
+
+    useEffect(() => {
+        // Функция, которая вызывается при клике вне меню
+        const handleClickOutside = (event) => {
+            if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
+                closeModal();
+            }
+        };
+
+        // Добавление обработчика события клика для всего документа
+        document.addEventListener("click", handleClickOutside);
+
+        // Очистка обработчика при размонтировании компонента
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
 
     useEffect(() => {
         getAllStudents(offset, limit, (res) => {
@@ -310,27 +338,42 @@ function Admin_students() {
                                 </p>
                             }
                             {res.id && <p><span>Статус: </span>{
-                                allStatus.find(el=>
-                                    el.id === allStudents.find(r=>
+                                allStatus.find(el =>
+                                    el.id === allStudents.find(r =>
                                         r.id === res.id).statusId)?.title
                             }</p>}
 
                         </div>
                     </div>
                     <button
-                        className='student-setting'
-                        onClick={() => handleSettingClick(res.id)}
+                        className='qr-setting'
+                        onClick={() => {
+                            if (isSetOpen === true && res.id !== selectedItemId) {
+                                closeModal();
+                                openModal(res.id);
+                            }
+                            else if (isSetOpen === true) {
+                                closeModal();
+                            }
+                            else {
+                                openModal(res.id);
+                            }
+                        }}
+                    // className='student-setting'
+                    // onClick={() => handleSettingClick(res.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
-                    <div className={`button-edit-delete ${userStates[res.id] ? 'active' : ''}`}>
-                        <button>
-                            <img src={require('../../img/edit.png')} alt='edit' />
-                        </button>
-                        <button>
-                            <img src={require('../../img/delete.png')} alt='delete' />
-                        </button>
-                    </div>
+                    {isSetOpen && selectedItemId === res.id && (
+                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                            {/* <div className={`button-edit-delete ${userStates[res.id] ? 'active' : ''}`}> */}
+                            <button>
+                                <img src={require('../../img/edit.png')} alt='edit' />
+                            </button>
+                            <button>
+                                <img src={require('../../img/delete.png')} alt='delete' />
+                            </button>
+                        </div>)}
                 </div>
             ))}
             {hasMoreData && (
