@@ -71,6 +71,11 @@ function Admin_students() {
     const [visibleItems, setVisibleItems] = useState(10);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
+    const [lastN, setLastN] = useState(null);
+    const [firstN, setFirstN] = useState(null);
+    const [middleN, setMiddleN] = useState(null);
+
+
     const [offset, setOffset] = useState(0);
     const limit = 30; // Количество элементов на странице
 
@@ -264,7 +269,18 @@ function Admin_students() {
                 />
                 <Select
                     styles={customStyles}
-                    placeholder="Программа"
+                    placeholder="Степень образования"
+                    value={filterProgram}
+                    onChange={handleFilterProgram}
+                    isSearchable={true}
+                    options={allUsers.map(user => ({
+                        value: user.email,
+                        label: user.email,
+                    }))}
+                />
+                <Select
+                    styles={customStyles}
+                    placeholder="Статус"
                     value={filterProgram}
                     onChange={handleFilterProgram}
                     isSearchable={true}
@@ -319,9 +335,9 @@ function Admin_students() {
                                                 directivity.id === allGroups.find(group =>
                                                     group.id === allStudents.find(student =>
                                                         student.id === res.groupId
-                                                    ).groupId
-                                                ).directivityId
-                                            ).headId
+                                                    )?.groupId
+                                                )?.directivityId
+                                            )?.headId
                                         )?.title
                                     }
                                 </p>
@@ -386,21 +402,18 @@ function Admin_students() {
 
                 <div className='modal-students'>
                     <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' />
+                        <input type='text' className='name-stud' placeholder=' ' value={lastN} onChange={e => setLastN(e.target.value)} />
                         <label className='label-name'>Фамилия</label>
                     </div>
                     <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' />
+                        <input type='text' className='name-stud' placeholder=' ' value={firstN} onChange={e => setFirstN(e.target.value)} />
                         <label className='label-name'>Имя</label>
                     </div>
                     <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' />
+                        <input type='text' className='name-stud' placeholder=' ' value={middleN} onChange={e => setMiddleN(e.target.value)} />
                         <label className='label-name'>Отчество</label>
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-course' placeholder=' ' />
-                        <label className='label-name'>Курс</label>
-                    </div>
+
 
                     <Select
                         styles={customStylesModal}
@@ -414,24 +427,6 @@ function Admin_students() {
                             label: el.title,
                         }))}
                     />
-                    {/* {console.log(allGroups.find(el => el.id === modalGroup).directivityId)} */}
-
-                    {/* <Select
-                        styles={customStylesModal}
-                        placeholder="Направленность"
-                        value={modalDirectivity}
-                        maxMenuHeight={100}
-                        onChange={handleModalDirectivity}
-                        isDisabled={modalGroup !== null ? false : true}
-                        isSearchable={true}
-                        options={modalGroup && allDirectivities.directivities.filter(r =>
-                            r.id === allGroups.find(el =>
-                                el.id === modalGroup.value)?.directivityId).map(res =>
-                                ({
-                                    value: res.id,
-                                    label: res.title
-                                }))}
-                    /> */}
                     <Select
                         styles={customStylesModal}
                         placeholder="Статус"
@@ -446,7 +441,7 @@ function Admin_students() {
                         }))}
                     />
                     <div className='modal-button'>
-                        <button onClick={() => { }}>Сохранить</button>
+                        <button onClick={() => {addData(); setLastN(null); setFirstN }}>Сохранить</button>
                         <button onClick={() => { setModalActive(false) }}>Отмена</button>
                     </div>
 

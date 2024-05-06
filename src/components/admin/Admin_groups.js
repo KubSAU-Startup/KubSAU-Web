@@ -258,7 +258,7 @@ function Admin_groups() {
                     <div className='content'>
                         <div className='col1'>
                             <p><span>Группа: </span>{res.title}</p>
-                            <p><span>Наравление: </span>{allDirectivities.find((el) => el.id === res.directivityId)
+                            <p><span>Направление: </span>{allDirectivities.find((el) => el.id === res.directivityId)
                                 && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId)
                                 && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).title}</p>
                         </div>
