@@ -7,6 +7,9 @@ import { customStyles } from '../Select_style/Select_style';
 import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { getAllDirectivities, getTextError } from '../../network';
+import Loading from '../Modal/Loading';
+import Error_modal from '../Modal/Error_modal';
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
@@ -20,43 +23,69 @@ function Admin_direction() {
     const [filterDirectivity, setFilterDirectivity] = useState(null);
     const [filterDirectioin, setFilterDirection] = useState(null);
     const [filterProgram, setFilterProgram] = useState(null);
+    const [allDirectivities, setAllDirectivities] = useState({
+        directivities: [],
+        heads: [],
+        grades: []
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchResults, setSearchResults] = useState({
+        directivities: [],
+        heads: [],
+        grades: []
+    });
+    const [errorActive, setErrorActive] = useState(false);
+    const [textError, setTextError] = useState('');
+
+
 
     const [modalIdGroup, setModalIdGroup] = useState(null);
     const [modalDirectioin, setModalDirection] = useState(null);
     const [modalDirectivity, setModalDirectivity] = useState(null);
     const [modalProgram, setModalProgram] = useState(null);
 
-    const [isSetOpen, setIsSetOpen] = useState(false);
-    const [selectedItemId, setSelectedItemId] = useState(null);
+    // const [isSetOpen, setIsSetOpen] = useState(false);
+    // const [selectedItemId, setSelectedItemId] = useState(null);
 
-    const openModal = (itemId) => {
-        setSelectedItemId(itemId);
-        setIsSetOpen(true);
-    };
+    // const openModal = (itemId) => {
+    //     setSelectedItemId(itemId);
+    //     setIsSetOpen(true);
+    // };
 
-    const closeModal = () => {
-        setIsSetOpen(false);
-    };
+    // const closeModal = () => {
+    //     setIsSetOpen(false);
+    // };
+
+    // useEffect(() => {
+    //     // Функция, которая вызывается при клике вне меню
+    //     const handleClickOutside = (event) => {
+    //         if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
+    //             closeModal();
+    //         }
+    //     };
+
+    //     // Добавление обработчика события клика для всего документа
+    //     document.addEventListener("click", handleClickOutside);
+
+    //     // Очистка обработчика при размонтировании компонента
+    //     return () => {
+    //         document.removeEventListener("click", handleClickOutside);
+    //     };
+    // }, []);
+
 
     useEffect(() => {
-        // Функция, которая вызывается при клике вне меню
-        const handleClickOutside = (event) => {
-            if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
-                closeModal();
+setIsLoading(true);
+        getAllDirectivities(true, (res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                setAllDirectivities(res.response);
+                setSearchResults(res.response);
             }
-        };
-
-        // Добавление обработчика события клика для всего документа
-        document.addEventListener("click", handleClickOutside);
-
-        // Очистка обработчика при размонтировании компонента
-        return () => {
-            document.removeEventListener("click", handleClickOutside);
-        };
-    }, []);
-
-
-    useEffect(() => {
+            setIsLoading(false);
+        })
         const fetchData = async () => {
             try {
                 const response = await fetch(endpoint);
@@ -120,6 +149,9 @@ function Admin_direction() {
     }
     return (
         <>
+            <Loading active={isLoading} setActive={setIsLoading} />
+            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+
             <Admin_header />
             <div className='admin-main-search'>
                 <input
@@ -154,7 +186,7 @@ function Admin_direction() {
                 />
                 <Select
                     styles={customStyles}
-                    placeholder="Программа"
+                    placeholder="Степень образованя"
                     value={filterProgram}
                     onChange={handleFilterProgram}
                     isSearchable={true}
@@ -170,22 +202,22 @@ function Admin_direction() {
 
             </div>
 
-            <button className='add-student' onClick={() => setModalActive(true)}>
+            {/* <button className='add-student' onClick={() => setModalActive(true)}>
                 <FontAwesomeIcon icon={faPlusCircle} />
-            </button>
-            {filteredUsers.map(user => (
-                <div className='cart-direct' key={user.id}>
+            </button> */}
+            {searchResults.directivities.map(res => (
+                <div className='cart-direct' key={res.id}>
                     <div className='content'>
                         <div className='col1'>
-                            <p><span>Направление:</span> {user.address.suite}</p>
-                            <p><span>Программа:</span> {user.company.name}</p>
+                            <p><span>Направление:</span> {res.headId && allDirectivities.heads.find(r=>r.id === res.headId)?.title}</p>
+                            <p><span>Степень образования:</span> {res.gradeId && allDirectivities.grades.find(r=>r.id === res.gradeId   )?.title}</p>
                         </div>
                         <div className='col2'>
-                            <p><span>Направленность:</span> {user.address.city}</p>
+                            <p><span>Направленность:</span> {res.title}</p>
 
                         </div>
                     </div>
-                    <button
+                    {/* <button
                         className='qr-setting'
                         onClick={() => {
                             if (isSetOpen === true && user.id !== selectedItemId) {
@@ -206,17 +238,16 @@ function Admin_direction() {
                     </button>
                     {isSetOpen && selectedItemId === user.id && (
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === user.id ? 'active' : ''}`}>
-                    {/* <div className={`button-edit-delete ${userStates[user.id] ? 'active' : ''}`}> */}
                         <button>
                             <img src={require('../../img/edit.png')} alt='edit' />
                         </button>
                         <button>
                             <img src={require('../../img/delete.png')} alt='delete' />
                         </button>
-                    </div>)}
+                    </div>)} */}
                 </div>
             ))}
-            <Modal active={modalActive} setActive={setModalActive}>
+            {/* <Modal active={modalActive} setActive={setModalActive}>
                 <div className='input-conteiner'>
                     <input type='text' className='name-direction' placeholder=' ' />
                     <label className='label-name'>Название направления</label>
@@ -244,7 +275,7 @@ function Admin_direction() {
                 />
 
 
-            </Modal>
+            </Modal> */}
         </>
 
     );
