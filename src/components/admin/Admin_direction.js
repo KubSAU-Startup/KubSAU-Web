@@ -30,6 +30,7 @@ function Admin_direction() {
     const [searchResults, setSearchResults] = useState([]);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
+    const [filterData, setFilterData] = useState([]);
 
     const [searchDone, setSearchDone] = useState(false);
     const [filterDone, setFilterDone] = useState(false);
@@ -104,7 +105,19 @@ function Admin_direction() {
 
         setSearchTerm(e.target.value);
         setIsLoading(true);
-        let filteredResults = allDirectivities.directivities.filter(item => {
+
+        let filteredResults = [...allDirectivities.directivities]; // Создаем копию исходных данных для фильтрации
+        if (filterDirectivity !== null) {
+            filteredResults = filteredResults.filter(res => res.id === filterDirectivity.value);
+        }
+        if (filterDirection !== null) {
+            filteredResults = filteredResults.filter(res => res.headId === filterDirection.value);
+        }
+        if (filterGrade !== null) {
+            filteredResults = filteredResults.filter(res => res.gradeId === filterGrade.value);
+        }
+
+        filteredResults = filteredResults.filter(item => {
 
             // Проверяем условие для каждого поля, по которому хотим искать
             return (
@@ -132,7 +145,7 @@ function Admin_direction() {
         if (filterGrade !== null) {
             filteredResults = filteredResults.filter(res => res.gradeId === filterGrade.value);
         }
-
+        setFilterData(filteredResults);
         setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
         console.log(filteredResults)
     }

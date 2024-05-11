@@ -282,7 +282,51 @@ async function getAllStudents(off, lim, callback) {
 
 }
 
+async function addNewStudent(firstN, lastN, middleN, group, status, callback) {
+    const url = `${baseUrl_test}/students`;
+    await axios.post(url, {
+        firstName: firstN,
+        lastName: lastN,
+        middleName: middleN,
+        groupId: group,
+        statusId: status
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
 
+async function editStudent(id, firstN, lastN, middleN, group, status, callback) {
+    const url = `${baseUrl_test}/students/${id}`;
+    await axios.patch(url, {
+        firstName: firstN,
+        lastName: lastN,
+        middleName: middleN,
+        groupId: group,
+        statusId: status
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function deleteStudent(index, callback) {
+    const url = `${baseUrl_test}/students/${index}`;
+    await axios.delete(url).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
 
 
 
@@ -390,6 +434,6 @@ export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
-    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup
+    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent
 }
 

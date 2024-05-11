@@ -7,7 +7,7 @@ import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import Empty_modal from '../Modal/Empty_modal'
-import { getAllDirectivities, getAllGroups, getAllStudents, getTextError } from '../../network';
+import { getAllDirectivities, getAllGroups, getAllStudents, getTextError, addNewStudent, editStudent, deleteStudent } from '../../network';
 
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
@@ -24,9 +24,9 @@ function Admin_students() {
     const [filterProgram, setFilterProgram] = useState(null);
 
     const [modalGroup, setModalGroup] = useState(null);
-    const [modalDirectioin, setModalDirection] = useState(null);
-    const [modalDirectivity, setModalDirectivity] = useState(null);
+    const [modalEditGroup, setModalEditGroup] = useState(null);
     const [modalStatus, setModalStatus] = useState(null);
+    const [modalEditStatus, setModalEditStatus] = useState(null);
 
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
@@ -74,7 +74,9 @@ function Admin_students() {
     const [lastN, setLastN] = useState(null);
     const [firstN, setFirstN] = useState(null);
     const [middleN, setMiddleN] = useState(null);
-
+    const [lastNEdit, setLastNEdit] = useState(null);
+    const [firstNEdit, setFirstNEdit] = useState(null);
+    const [middleNEdit, setMiddleNEdit] = useState(null);
 
     const [offset, setOffset] = useState(0);
     const limit = 30; // Количество элементов на странице
@@ -132,7 +134,7 @@ function Admin_students() {
                 } else {
                     // Иначе обновляем данные
                     setAllStudents(prevData => [...prevData, ...res.response.students]);
-                    setAllStatus(prevData => [...prevData, ...res.response.statuses])
+                    setAllStatus([...res.response.statuses])
 
                     setSearchResults(prevResults => [...prevResults, ...res.response.students]);
                 }
@@ -183,12 +185,12 @@ function Admin_students() {
         fetchData();
     }, []);
     useEffect(() => {
-        if (modalActive || modalContActive) {
+        if (modalActive || modalEditActive || modalDeleteActive) {
             document.body.classList.add('modal-open');
         } else {
             document.body.classList.remove('modal-open');
         }
-    }, [modalActive, modalContActive]);
+    }, [modalActive, modalEditActive, modalDeleteActive]);
 
     const handleChange = (e) => {
         setSearchTerm(e.target.value);
@@ -197,6 +199,58 @@ function Admin_students() {
         );
         setFilteredUsers(filtered);
     };
+    async function addData() {
+        await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
+            if (res.success) {
+                setAllStudents(prevData => [res.response, ...prevData]);
+            } else {
+                console.log(res);
+            }
+        });
+    }
+    async function editData() {
+        await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
+            if (res.success) {
+                console.log(res.response);
+
+                const editStudent = allStudents.map(elem => {
+                    if (elem.id === editId) {
+                        return {
+                            ...elem, // копируем все свойства из исходного объекта
+                            firstName: firstNEdit,
+                            lastName: lastNEdit,
+                            middleName: middleNEdit,
+                            groupId: modalEditGroup.value,
+                            statusId: modalEditStatus.value
+                        };
+                    } else {
+                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                    }
+                });
+
+                setAllStudents(editStudent);
+
+            } else {
+                console.log(res.response);
+            }
+        });
+    }
+    async function deleteData() {
+        await deleteStudent(deleteId, (res) => {
+            if (res.success) {
+                console.log(res.response);
+                setAllStudents(allStudents.filter((a) => a.id !== deleteId));
+
+            } else {
+                console.log(res.response);
+            }
+        });
+
+    }
+
+    useEffect(() => {
+        setSearchResults(allStudents)
+    }, [allStudents])
 
     const handleSettingClick = (userId) => {
         setUserStates(prevUserStates => ({
@@ -219,19 +273,15 @@ function Admin_students() {
 
     function handleModalGroup(data) {
         setModalGroup(data);
-        setModalDirectivity(null);
     }
-
-    function handleModalDirection(data) {
-        setModalDirection(data);
-    }
-
-    function handleModalDirectivity(data) {
-        setModalDirectivity(data);
-    }
-
     function handleModalStatus(data) {
         setModalStatus(data);
+    }
+    function handleModalEditGroup(data) {
+        setModalEditGroup(data);
+    }
+    function handleModalEditStatus(data) {
+        setModalEditStatus(data);
     }
     return (
         <>
@@ -316,9 +366,9 @@ function Admin_students() {
                                                 directivity.id === allGroups.find(group =>
                                                     group.id === allStudents.find(student =>
                                                         student.id === res.groupId
-                                                    ).groupId
-                                                ).directivityId
-                                            ).gradeId
+                                                    )?.groupId
+                                                )?.directivityId
+                                            )?.gradeId
                                         )?.title
                                     }
                                 </p>
@@ -348,7 +398,7 @@ function Admin_students() {
                                     allDirectivities.directivities.find(r =>
                                         r.id === allGroups.find(el =>
                                             el.id === res.groupId
-                                        ).directivityId
+                                        )?.directivityId
                                     )?.title
                                 }
                                 </p>
@@ -356,7 +406,7 @@ function Admin_students() {
                             {res.id && <p><span>Статус: </span>{
                                 allStatus.find(el =>
                                     el.id === allStudents.find(r =>
-                                        r.id === res.id).statusId)?.title
+                                        r.id === res.id)?.statusId)?.title
                             }</p>}
 
                         </div>
@@ -383,10 +433,31 @@ function Admin_students() {
                     {isSetOpen && selectedItemId === res.id && (
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
                             {/* <div className={`button-edit-delete ${userStates[res.id] ? 'active' : ''}`}> */}
-                            <button>
+                            <button onClick={() => {
+                                setEditId(res.id);
+                                setLastNEdit(res.lastName);
+                                setFirstNEdit(res.firstName);
+                                setMiddleNEdit(res.middleName);
+                                setModalEditGroup({
+                                    value: allGroups.find(el => el.id === res.groupId)?.id,
+                                    label: allGroups.find(el => el.id === res.groupId)?.title
+                                })
+                                setModalEditStatus({
+                                    value: allStatus.find(el =>
+                                        el.id === allStudents.find(r =>
+                                            r.id === res.id).statusId)?.id,
+                                    label: allStatus.find(el =>
+                                        el.id === allStudents.find(r =>
+                                            r.id === res.id).statusId)?.title
+                                })
+                                setModalEditActive(true);
+                            }}>
                                 <img src={require('../../img/edit.png')} alt='edit' />
                             </button>
-                            <button>
+                            <button onClick={()=>{
+                                setDeleteId(res.id);
+                                setModalDeleteActive(true);
+                            }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
                             </button>
                         </div>)}
@@ -441,51 +512,79 @@ function Admin_students() {
                         }))}
                     />
                     <div className='modal-button'>
-                        <button onClick={() => {addData(); setLastN(null); setFirstN }}>Сохранить</button>
+                        <button onClick={() => {
+                            addData();
+                            setLastN('');
+                            setFirstN('');
+                            setMiddleN('');
+                            setModalGroup(null);
+                            setModalStatus(null);
+                            setModalActive(false);
+                        }}>Сохранить</button>
                         <button onClick={() => { setModalActive(false) }}>Отмена</button>
                     </div>
 
                 </div>
             </Empty_modal>
 
-            <Empty_modal active={modalContActive} setActive={setModalContActive}>
-                <Select
-                    styles={customStylesModal}
-                    placeholder="Группа"
-                    value={modalGroup}
-                    onChange={handleModalGroup}
-                    isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.suite,
-                        label: user.address.suite,
-                    }))}
-                />
-                <Select
-                    styles={customStylesModal}
-                    placeholder="Направление"
-                    value={modalDirectioin}
-                    onChange={handleModalDirection}
-                    isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.city,
-                        label: user.address.city,
-                    }))}
-                />
-                <Select
-                    styles={customStylesModal}
-                    placeholder="Направленность"
-                    value={modalDirectivity}
-                    onChange={handleModalDirectivity}
-                    isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.city,
-                        label: user.address.city,
-                    }))}
-                />
+            <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
+                <div className='modal-students'>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' value={lastNEdit} onChange={e => setLastNEdit(e.target.value)} />
+                        <label className='label-name'>Фамилия</label>
+                    </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' value={firstNEdit} onChange={e => setFirstNEdit(e.target.value)} />
+                        <label className='label-name'>Имя</label>
+                    </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
+                        <label className='label-name'>Отчество</label>
+                    </div>
 
-                <div className='modal-button'>
-                    <button onClick={() => { }}>Сохранить</button>
-                    <button onClick={() => { setModalContActive(false) }}>Отмена</button>
+
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Группа"
+                        value={modalEditGroup}
+                        maxMenuHeight={120}
+                        onChange={handleModalEditGroup}
+                        isSearchable={true}
+                        options={allGroups.map(el => ({
+                            value: el.id,
+                            label: el.title,
+                        }))}
+                    />
+                    <Select
+                        styles={customStylesModal}
+                        placeholder="Статус"
+                        value={modalEditStatus}
+                        maxMenuHeight={120}
+                        onChange={handleModalEditStatus}
+                        isSearchable={true}
+                        options={allStatus.map(el =>
+                        ({
+                            value: el.id,
+                            label: el.title
+                        }))}
+                    />
+                    <div className='modal-button'>
+                        <button onClick={() => {
+                            editData();
+                            setModalEditActive(false);
+                        }}>Сохранить</button>
+                        <button onClick={() => { setModalEditActive(false) }}>Отмена</button>
+                    </div>
+
+                </div>
+            </Empty_modal>
+            <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
+                <div className='content-delete'>
+                    <p className='text-delete'>Вы уверены, что хотите удалить?</p>
+                    <div className='modal-button'>
+                        <button onClick={() => { deleteData(); setModalDeleteActive(false); }}>Удалить</button>
+                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
+                    </div>
                 </div>
             </Empty_modal>
         </>
