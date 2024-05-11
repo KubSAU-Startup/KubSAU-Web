@@ -44,7 +44,7 @@ function Admin_groups() {
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
 
-    const [visibleItems, setVisibleItems] = useState(10);
+    const [visibleItems, setVisibleItems] = useState(30);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
@@ -77,7 +77,7 @@ function Admin_groups() {
 
 
     useEffect(() => {
-        setVisibleItems(10);
+        setVisibleItems(30);
         getAllGroups((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -195,7 +195,7 @@ function Admin_groups() {
 
     // функция пагинации
     const loadMore = () => {
-        setVisibleItems(prevVisibleItems => prevVisibleItems + 10);
+        setVisibleItems(prevVisibleItems => prevVisibleItems + 30);
     };
 
     //скрытие кнопки пагинации, если закончились данные для отображения

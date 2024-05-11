@@ -11,8 +11,6 @@ import { getAllDirectivities, getTextError } from '../../network';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
 
-const endpoint = 'https://jsonplaceholder.typicode.com/users';
-
 function Admin_direction() {
     const [modalActive, setModalActive] = useState(false);
     const [userStates, setUserStates] = useState({});
@@ -21,23 +19,22 @@ function Admin_direction() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [filterDirectivity, setFilterDirectivity] = useState(null);
-    const [filterDirectioin, setFilterDirection] = useState(null);
-    const [filterProgram, setFilterProgram] = useState(null);
+    const [filterDirection, setFilterDirection] = useState(null);
+    const [filterGrade, setFilterGrade] = useState(null);
     const [allDirectivities, setAllDirectivities] = useState({
         directivities: [],
         heads: [],
         grades: []
     });
     const [isLoading, setIsLoading] = useState(true);
-    const [searchResults, setSearchResults] = useState({
-        directivities: [],
-        heads: [],
-        grades: []
-    });
+    const [searchResults, setSearchResults] = useState([]);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
 
-
+    const [searchDone, setSearchDone] = useState(false);
+    const [filterDone, setFilterDone] = useState(false);
+    const [visibleItems, setVisibleItems] = useState(30);
+    const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
     const [modalIdGroup, setModalIdGroup] = useState(null);
     const [modalDirectioin, setModalDirection] = useState(null);
@@ -75,43 +72,81 @@ function Admin_direction() {
 
 
     useEffect(() => {
-setIsLoading(true);
+        setVisibleItems(30);
+        setIsLoading(true);
         getAllDirectivities(true, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
             } else {
                 setAllDirectivities(res.response);
-                setSearchResults(res.response);
+                setSearchResults(res.response.directivities);
             }
             setIsLoading(false);
         })
-        const fetchData = async () => {
-            try {
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                setAllUsers(data);
-                setFilteredUsers(data);
 
-                const initialUserStates = {};
-                data.forEach(user => {
-                    initialUserStates[user.id] = false;
-                });
-                setUserStates(initialUserStates);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
     }, []);
 
+    //скрытие кнопки пагинации, если закончились данные для отображения
+    useEffect(() => {
+
+        if (searchResults.length <= visibleItems) {
+            setIsPaginationVisible(false); // Скрыть кнопку пагинации
+        } else {
+            setIsPaginationVisible(true); // Показать 
+        }
+    }, [searchResults, visibleItems]);
+
+    // Функция поиска
     const handleChange = (e) => {
+
+        const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
+
         setSearchTerm(e.target.value);
-        const filtered = allUsers.filter(user =>
-            user.name.toLowerCase().includes(e.target.value.toLowerCase())
-        );
-        setFilteredUsers(filtered);
+        setIsLoading(true);
+        let filteredResults = allDirectivities.directivities.filter(item => {
+
+            // Проверяем условие для каждого поля, по которому хотим искать
+            return (
+                item.title.toLowerCase().includes(searchTerm) ||
+                (item.headId && allDirectivities.heads.find((el) => el.id === item.headId)?.title.toLowerCase().includes(searchTerm)) ||
+                (item.headId && allDirectivities.grades.find((el) => el.id === item.gradeId)?.title.toLowerCase().includes(searchTerm))
+            );
+        });
+        setSearchResults(filteredResults);
+        setSearchDone(searchTerm !== null ? true : false);
+
+        setIsLoading(false);
+    };
+
+
+    const getParams = () => {
+        let filteredResults = [...allDirectivities.directivities]; // Создаем копию исходных данных для фильтрации
+
+        if (filterDirectivity !== null) {
+            filteredResults = filteredResults.filter(res => res.id === filterDirectivity.value);
+        }
+        if (filterDirection !== null) {
+            filteredResults = filteredResults.filter(res => res.headId === filterDirection.value);
+        }
+        if (filterGrade !== null) {
+            filteredResults = filteredResults.filter(res => res.gradeId === filterGrade.value);
+        }
+
+        setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
+        console.log(filteredResults)
+    }
+
+    const resetParams = () => {
+        setFilterDirection(null);
+        setFilterDirectivity(null);
+        setFilterGrade(null);
+        setSearchTerm('');
+        setSearchResults(allDirectivities.directivities);
+    }
+    // функция пагинации
+    const loadMore = () => {
+        setVisibleItems(prevVisibleItems => prevVisibleItems + 30);
     };
 
     const handleSettingClick = (userId) => {
@@ -128,8 +163,8 @@ setIsLoading(true);
         setFilterDirection(data);
     }
 
-    function handleFilterProgram(data) {
-        setFilterProgram(data);
+    function handleFilterGrade(data) {
+        setFilterGrade(data);
     }
 
     function handleModalIdGroup(data) {
@@ -158,19 +193,19 @@ setIsLoading(true);
                     type='text'
                     value={searchTerm}
                     onChange={handleChange}
-                    placeholder='Поиск по имени...'
+                    placeholder='Поиск...'
                 />
             </div>
             <div className='filters'>
                 <Select
                     styles={customStyles}
                     placeholder="Направление"
-                    value={filterDirectioin}
+                    value={filterDirection}
                     onChange={handleFilterDirection}
                     isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.city,
-                        label: user.address.city,
+                    options={allDirectivities.heads.map(res => ({
+                        value: res.id,
+                        label: res.title,
                     }))}
                 />
                 <Select
@@ -179,38 +214,38 @@ setIsLoading(true);
                     value={filterDirectivity}
                     onChange={handleFilterDirectivity}
                     isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.email,
-                        label: user.email,
+                    options={allDirectivities.directivities.map(res => ({
+                        value: res.id,
+                        label: res.title,
                     }))}
                 />
                 <Select
                     styles={customStyles}
                     placeholder="Степень образованя"
-                    value={filterProgram}
-                    onChange={handleFilterProgram}
+                    value={filterGrade}
+                    onChange={handleFilterGrade}
                     isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.email,
-                        label: user.email,
+                    options={allDirectivities.grades.map(res => ({
+                        value: res.id,
+                        label: res.title,
                     }))}
                 />
 
 
-                <button className='get-params' type='submit'>Применить</button>
-                <button className='delete-params'>Сбросить</button>
+                <button className='get-params' type='submit' onClick={getParams}>Применить</button>
+                <button className='delete-params' onClick={resetParams}>Сбросить</button>
 
             </div>
 
             {/* <button className='add-student' onClick={() => setModalActive(true)}>
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button> */}
-            {searchResults.directivities.map(res => (
+            {searchResults.slice(0, visibleItems).map(res => (
                 <div className='cart-direct' key={res.id}>
                     <div className='content'>
                         <div className='col1'>
-                            <p><span>Направление:</span> {res.headId && allDirectivities.heads.find(r=>r.id === res.headId)?.title}</p>
-                            <p><span>Степень образования:</span> {res.gradeId && allDirectivities.grades.find(r=>r.id === res.gradeId   )?.title}</p>
+                            <p><span>Направление:</span> {res.headId && allDirectivities.heads.find(r => r.id === res.headId)?.title}</p>
+                            <p><span>Степень образования:</span> {res.gradeId && allDirectivities.grades.find(r => r.id === res.gradeId)?.title}</p>
                         </div>
                         <div className='col2'>
                             <p><span>Направленность:</span> {res.title}</p>
@@ -247,6 +282,12 @@ setIsLoading(true);
                     </div>)} */}
                 </div>
             ))}
+            {/* кнопка пагинации */}
+            {isPaginationVisible && (
+                <button className='btn-loadMore' onClick={loadMore}>
+                    Загрузить ещё
+                </button>
+            )}
             {/* <Modal active={modalActive} setActive={setModalActive}>
                 <div className='input-conteiner'>
                     <input type='text' className='name-direction' placeholder=' ' />

@@ -189,18 +189,18 @@ function Admin_main() {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
             } else {
-                if (res.response.journal.length < limit) {
+                if (res.response.entries.length < limit) {
                     setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
                 }
     
                 // Если это первая страница, просто устанавливаем новые данные
                 if (offset === 0) {
-                    setMainData(res.response.journal);
-                    setSearchResults(res.response.journal);
+                    setMainData(res.response.entries);
+                    setSearchResults(res.response.entries);
                 } else {
                     // Иначе обновляем данные
-                    setMainData(prevData => [...prevData, ...res.response.journal]);
-                    setSearchResults(prevResults => [...prevResults, ...res.response.journal]);
+                    setMainData(prevData => [...prevData, ...res.response.entries]);
+                    setSearchResults(prevResults => [...prevResults, ...res.response.entries]);
                 }
             }
             setIsLoading(false);
@@ -320,23 +320,23 @@ function Admin_main() {
             {/* данные о зарегистрированных работах (карточки) */}
             {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
 
-            {searchResults.map(journal => (
+            {searchResults.map(entries => (
                 <div className='cart' >
                     <div className='data'>
-                        {new Date(journal.work.registrationDate * 1000).toLocaleString("ru-ru")}
+                        {new Date(entries.work.registrationDate * 1000).toLocaleString("ru-ru")}
                     </div>
                     <div className='content'>
                         <div className='col1'>
-                            <p><span>ФИО:</span> {journal.student.fullName}</p>
-                            <p><span>Группа:</span> {journal.group.title}</p>
-                            <p><span>Тип работы:</span> {journal.work.type.title}</p>
-                            <p><span>Статус:</span> {journal.student.status.title}</p>
+                            <p><span>ФИО:</span> {entries.student.fullName}</p>
+                            <p><span>Группа:</span> {entries.group.title}</p>
+                            <p><span>Тип работы:</span> {entries.work.type.title}</p>
+                            <p><span>Статус:</span> {entries.student.status.title}</p>
                         </div>
                         <div className='col2'>
-                            <p><span>Дисциплина:</span> {journal.discipline.title}</p>
-                            <p><span>Преподаватель:</span> {journal.employee.lastName} {journal.employee.firstName} {journal.employee.middleName}</p>
-                            <p><span>Кафедра:</span> {journal.department.title}</p>
-                            {journal.work.title && <p><span>Название:</span> {journal.work.title}</p>}
+                            <p><span>Дисциплина:</span> {entries.discipline.title}</p>
+                            <p><span>Преподаватель:</span> {entries.employee.lastName} {entries.employee.firstName} {entries.employee.middleName}</p>
+                            <p><span>Кафедра:</span> {entries.department.title}</p>
+                            {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
                         </div>
                     </div>
                 </div>

@@ -32,7 +32,7 @@ function Admin_department() {
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
 
-    const [visibleItems, setVisibleItems] = useState(10);
+    const [visibleItems, setVisibleItems] = useState(30);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
     const [newDepartment, setNewDepartment] = useState({});
@@ -67,7 +67,7 @@ function Admin_department() {
     }, []);
 
     useEffect(() => {
-        setVisibleItems(10);
+        setVisibleItems(30);
 
 
         getAllDepartments((res) => {
@@ -173,7 +173,7 @@ function Admin_department() {
 
     // функция пагинации
     const loadMore = () => {
-        setVisibleItems(prevVisibleItems => prevVisibleItems + 10);
+        setVisibleItems(prevVisibleItems => prevVisibleItems + 30);
     };
 
     //скрытие кнопки пагинации, если закончились данные для отображения

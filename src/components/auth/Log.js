@@ -57,7 +57,7 @@ function Log() {
         <div className='conteiner'>
             <form className='auth-form' onSubmit={handleSubmit(onSubmit)} action='/'>
                 <div className='img-conteiner'>
-                    <img src={require('../../img/logo.png')} alt='Логотип КубГАУ' />
+                    <img src={require('../../img/logo.webp')} alt='Логотип КубГАУ' />
                 </div>
 
                 <input className='auth-email auth-input' type="email" placeholder='Почта' {...register("email", {
