@@ -109,6 +109,22 @@ async function getDataAdminJournal(offset, limit, par, callback) {
     })
 }
 
+async function searchOfWorks(offset, limit, str, callback){
+    const url = `${baseUrl_test}/works/latest/search`;
+
+    await axios.get(url, {
+        params:{
+            offset: offset,
+            limit: limit,
+            query: str
+        }
+    }).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
 async function getDataPrograms(offset, limit, callback) {
     const url = `${baseUrl_test}/programs`;
 
@@ -282,6 +298,22 @@ async function getAllStudents(off, lim, callback) {
 
 }
 
+async function searchOfStudents(offset, limit, str, callback){
+    const url = `${baseUrl_test}/students/search`;
+
+    await axios.get(url, {
+        params:{
+            offset: offset,
+            limit: limit,
+            query: str
+        }
+    }).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
 async function addNewStudent(firstN, lastN, middleN, group, status, callback) {
     const url = `${baseUrl_test}/students`;
     await axios.post(url, {
@@ -434,6 +466,7 @@ export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
-    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent
+    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
+    searchOfWorks, searchOfStudents
 }
 

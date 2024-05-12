@@ -7,7 +7,7 @@ import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import Empty_modal from '../Modal/Empty_modal'
-import { getAllDirectivities, getAllGroups, getAllStudents, getTextError, addNewStudent, editStudent, deleteStudent } from '../../network';
+import { getAllDirectivities, getAllGroups, getAllStudents, getTextError, addNewStudent, editStudent, deleteStudent, searchOfStudents } from '../../network';
 
 
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
@@ -20,8 +20,8 @@ function Admin_students() {
     const [filteredUsers, setFilteredUsers] = useState([]);
 
     const [filterGroup, setFilterGroup] = useState(null);
-    const [filterDirectioin, setFilterDirection] = useState(null);
-    const [filterProgram, setFilterProgram] = useState(null);
+    const [filterGrade, setFilterGrade] = useState(null);
+    const [filterStatus, setFilterStatus] = useState(null);
 
     const [modalGroup, setModalGroup] = useState(null);
     const [modalEditGroup, setModalEditGroup] = useState(null);
@@ -39,7 +39,8 @@ function Admin_students() {
     });
     const [allHeads, setAllHeads] = useState([]);
 
-
+    const [inputValue, setInputValue] = useState("");
+    const [debouncedInputValue, setDebouncedInputValue] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [hasMoreData, setHasMoreData] = useState(true);
 
@@ -115,33 +116,62 @@ function Admin_students() {
     }, []);
 
     useEffect(() => {
-        getAllStudents(offset, limit, (res) => {
-            setIsLoading(true);
-            setHasMoreData(true);
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-            } else {
-                if (res.response.students.length < limit) {
-                    setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-                }
+        setIsLoading(true);
+        setHasMoreData(true);
 
-                // Если это первая страница, просто устанавливаем новые данные
-                if (offset === 0) {
-                    setAllStudents(res.response.students);
-                    setAllStatus(res.response.statuses)
-                    setSearchResults(res.response.students);
+        if (inputValue === '') {
+            getAllStudents(offset, limit, (res) => {
+                if (res.error) {
+                    setTextError(getTextError(res.error));
+                    setErrorActive(true);
                 } else {
-                    // Иначе обновляем данные
-                    setAllStudents(prevData => [...prevData, ...res.response.students]);
-                    setAllStatus([...res.response.statuses])
+                    if (res.response.students.length < limit) {
+                        setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
+                    }
 
-                    setSearchResults(prevResults => [...prevResults, ...res.response.students]);
+                    // Если это первая страница, просто устанавливаем новые данные
+                    if (offset === 0) {
+                        setAllStudents(res.response.students);
+                        setAllStatus(res.response.statuses)
+                        // setSearchResults(res.response.students);
+                    } else {
+                        // Иначе обновляем данные
+                        setAllStudents(prevData => [...prevData, ...res.response.students]);
+                        setAllStatus([...res.response.statuses])
+
+                        // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
+                    }
                 }
-            }
-            setIsLoading(false);
-        });
-    }, [offset, limit])
+                setIsLoading(false);
+            })
+        } else {
+            console.log(debouncedInputValue);
+            searchOfStudents(offset, limit, debouncedInputValue, (res) => {
+                if (res.error) {
+                    setTextError(getTextError(res.error));
+                    setErrorActive(true);
+                } else {
+                    if (res.response.students.length < limit) {
+                        setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
+                    }
+
+                    // Если это первая страница, просто устанавливаем новые данные
+                    if (offset === 0) {
+                        setAllStudents(res.response.students);
+                        // setAllStatus(res.response.statuses)
+                        // setSearchResults(res.response.students);
+                    } else {
+                        // Иначе обновляем данные
+                        setAllStudents(prevData => [...prevData, ...res.response.students]);
+                        // setAllStatus([...res.response.statuses])
+
+                        // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
+                    }
+                }
+                setIsLoading(false);
+            })
+        }
+    }, [offset, limit, debouncedInputValue])
 
     useEffect(() => {
         getAllDirectivities(true, (res) => {
@@ -165,24 +195,6 @@ function Admin_students() {
             }
             setIsLoading(false);
         })
-        // const fetchData = async () => {
-        //     try {
-        //         const response = await fetch(endpoint);
-        //         const data = await response.json();
-        //         setAllUsers(data);
-        //         setFilteredUsers(data);
-
-        //         const initialUserStates = {};
-        //         data.forEach(user => {
-        //             initialUserStates[user.id] = false;
-        //         });
-        //         setUserStates(initialUserStates);
-        //     } catch (error) {
-        //         console.error('Error fetching data:', error);
-        //     }
-        // };
-
-        // fetchData();
     }, []);
     useEffect(() => {
         if (modalActive || modalEditActive || modalDeleteActive) {
@@ -192,13 +204,17 @@ function Admin_students() {
         }
     }, [modalActive, modalEditActive, modalDeleteActive]);
 
-    const handleChange = (e) => {
-        setSearchTerm(e.target.value);
-        const filtered = allUsers.filter(user =>
-            user.name.toLowerCase().includes(e.target.value.toLowerCase())
-        );
-        setFilteredUsers(filtered);
+    const handleInputValue = (e) => {
+        setInputValue(e.target.value);
     };
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setDebouncedInputValue(inputValue);
+        }, 1000);
+        return () => clearTimeout(timeoutId);
+    }, [inputValue, 1000]);
+
     async function addData() {
         await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
             if (res.success) {
@@ -208,7 +224,8 @@ function Admin_students() {
             }
         });
     }
-    console.log(searchResults)
+    // console.log(searchResults)
+
     async function editData() {
         await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
             if (res.success) {
@@ -264,12 +281,12 @@ function Admin_students() {
         setFilterGroup(data);
     }
 
-    function handleFilterDirection(data) {
-        setFilterDirection(data);
+    function handleFilterGrade(data) {
+        setFilterGrade(data);
     }
 
-    function handleFilterProgram(data) {
-        setFilterProgram(data);
+    function handleFilterStatus(data) {
+        setFilterStatus(data);
     }
 
     function handleModalGroup(data) {
@@ -290,8 +307,8 @@ function Admin_students() {
             <div className='admin-main-search'>
                 <input
                     type='text'
-                    value={searchTerm}
-                    onChange={handleChange}
+                    value={inputValue}
+                    onChange={handleInputValue}
                     placeholder='Поиск...'
                 />
             </div>
@@ -310,7 +327,7 @@ function Admin_students() {
                 {/* <Select
                     styles={customStyles}
                     placeholder="Направление"
-                    value={filterDirectioin}
+                    value={filterGrade}
                     onChange={handleFilterDirection}
                     isSearchable={true}
                     options={allDirectivities.heads.map(res => ({
@@ -321,8 +338,8 @@ function Admin_students() {
                 <Select
                     styles={customStyles}
                     placeholder="Степень образования"
-                    value={filterProgram}
-                    onChange={handleFilterProgram}
+                    value={filterGrade}
+                    onChange={handleFilterGrade}
                     isSearchable={true}
                     options={allDirectivities.grades.map(res => ({
                         value: res.id,
@@ -332,8 +349,8 @@ function Admin_students() {
                 <Select
                     styles={customStyles}
                     placeholder="Статус"
-                    value={filterProgram}
-                    onChange={handleFilterProgram}
+                    value={filterStatus}
+                    onChange={handleFilterStatus}
                     isSearchable={true}
                     options={allStatus.map(res => ({
                         value: res.id,
