@@ -67,6 +67,7 @@
     transform: translateY(-10px);
     visibility: hidden;
     transition: 0.3s;
+    display: flex;
 }
 
 .button-edit-delete.active {

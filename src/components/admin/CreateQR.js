@@ -86,7 +86,7 @@ function CreateQR() {
   const [getEditProgram, setGetEditProgram] = useState(null);
   const [getEditSubject, setGetEditSubject] = useState(null);
 
-  const [visibleItems, setVisibleItems] = useState(10);
+  const [visibleItems, setVisibleItems] = useState(30);
   const [hasMoreData, setHasMoreData] = useState(true);
   const menuRef = useRef(null);
 
@@ -231,7 +231,7 @@ function CreateQR() {
 
   //поиск программ
   const handleChange = event => {
-    //   setVisibleItems(10);
+    //   setVisibleItems(30);
     //   setSearchTerm(event.target.value);
 
     // //   const searchDisciplines = dataDisciplines.response.map(resp => (
@@ -470,7 +470,7 @@ function CreateQR() {
   { value: 7, label: 7 },
   { value: 8, label: 8 },
   { value: 9, label: 9 },
-  { value: 10, label: 10 },
+  { value: 30, label: 30 },
   { value: 11, label: 11 },
   { value: 12, label: 12 }];
 
@@ -501,7 +501,7 @@ function CreateQR() {
 
       {/* блок создания qr */}
       <div className='qr-options'>
-        <div className='create-qr'>
+        {/* <div className='create-qr'>
           <h2>Создать QR-код</h2>
           <p>Выберите последовательно:</p>
           <div className='filter-qr'>
@@ -512,8 +512,8 @@ function CreateQR() {
               onChange={handleSelectSemester}
               isSearchable={true}
               options={dataSemester}
-            />
-            {/*<Select
+            /> */}
+        {/*<Select
               styles={customStyles}
               placeholder="Программа"
               value={program}
@@ -537,13 +537,13 @@ function CreateQR() {
                 label: groups.title,
               }))} 
             />*/}
-            {/* кнопка создания qr */}
-            <button className='btn-create-qr' onClick={getQR} disabled={(semester !== null && program !== null && group !== null) ? false : true}>
+        {/* кнопка создания qr */}
+        {/* <button className='btn-create-qr' onClick={getQR} disabled={(semester !== null && program !== null && group !== null) ? false : true}>
               Создать QR
               <img src={require('../../img/qr_white.png')} />
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* поиск */}
         <div className='data-option'>
@@ -599,6 +599,10 @@ function CreateQR() {
             <div className='qr1'>
               <p><span>Семестр: </span>{value.program.semester}</p>
               <p><span>Направленность: </span>{directivitiesPrograms.find((res) => res.id === value.program.directivityId).title}</p>
+              {/* <button className='btn-create-qr' onClick={getQR}>
+                Создать QR
+                <img src={require('../../img/qr_white.png')} />
+              </button> */}
             </div>
             <div className='qr2'>
               <span>Дисциплины: </span>
@@ -609,7 +613,7 @@ function CreateQR() {
               </div>
             </div>
           </div>
-
+          
           <button
             className='qr-setting'
             onClick={() => {
@@ -627,16 +631,24 @@ function CreateQR() {
           >
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
+          {/* <button className='btn-create-qr' onClick={getQR}>
+                <img src={require('../../img/qr_white.png')} />
+              </button> */}
           {isSetOpen && selectedItemId === value.program.id && (
             <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
+              <button className='btn-create-qr' onClick={getQR}>
+                <img src={require('../../img/qr_white.png')} />
+              </button>
               <button onClick={editPrograms}>
                 <img src={require('../../img/edit.png')} alt='edit' />
               </button>
               <button>
                 <img src={require('../../img/delete.png')} alt='delete' />
               </button>
+              
+              
             </div>
-          )} 
+          )}
         </div>
       ))}
 

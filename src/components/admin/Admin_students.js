@@ -165,24 +165,24 @@ function Admin_students() {
             }
             setIsLoading(false);
         })
-        const fetchData = async () => {
-            try {
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                setAllUsers(data);
-                setFilteredUsers(data);
+        // const fetchData = async () => {
+        //     try {
+        //         const response = await fetch(endpoint);
+        //         const data = await response.json();
+        //         setAllUsers(data);
+        //         setFilteredUsers(data);
 
-                const initialUserStates = {};
-                data.forEach(user => {
-                    initialUserStates[user.id] = false;
-                });
-                setUserStates(initialUserStates);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+        //         const initialUserStates = {};
+        //         data.forEach(user => {
+        //             initialUserStates[user.id] = false;
+        //         });
+        //         setUserStates(initialUserStates);
+        //     } catch (error) {
+        //         console.error('Error fetching data:', error);
+        //     }
+        // };
 
-        fetchData();
+        // fetchData();
     }, []);
     useEffect(() => {
         if (modalActive || modalEditActive || modalDeleteActive) {
@@ -208,6 +208,7 @@ function Admin_students() {
             }
         });
     }
+    console.log(searchResults)
     async function editData() {
         await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
             if (res.success) {
@@ -291,7 +292,7 @@ function Admin_students() {
                     type='text'
                     value={searchTerm}
                     onChange={handleChange}
-                    placeholder='Поиск по имени...'
+                    placeholder='Поиск...'
                 />
             </div>
             <div className='filters'>
@@ -301,31 +302,31 @@ function Admin_students() {
                     value={filterGroup}
                     onChange={handleFilterGroup}
                     isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.suite,
-                        label: user.address.suite,
+                    options={allGroups.map(res => ({
+                        value: res.id,
+                        label: res.title,
                     }))}
                 />
-                <Select
+                {/* <Select
                     styles={customStyles}
                     placeholder="Направление"
                     value={filterDirectioin}
                     onChange={handleFilterDirection}
                     isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.address.city,
-                        label: user.address.city,
+                    options={allDirectivities.heads.map(res => ({
+                        value: res.id,
+                        label: res.title,
                     }))}
-                />
+                /> */}
                 <Select
                     styles={customStyles}
                     placeholder="Степень образования"
                     value={filterProgram}
                     onChange={handleFilterProgram}
                     isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.email,
-                        label: user.email,
+                    options={allDirectivities.grades.map(res => ({
+                        value: res.id,
+                        label: res.title,
                     }))}
                 />
                 <Select
@@ -334,9 +335,9 @@ function Admin_students() {
                     value={filterProgram}
                     onChange={handleFilterProgram}
                     isSearchable={true}
-                    options={allUsers.map(user => ({
-                        value: user.email,
-                        label: user.email,
+                    options={allStatus.map(res => ({
+                        value: res.id,
+                        label: res.title,
                     }))}
                 />
                 <button className='get-params' type='submit'>Применить</button>
@@ -362,36 +363,22 @@ function Admin_students() {
                                 <p>
                                     <span>Степень образования:</span> {
                                         allDirectivities.grades.find(grade =>
-                                            grade.id === allDirectivities.directivities.find(directivity =>
-                                                directivity.id === allGroups.find(group =>
-                                                    group.id === allStudents.find(student =>
-                                                        student.id === res.groupId
-                                                    )?.groupId
+                                            grade.id === allDirectivities.directivities.find(r =>
+                                                r.id === allGroups.find(el =>
+                                                    el.id === res.groupId
                                                 )?.directivityId
                                             )?.gradeId
-                                        )?.title
-                                    }
-                                </p>
-                            }
-
-
+                                        )?.title}</p>}
                         </div>
                         <div className='col2'>
                             {res.groupId &&
                                 <p>
                                     <span>Направление:</span> {
-                                        allDirectivities.heads.find(head =>
-                                            head.id === allDirectivities.directivities.find(directivity =>
-                                                directivity.id === allGroups.find(group =>
-                                                    group.id === allStudents.find(student =>
-                                                        student.id === res.groupId
-                                                    )?.groupId
-                                                )?.directivityId
-                                            )?.headId
-                                        )?.title
-                                    }
-                                </p>
-                            }
+                                        allDirectivities.heads.find(head => head.id === allDirectivities.directivities.find(r =>
+                                            r.id === allGroups.find(el =>
+                                                el.id === res.groupId
+                                            )?.directivityId
+                                        )?.headId)?.title}</p>}
 
                             {res.groupId &&
                                 <p><span>Направленность:</span> {
@@ -399,15 +386,12 @@ function Admin_students() {
                                         r.id === allGroups.find(el =>
                                             el.id === res.groupId
                                         )?.directivityId
-                                    )?.title
-                                }
-                                </p>
-                            }
+                                    )?.title}</p>}
+
                             {res.id && <p><span>Статус: </span>{
                                 allStatus.find(el =>
                                     el.id === allStudents.find(r =>
-                                        r.id === res.id)?.statusId)?.title
-                            }</p>}
+                                        r.id === res.id)?.statusId)?.title}</p>}
 
                         </div>
                     </div>
@@ -454,7 +438,7 @@ function Admin_students() {
                             }}>
                                 <img src={require('../../img/edit.png')} alt='edit' />
                             </button>
-                            <button onClick={()=>{
+                            <button onClick={() => {
                                 setDeleteId(res.id);
                                 setModalDeleteActive(true);
                             }}>
