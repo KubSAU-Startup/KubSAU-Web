@@ -39,7 +39,14 @@ function Log() {
             }
         });
     }
-
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false)
+        }
+      }, []);
     useEffect(() => {
 
         checkAccount((res) => {
