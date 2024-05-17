@@ -360,6 +360,14 @@ async function deleteStudent(index, callback) {
     })
 }
 
+async function getAllEmployees(callback) {
+    const url = `${baseUrl_test}/employees`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })}
 
 
 
@@ -467,6 +475,6 @@ export {
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
-    searchOfWorks, searchOfStudents
+    searchOfWorks, searchOfStudents, getAllEmployees
 }
 

@@ -351,7 +351,7 @@ function User_main() {
             {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
 
             {searchResults.map(entries => (
-                <div className='cart' >
+                <div className='cart-stud' >
                     <div className='data'>
                         {new Date(entries.work.registrationDate * 1000).toLocaleString("ru-ru")}
                     </div>
@@ -369,9 +369,11 @@ function User_main() {
                             {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
                         </div>
                     </div>
+                    <button className='qr-setting'>
+                        <img src={require('../../img/setting.png')} alt='setting' />
+                    </button>
                 </div>
             ))}
-
             {/* кнопка пагинации */}
 
             {hasMoreData && (
