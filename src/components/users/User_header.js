@@ -22,7 +22,7 @@ function User_header() {
             </button>
             <nav className={`menu ${isOpen ? "active" : ""}`}>
                 <ul className='menu_list'>
-                    <Link to="/UserMain" className='link-to'><li className='menu_item'>Последнии записи</li></Link>
+                    <Link to="/UserMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
                     <Link to="/UserSubject" className='link-to'><li className='menu_item'>Дисциплины</li></Link>
                     <Link to="/UserProf" className='link-to'><li className='menu_item'>Преподаватели</li></Link>
                 </ul>
