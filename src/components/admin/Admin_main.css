@@ -102,7 +102,7 @@
     border-radius: 4px;
 }
 
-.cart {
+/* .cart {
     border-radius: 16px;
     border: 1px solid #A2A2A2;
     background: #F1F1F1;
@@ -112,7 +112,7 @@
     text-align: left;
     color: #000;
     font-size: 16px;
-}
+}*/
 
 .content {
     display: flex;
@@ -124,9 +124,9 @@
 
 .col2 {
     width: 50%;
-}
+} 
 
-.cart span,
+ .cart span,
 .data {
     font-weight: 700;
 }
@@ -134,5 +134,5 @@
 .cart p,
 .data {
     margin: 10px 0;
-}
+} 
 

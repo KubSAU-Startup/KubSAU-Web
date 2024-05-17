@@ -494,7 +494,7 @@ function CreateQR() {
             <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
           </ul>
         </nav>
-        <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link>
+        {/* <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link> */}
         <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
         <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
       </div>

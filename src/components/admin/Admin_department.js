@@ -220,16 +220,23 @@ function Admin_department() {
                         placeholder='Поиск...'
                     />
                 </div>
-                <button className='add-department' onClick={() => setModalActive(true)}>
+                <button className='add-student' onClick={() => setModalActive(true)}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
             </div>
 
             {searchResults.slice(0, visibleItems).map(res => (
-                <div className='cart-department' key={res.id}>
-                    <div className='data-department'>
-                        <p><span>Кафедра: </span>{res.title}</p>
-                        <p><span>Номер телефона: </span>{res.phone}</p>
+                <div className='cart-stud' key={res.id}>
+                    <div className='content'>
+                        <div className='col1'>
+                            <p><span>Кафедра: </span>{res.title}</p>
+
+                        </div>
+                        <div className='col2'>
+                            <p><span>Номер телефона: </span>{res.phone}</p>
+
+                        </div>
+
                     </div>
                     <button
                         className='qr-setting'

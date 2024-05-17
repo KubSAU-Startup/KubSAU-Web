@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Admin_header from './Admin_header';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
 
@@ -45,9 +47,9 @@ function Admin_users() {
             [userId]: !prevUserStates[userId],
         }));
     };
-    return ( 
+    return (
         <>
-            <Admin_header/>
+            <Admin_header />
             <div className='search-add'>
                 <div className='admin-main-search'>
                     <input
@@ -57,19 +59,24 @@ function Admin_users() {
                         placeholder='Поиск по названию...'
                     />
                 </div>
-                <button className='add-department' onClick={() => setModalActive(true)}>
-                    <img src={require('../../img/add.png')} alt='add' />
+                <button className='add-student' onClick={() => setModalActive(true)}>
+                    <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
             </div>
 
             {filteredUsers.map(user => (
-                <div className='cart-department' key={user.id}>
-                    <div className='data-department'>
-                        <p><span>Кафедра: </span>{user.address.street}</p>
-                        <p><span>Номер телефона: </span>{user.address.zipcode}</p>
+                <div className='cart-stud' key={user.id}>
+                    <div className='content'>
+                        <div className='col1'>
+                            <p><span>Кафедра: </span>{user.address.street}</p>
+                        </div>
+                        <div className='col2'>
+                            <p><span>Номер телефона: </span>{user.address.zipcode}</p>
+                        </div>
+
                     </div>
                     <button
-                        className='department-setting'
+                        className='qr-setting'
                         onClick={() => handleSettingClick(user.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
@@ -85,7 +92,7 @@ function Admin_users() {
                 </div>
             ))}
         </>
-     );
+    );
 }
 
 export default Admin_users;

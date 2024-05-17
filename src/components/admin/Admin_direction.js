@@ -254,7 +254,7 @@ function Admin_direction() {
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button> */}
             {searchResults.slice(0, visibleItems).map(res => (
-                <div className='cart-direct' key={res.id}>
+                <div className='cart-stud' key={res.id}>
                     <div className='content'>
                         <div className='col1'>
                             <p><span>Направление:</span> {res.headId && allDirectivities.heads.find(r => r.id === res.headId)?.title}</p>

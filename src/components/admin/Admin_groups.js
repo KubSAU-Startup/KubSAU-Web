@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Admin_header from './Admin_header';
 import Select from 'react-select';
-import './Admin_department.css'
+import './Admin_groups.css'
 import Modal from '../Modal/Modal';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
@@ -248,7 +248,7 @@ function Admin_groups() {
                         placeholder='Поиск...'
                     />
                 </div>
-                <button className='add-department' onClick={() => setModalActive(true)}>
+                <button className='add-student' onClick={() => setModalActive(true)}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
             </div>
@@ -319,7 +319,7 @@ function Admin_groups() {
                 </button>
             )}
             <Empty_modal active={modalActive} setActive={setModalActive} >
-                <div className='modal-department'>
+                <div className='modal-group'>
                     <Select
                         styles={customStylesModal}
                         placeholder="Направление"
@@ -350,7 +350,7 @@ function Admin_groups() {
                     <div className='value-input'>
                         {head !== null && <p>{abbGroup}</p>}
                         <div className='input-conteiner'>
-                            <input type='text' className='name-dapartment' placeholder=' ' value={numberGroup} onChange={e => setNumberGroup(e.target.value)} />
+                            <input type='text' className='name-group' placeholder=' ' value={numberGroup} onChange={e => setNumberGroup(e.target.value)} />
                             <label className='label-name'>Номер группы</label>
                         </div>
                     </div>
@@ -392,7 +392,7 @@ function Admin_groups() {
                 <div className='value-input'>
                     {newHead !== null && <p>{newAbbGroup}</p>}
                     <div className='input-conteiner'>
-                        <input type='text' className='name-dapartment' placeholder=' ' value={newNumberGroup} onChange={e => setNewNumberGroup(e.target.value)} />
+                        <input type='text' className='name-group' placeholder=' ' value={newNumberGroup} onChange={e => setNewNumberGroup(e.target.value)} />
                         <label className='label-name'>Номер группы</label>
                     </div>
                 </div>

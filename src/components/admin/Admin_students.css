@@ -8,18 +8,18 @@
     position: relative;
 }
 
-.student-setting {
+/* .student-setting {
     position: absolute;
     top: 20px;
     right: 20px;
     background: none;
     border: none;
     cursor: pointer;
-}
+} */
 
-.student-setting img {
+/* .student-setting img {
     width: 18px;
-}
+} */
 
 .cart-stud p {
     color: #000;
