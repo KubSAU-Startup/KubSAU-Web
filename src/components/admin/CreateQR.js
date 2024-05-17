@@ -269,7 +269,7 @@ function CreateQR() {
 
   // проверка авторизован ли пользователь
   if (isAuthenticated == false) {
-    return <Navigate to='/Log' />
+    return <Navigate to='/' />
   }
 
   // установка значений для создание qr

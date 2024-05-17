@@ -12,7 +12,7 @@ axios.interceptors.request.use(async request => {
 async function loginAxios(loginInfo, callback) {
     const url = `${baseUrl_test}/auth`
 
-    console.log(loginInfo)
+    // console.log(loginInfo)
 
     await axios.post(url, {
         login: loginInfo.email,
@@ -31,7 +31,7 @@ async function checkAccount(callback) {
     const url = `${baseUrl_test}/account`;
 
     await axios.get(url).then((res) => {
-        callback(res.data)
+        callback(res.data);
     }).catch((error) => {
         console.log(error)
     })

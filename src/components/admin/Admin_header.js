@@ -33,7 +33,7 @@ function Admin_header() {
     };
 
     if (!isAuthenticated) {
-        return <Navigate to='/Log' />
+        return <Navigate to='/' />
     }
 
     return (

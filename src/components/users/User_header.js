@@ -7,13 +7,13 @@ function User_header() {
     const [isOpen, setOpen] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState();
 
-    // const handleLogout = () => {
-    //     localStorage.removeItem('token');
-    //     setIsAuthenticated(false);
-    // };
-    // if (isAuthenticated == false) {
-    //     return <Navigate to='/Log' />
-    // }
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+    };
+    if (isAuthenticated == false) {
+        return <Navigate to='/' />
+    }
     return (
         <div className='us_main_header'>
             <img className='us_main_logo' src={require('../../img/logo1.png')} />
@@ -30,9 +30,9 @@ function User_header() {
 
 
             <Link to='/UserAccount' className='user-to-account'>Мой аккаунт</Link>
-            <div className='user-to-exit'>Выход</div>
+            {/* <div className='user-to-exit'>Выход</div> */}
 
-            {/* <div className='user-to-exit' onClick={handleLogout}>Выход</div> */}
+            <div className='user-to-exit' onClick={handleLogout}>Выход</div>
         </div>
 
     );
