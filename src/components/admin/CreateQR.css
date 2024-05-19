@@ -111,6 +111,9 @@
 .data-qr span {
     font-weight: 700;
 }
+.qr1{
+    margin-right: 10px;
+}
 
 .qr2 {
     display: flex;

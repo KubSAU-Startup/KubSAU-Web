@@ -15,7 +15,7 @@ function Error_modal({ active, setActive, children, text, setText }) {
                     </div>
                     <p>{`${text}`}</p>
                     <p>Попробуйте авторизоваться</p>
-                    <Link to='/Log' className='btn-to-log'>Авторизоваться</Link>
+                    <Link to='/' className='btn-to-log'>Авторизоваться</Link>
                 </div>
             </div>
         </div>

@@ -42,11 +42,13 @@ function Log() {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-          setIsAuthenticated(true);
+            setIsAuthenticated(true);
         } else {
-          setIsAuthenticated(false)
+            setIsAuthenticated(false)
         }
-      }, []);
+    }, []);
+    console.log(isAuthenticated)
+
     useEffect(() => {
 
         checkAccount((res) => {
@@ -62,10 +64,10 @@ function Log() {
                     }
                 }
             }
-            // else {
-            //     setIsTypeUser(null);
-            //     // setIsAuthenticated(false);
-            // }
+            else {
+                localStorage.removeItem('token');
+                setIsAuthenticated(false);
+            }
         })
     }, [isAuthenticated, navigate]);
 
@@ -73,7 +75,7 @@ function Log() {
     const togglePasswordVisiblity = () => {
         setPasswordShown(passwordShown ? false : true);
     };
-       
+
     return (
         <>
             <Loading active={isLoading} setActive={setIsLoading} />

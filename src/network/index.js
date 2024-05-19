@@ -109,11 +109,11 @@ async function getDataAdminJournal(offset, limit, par, callback) {
     })
 }
 
-async function searchOfWorks(offset, limit, str, callback){
+async function searchOfWorks(offset, limit, str, callback) {
     const url = `${baseUrl_test}/works/latest/search`;
 
     await axios.get(url, {
-        params:{
+        params: {
             offset: offset,
             limit: limit,
             query: str
@@ -125,20 +125,24 @@ async function searchOfWorks(offset, limit, str, callback){
     })
 }
 
-async function getDataPrograms(offset, limit, callback) {
-    const url = `${baseUrl_test}/programs`;
+async function getDataPrograms(offset, limit, param, text, callback) {
+    const url = `${baseUrl_test}/programs/search`;
 
     await axios.get(url, {
         params: {
             offset: offset,
             limit: limit,
-            extended: true
+            query: text,
+            semester: param.semester,
+            directivityId: param.directivity
         }
     }).then((res) => {
         callback(res.data);
     }).catch((error) => {
         console.log(error)
     })
+    console.log(offset, limit, param)
+
 }
 
 async function getDirectivitiesPrograms(callback) {
@@ -218,8 +222,8 @@ async function getAllGroups(callback) {
 async function getAllDirectivities(ext, callback) {
     const url = `${baseUrl_test}/directivities`;
 
-    await axios.get(url,{
-        params:{
+    await axios.get(url, {
+        params: {
             extended: ext
         }
     }).then((res) => {
@@ -260,7 +264,7 @@ async function editGroup(id, groupAbb, groupNumber, groupDirectivity, callback) 
     const url = `${baseUrl_test}/groups/${id}`;
     // console.log(id, dapartmentTitle, departmentPhone)
     await axios.patch(url, {
-        title: groupAbb+groupNumber,
+        title: groupAbb + groupNumber,
         directivityId: groupDirectivity
     }, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
@@ -286,7 +290,7 @@ async function getAllStudents(off, lim, callback) {
     const url = `${baseUrl_test}/students?extended=true`;
 
     await axios.get(url, {
-        params:{
+        params: {
             offset: off,
             limit: lim
         }
@@ -298,11 +302,11 @@ async function getAllStudents(off, lim, callback) {
 
 }
 
-async function searchOfStudents(offset, limit, str, callback){
+async function searchOfStudents(offset, limit, str, callback) {
     const url = `${baseUrl_test}/students/search`;
 
     await axios.get(url, {
-        params:{
+        params: {
             offset: offset,
             limit: limit,
             query: str
@@ -367,7 +371,8 @@ async function getAllEmployees(callback) {
         callback(res.data);
     }).catch((error) => {
         console.log(error)
-    })}
+    })
+}
 
 
 

@@ -14,6 +14,7 @@ import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
 import Empty_modal from '../Modal/Empty_modal';
+import Admin_header from './Admin_header';
 
 function CreateQR() {
   const [isOpen, setOpen] = useState(false);
@@ -72,8 +73,10 @@ function CreateQR() {
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
 
-  const [semesterFilter, setSemesterFilter] = useState(-1);
-  const [programFilter, setProgramFilter] = useState(null);
+  const [semesterFilter, setSemesterFilter] = useState(null);
+  const [directivityFilter, setDirectivityFilter] = useState(null);
+
+  const [qrParams, setQRParams] = useState({});
 
   const [getSemester, setGetSemester] = useState(null);
   const [getProgram, setGetProgram] = useState(null);
@@ -89,7 +92,8 @@ function CreateQR() {
   const [visibleItems, setVisibleItems] = useState(30);
   const [hasMoreData, setHasMoreData] = useState(true);
   const menuRef = useRef(null);
-
+  const [inputValue, setInputValue] = useState("");
+  const [debouncedInputValue, setDebouncedInputValue] = useState("");
 
   const [offset, setOffset] = useState(0);
   const limit = 30; // Количество элементов на странице
@@ -107,93 +111,54 @@ function CreateQR() {
   };
 
   // Обработчик клика вне модального окна
-  // const handleClickOutside = (event) => {
-  //   if (modalRef.current && !modalRef.current.contains(event.target)) {
-  //     closeModal();
-  //   }
-  // };
-  // useEffect(() => {
-  //   // Добавляем обработчик клика вне модального окна при открытии модального окна
-  //   if (isSetOpen) {
-  //     document.addEventListener('click', handleClickOutside);
-  //   } else {
-  //     document.removeEventListener('click', handleClickOutside);
-  //   }
-  //   // Очищаем обработчик при размонтировании компонента
-  //   return () => {
-  //     document.removeEventListener('click', handleClickOutside);
-  //   };
-  // }, [isSetOpen]);
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      closeModal();
+    }
+  };
+  useEffect(() => {
+    // Добавляем обработчик клика вне модального окна при открытии модального окна
+    if (isSetOpen) {
+      document.addEventListener('click', handleClickOutside);
+    } else {
+      document.removeEventListener('click', handleClickOutside);
+    }
+    // Очищаем обработчик при размонтировании компонента
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isSetOpen]);
 
   //загрузка данных с бэка
   useEffect(() => {
+
     setIsLoading(true);
-    getDataPrograms(offset, limit, (res) => {
+    setHasMoreData(true);
+    console.log(qrParams)
+    getDataPrograms(offset, limit, qrParams, debouncedInputValue, (res) => {
+      console.log(res.response)
       if (res.error) {
         setTextError(getTextError(res.error));
         setErrorActive(true);
       } else {
-        if (res.response.programs.length < limit) {
+        if (res.response.entries.length < limit) {
           setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
         }
-        setProgramQR(prevData => [...prevData, ...res.response.programs]); // Добавляем новые данные к существующим
-        setDisciplinesPrograms(prevData => [...prevData, ...res.response.disciplines])
-        setSearchResults(prevResults => [...prevResults, ...res.response.programs]); // Обновляем результаты поиска
+
+        // Если это первая страница, просто устанавливаем новые данные
+        if (offset === 0) {
+          setProgramQR(res.response.entries);
+          setSearchResults(res.response.entries);
+        } else {
+          // Иначе обновляем данные
+          setProgramQR(prevData => [...prevData, ...res.response.entries]);
+          setSearchResults(prevResults => [...prevResults, ...res.response.entries]);
+        }
       }
       setIsLoading(false);
     })
 
-
-
-
-    // getDisciplinesForPrograms((res) => {
-    //   if (res.error) {
-    //     setTextError(getTextError(res.error));
-    //     setErrorActive(true);
-    //     setIsLoading(false);
-
-    //   } else {
-    //     setDataDisciplines(res);
-    //     setIsLoading(false);
-    //   }
-    // })
-
-    // getGroups((res) => {
-    //   if (res.error) {
-    //     setTextError(getTextError(res.error));
-    //     setErrorActive(true);
-    //     setIsLoading(false);
-
-    //   } else {
-    //     setGroupQR(res);
-    //     setIsLoading(false);
-    //   }
-    // })
-
-    // getAllDisciplines((res) => {
-    //   if (res.error) {
-    //     setTextError(getTextError(res.error));
-    //     setErrorActive(true);
-    //     setIsLoading(false);
-
-    //   } else {
-    //     setAllDisciplines(res);
-    //     setIsLoading(false);
-    //   }
-    // })
-
-    // getAllWorkTypes((res) => {
-    //   if (res.error) {
-    //     setTextError(getTextError(res.error));
-    //     setErrorActive(true);
-    //     setIsLoading(false);
-
-    //   } else {
-    //     setAllWorkTypes(res);
-    //     setIsLoading(false);
-    //   }
-    // })
-  }, [offset, limit]);
+  }, [offset, limit, qrParams, debouncedInputValue]);
 
   useEffect(() => {
     // Функция, которая вызывается при клике вне меню
@@ -230,36 +195,17 @@ function CreateQR() {
   }, []);
 
   //поиск программ
-  const handleChange = event => {
-    //   setVisibleItems(30);
-    //   setSearchTerm(event.target.value);
-
-    // //   const searchDisciplines = dataDisciplines.response.map(resp => (
-    // //     resp.disciplines.find(disc => 
-    // //         disc.discipline.title.toLowerCase().includes(event.target.value.toLowerCase())
-    // //     )
-    // // ));
-
-
-    // //   console.log(searchDisciplines)
-    //   const results = programQR.response.filter(response =>
-    //     response.title.toLowerCase().includes(event.target.value.toLowerCase())
-    //   );
-    //   setSearchResults(results);
-  };
-
-
-  // открытие настроик карточки
-  const handleSettingClick = (event, progId) => {
-
-    setGetProgId(progId);
-    setUserStates(prevProgStates => ({
-
-      [progId]: !prevProgStates[progId],
-    }));
-
+  const handleInputValue = e => {
+    setInputValue(e.target.value);
 
   };
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setOffset(0);
+        setDebouncedInputValue(inputValue);
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+}, [inputValue, 1000]);
 
   // кнопка выхода из системы
   const handleLogout = () => {
@@ -334,55 +280,29 @@ function CreateQR() {
   function handleSelectSemesterFilter(data) {
     setSemesterFilter(data);
   }
-  function handleSelectProgramFilter(data) {
-    setProgramFilter(data);
+  function handelSelectDirectivityFilter(data) {
+    setDirectivityFilter(data);
   }
 
   // функция фильтрации данных
   const getParams = () => {
-    let filteredResults = [...programQR.response]; // Создаем копию исходных данных для фильтрации
+    setIsLoading(true);
+    setOffset(0);
 
-    if (semesterFilter !== -1) {
-      filteredResults = filteredResults.filter(programs => programs.semester === semesterFilter.value);
-    }
-    if (programFilter !== null) {
-      filteredResults = filteredResults.filter(programs => programs.id === programFilter.value);
-    }
-    if (semesterFilter !== -1 && programFilter !== null) {
-      filteredResults = filteredResults.filter(programs => programs.semester === semesterFilter.value);
-      filteredResults = filteredResults.filter(programs => programs.id === programFilter.value);
-    }
-
-    setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
+    setQRParams({
+      semester: semesterFilter ? semesterFilter.value : null,
+      directivity: directivityFilter ? directivityFilter.value : null,
+    });
   }
 
   // функция сброса фильтров
   const deleteParams = () => {
-    setSemesterFilter(-1);
-    setProgramFilter(null);
-    setSearchResults(programQR.response);
+    setQRParams({});
+    setSemesterFilter(null);
+    setDirectivityFilter(null);
   }
 
-  // запись значений из модального окна создания программ
-  function handelGetSemester(data) {
-    setGetSemester(data);
-  }
-  function handelGetProgram(data) {
-    setGetProgram(data);
-  }
-  function handelGetSubject(data) {
-    setGetSubject(data);
-  }
 
-  function handelGetEditSemester(data) {
-    setGetEditSemester(data);
-  }
-  function handelGetEditProgram(data) {
-    setGetEditProgram(data);
-  }
-  function handelGetEditSubject(data) {
-    setGetEditSubject(data);
-  }
 
   const editPrograms = () => {
     setEditActive(true);
@@ -470,7 +390,7 @@ function CreateQR() {
   { value: 7, label: 7 },
   { value: 8, label: 8 },
   { value: 9, label: 9 },
-  { value: 30, label: 30 },
+  { value: 10, label: 10 },
   { value: 11, label: 11 },
   { value: 12, label: 12 }];
 
@@ -494,7 +414,14 @@ function CreateQR() {
             <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
           </ul>
         </nav>
+
         {/* <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link> */}
+
+        <Link style={{ visibility: 'hidden' }} className='admin-to-qr' to="/CreateQR">
+          <p>Создать QR-код</p>
+          <img className='qr-arrow' src={require('../../img/arrow.png')} />
+        </Link>
+
         <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
         <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
       </div>
@@ -549,36 +476,35 @@ function CreateQR() {
         <div className='data-option'>
           <div className='search'>
             <input type='text'
-              value={searchTerm}
-              onChange={handleChange}
-              placeholder='Поиск по программе...' />
+              value={inputValue}
+              onChange={handleInputValue}
+              placeholder='Поиск...' />
           </div>
 
           {/* фильтры */}
           <div className='filter-data-qr'>
-            {/*<Select
+            <Select
               styles={customStylesQR}
               placeholder="Семестр"
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
               isSearchable={true}
-              isDisabled={semesterFilter === -1 && programFilter !== null ? true : false}
+              // isDisabled={semesterFilter === -1 && directivityFilter !== null ? true : false}
               options={dataSemester}
             />
             <Select
               styles={customStyles}
-              placeholder="Программа"
-              value={programFilter}
-              onChange={handleSelectProgramFilter}
+              placeholder="Направленность"
+              value={directivityFilter}
+              onChange={handelSelectDirectivityFilter}
               isSearchable={true}
-              options={semesterFilter !== -1 ? programQR.response.filter(response => response.semester === semesterFilter.value).map(response => ({
-                value: response.id,
-                label: response.title,
-              })) : programQR.response.map(response => ({
-                value: response.id,
-                label: response.title,
-              }))}
-            /> */}
+              options={directivitiesPrograms.map(res =>
+              ({
+                value: res.id,
+                label: res.title
+              })
+              )}
+            />
             {/* задать заначения фильтрам */}
             <button className='get-params-qr' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
             {/* очистить фильтры */}
@@ -598,22 +524,19 @@ function CreateQR() {
           <div className='data-qr'>
             <div className='qr1'>
               <p><span>Семестр: </span>{value.program.semester}</p>
-              <p><span>Направленность: </span>{directivitiesPrograms.find((res) => res.id === value.program.directivityId).title}</p>
-              {/* <button className='btn-create-qr' onClick={getQR}>
-                Создать QR
-                <img src={require('../../img/qr_white.png')} />
-              </button> */}
+              <p><span>Степень образования: </span>{value.grade.title}</p>
+              <p><span>Направленность: </span>{value.directivity.title}</p>
             </div>
             <div className='qr2'>
               <span>Дисциплины: </span>
               <div className='dicip'>
-                {value.program && value.disciplineIds && value.disciplineIds.map((res) => (
-                  <p>{disciplinesPrograms.find(val => val.discipline.id === res).discipline.title}</p>
+                {value.disciplines.map((res) => (
+                  <p>{res.title}</p>
                 ))}
               </div>
             </div>
           </div>
-          
+
           <button
             className='qr-setting'
             onClick={() => {
@@ -631,9 +554,7 @@ function CreateQR() {
           >
             <img src={require('../../img/setting.png')} alt='setting' />
           </button>
-          {/* <button className='btn-create-qr' onClick={getQR}>
-                <img src={require('../../img/qr_white.png')} />
-              </button> */}
+
           {isSetOpen && selectedItemId === value.program.id && (
             <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
               <button className='btn-create-qr' onClick={getQR}>
@@ -645,8 +566,8 @@ function CreateQR() {
               <button>
                 <img src={require('../../img/delete.png')} alt='delete' />
               </button>
-              
-              
+
+
             </div>
           )}
         </div>

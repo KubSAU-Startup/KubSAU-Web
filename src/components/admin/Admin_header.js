@@ -35,7 +35,6 @@ function Admin_header() {
     if (!isAuthenticated) {
         return <Navigate to='/' />
     }
-
     return (
         <div className='ad_main_header'>
             <img className='ad_main_logo' src={require('../../img/logo1.png')} />

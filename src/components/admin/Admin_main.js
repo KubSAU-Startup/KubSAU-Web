@@ -16,7 +16,6 @@ function Admin_main() {
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-
     // переменные для получения фильтров из бэка
     const [filterWorkType, setFilterWorkType] = useState([]);
     const [filterDiscipline, setFilterDiscipline] = useState([]);
@@ -129,7 +128,7 @@ function Admin_main() {
     const getParams = () => {
         setIsLoading(true);
         setOffset(0);
-        
+
         setJournalParam({
             disciplineId: selectedDiscipline ? selectedDiscipline.value : null,
             teacherId: selectedTeacher ? selectedTeacher.value : null,
