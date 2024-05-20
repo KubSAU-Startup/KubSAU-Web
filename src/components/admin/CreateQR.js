@@ -9,7 +9,7 @@ import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getAllGroups, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents } from '../../network';
+import { getAllGroups, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents, getStudentsByGroups } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
@@ -120,6 +120,7 @@ function CreateQR() {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [isSetOpen]);
+  useEffect(() => { console.log(studQR) }, [studQR])
 
   //загрузка данных с бэка
   useEffect(() => {
@@ -232,9 +233,9 @@ function CreateQR() {
   }
 
   // функция создание qr
-  const generateQRCode = async (studentId, subjectId, editable) => {
+  const generateQRCode = async (departmentId, subjectId, studentId, workTypeId) => {
 
-    const qrContent = `${studentId},${subjectId},${editable}`;
+    const qrContent = `${departmentId},${subjectId},${studentId},${workTypeId}`;
     const qrUrl = await QRCode.toDataURL(qrContent);
     return qrUrl;
   };
@@ -252,38 +253,57 @@ function CreateQR() {
       }
     }
     const folder = zip.folder(titleZip);
-    console.log(titleZip);
 
+    let selectGroups = '';
+    for (const group of groupQR) {
+      selectGroups = selectGroups + group.value + ',';
+    }
 
-    // getAllStudents((res) => {
-    //   if (res.error) {
-    //     setTextError(getTextError(res.error));
-    //     setErrorActive(true);
-    //     setIsLoading(false);
+    console.log(selectGroups);
 
-    //   } else {
-    //     setStudQR(res.students);
-    //   }
-    // })
+    await getStudentsByGroups(selectGroups, (res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+        setIsLoading(false);
 
-    // for (const stud of studQR.response) {
-    //   const studentFolder = folder.folder(`${stud.lastName} ${stud.firstName} ${stud.middleName}`);
-    //   const discResp = dataDisciplines.response.filter(discipline => discipline.programId === program.value);
-    //   for (const disc of discResp) {
-    //     for (const d of disc.disciplines) {
-    //       const qrCodeUrl = await generateQRCode(stud.id, d.discipline.id, d.workType.isEditable);
-    //       const response = await fetch(qrCodeUrl);
-    //       const qrCodeBlob = await response.blob();
-    //       studentFolder.file(`${d.discipline.title}.png`, qrCodeBlob);
-    //     }
-    //   }
-    // }
+      } else {
+        setStudQR(res.response);
+      }
+    })
 
-    // zip.generateAsync({ type: "blob" }).then(function (content) {
-    //   saveAs(content, `${group.label}.zip`);
-    // });
+    for (const group of groupQR) {
+      // Создаем папку для группы
+      const groupFolder = folder.folder(`${group.label}`);
+    
+      for (const stud of studQR) {
+        // Проверяем, принадлежит ли студент текущей группе
+        if (stud.groupId === group.value) {
+          for (const studName of stud.students) {
+            // Создаем папку для студента внутри папки группы
+            const studentFolder = groupFolder.folder(`${studName.title}`);
+    
+            for (const prog of programQR) {
+              if (prog.program.id === idProgram) {
+                for (const disc of prog.disciplines) {
+                  const qrCodeUrl = await generateQRCode(disc.departmentId, disc.id, studName.id, disc.workTypeId);
+                  const response = await fetch(qrCodeUrl);
+                  const qrCodeBlob = await response.blob();
+                  studentFolder.file(`${disc.title}.png`, qrCodeBlob);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+      saveAs(content, `${titleZip}.zip`);
+    });
     setIsLoading(false);
   };
+
 
   // запись значений фильтров
   function handleSelectSemesterFilter(data) {

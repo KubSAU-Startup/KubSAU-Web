@@ -378,6 +378,19 @@ async function getAllEmployees(callback) {
     })
 }
 
+async function getStudentsByGroups(param, callback) {
+    const url = `${baseUrl_test}/qr/groups/students`;
+
+    await axios.get(url, {
+        params: {
+            groupIds: param
+        }
+    }).then((res) => {
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
 
 
 
@@ -484,6 +497,6 @@ export {
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
-    searchOfWorks, searchOfStudents, getAllEmployees
+    searchOfWorks, searchOfStudents, getAllEmployees, getStudentsByGroups
 }
 
