@@ -89,7 +89,7 @@ async function getFilterDepartments(callback) {
     })
 }
 
-async function getDataAdminJournal(offset, limit, par, callback) {
+async function getDataAdminJournal(offset, limit, par, query, callback) {
     const url = `${baseUrl_test}/works/latest`;
 
     await axios.get(url, {
@@ -100,7 +100,8 @@ async function getDataAdminJournal(offset, limit, par, callback) {
             disciplineId: par.disciplineId,
             employeeId: par.teacherId,
             departmentId: par.departmentId,
-            groupId: par.groupId
+            groupId: par.groupId,
+            query: query
         }
     }).then((res) => {
         callback(res.data);
@@ -302,14 +303,17 @@ async function getAllStudents(off, lim, callback) {
 
 }
 
-async function searchOfStudents(offset, limit, str, callback) {
+async function searchOfStudents(offset, limit, param, query, callback) {
     const url = `${baseUrl_test}/students/search`;
 
     await axios.get(url, {
         params: {
             offset: offset,
             limit: limit,
-            query: str
+            groupId: param.groupId,
+            gradeId: param.gradeId,
+            statusId: param.statusId,
+            query: query
         }
     }).then((res) => {
         callback(res.data);

@@ -198,3 +198,7 @@
     justify-content: space-between;
     align-items: center;
 }
+
+.modal-groups p{
+    margin-bottom: 50px;
+}

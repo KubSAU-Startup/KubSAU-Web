@@ -45,6 +45,7 @@ function Admin_students() {
     const [hasMoreData, setHasMoreData] = useState(true);
 
     const [allGroups, setAllGroups] = useState([]);
+    const [studentsParam, setStudentsParam] = useState({});
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -118,60 +119,83 @@ function Admin_students() {
     useEffect(() => {
         setIsLoading(true);
         setHasMoreData(true);
-
-        if (inputValue === '') {
-            getAllStudents(offset, limit, (res) => {
-                if (res.error) {
-                    setTextError(getTextError(res.error));
-                    setErrorActive(true);
-                } else {
-                    if (res.response.students.length < limit) {
-                        setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-                    }
-
-                    // Если это первая страница, просто устанавливаем новые данные
-                    if (offset === 0) {
-                        setAllStudents(res.response.students);
-                        setAllStatus(res.response.statuses)
-                        // setSearchResults(res.response.students);
-                    } else {
-                        // Иначе обновляем данные
-                        setAllStudents(prevData => [...prevData, ...res.response.students]);
-                        setAllStatus([...res.response.statuses])
-
-                        // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
-                    }
+        searchOfStudents(offset, limit, studentsParam, debouncedInputValue, (res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                if (res.response.students.length < limit) {
+                    setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
                 }
-                setIsLoading(false);
-            })
-        } else {
-            console.log(debouncedInputValue);
-            searchOfStudents(offset, limit, debouncedInputValue, (res) => {
-                if (res.error) {
-                    setTextError(getTextError(res.error));
-                    setErrorActive(true);
+
+                // Если это первая страница, просто устанавливаем новые данные
+                if (offset === 0) {
+                    setAllStudents(res.response.students);
+                    // setAllStatus(res.response.statuses)
+                    setSearchResults(res.response.students);
                 } else {
-                    if (res.response.students.length < limit) {
-                        setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-                    }
+                    // Иначе обновляем данные
+                    setAllStudents(prevData => [...prevData, ...res.response.students]);
+                    // setAllStatus([...res.response.statuses])
 
-                    // Если это первая страница, просто устанавливаем новые данные
-                    if (offset === 0) {
-                        setAllStudents(res.response.students);
-                        // setAllStatus(res.response.statuses)
-                        // setSearchResults(res.response.students);
-                    } else {
-                        // Иначе обновляем данные
-                        setAllStudents(prevData => [...prevData, ...res.response.students]);
-                        // setAllStatus([...res.response.statuses])
-
-                        // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
-                    }
+                    setSearchResults(prevResults => [...prevResults, ...res.response.students]);
                 }
-                setIsLoading(false);
-            })
-        }
-    }, [offset, limit, debouncedInputValue])
+            }
+            setIsLoading(false);
+        })
+        // if (inputValue === '') {
+        //     getAllStudents(offset, limit, (res) => {
+        //         if (res.error) {
+        //             setTextError(getTextError(res.error));
+        //             setErrorActive(true);
+        //         } else {
+        //             if (res.response.students.length < limit) {
+        //                 setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
+        //             }
+
+        //             // Если это первая страница, просто устанавливаем новые данные
+        //             if (offset === 0) {
+        //                 setAllStudents(res.response.students);
+        //                 setAllStatus(res.response.statuses)
+        //                 // setSearchResults(res.response.students);
+        //             } else {
+        //                 // Иначе обновляем данные
+        //                 setAllStudents(prevData => [...prevData, ...res.response.students]);
+        //                 setAllStatus([...res.response.statuses])
+
+        //                 // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
+        //             }
+        //         }
+        //         setIsLoading(false);
+        //     })
+        // } else {
+        //     console.log(debouncedInputValue);
+        //     searchOfStudents(offset, limit, debouncedInputValue, (res) => {
+        //         if (res.error) {
+        //             setTextError(getTextError(res.error));
+        //             setErrorActive(true);
+        //         } else {
+        //             if (res.response.students.length < limit) {
+        //                 setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
+        //             }
+
+        //             // Если это первая страница, просто устанавливаем новые данные
+        //             if (offset === 0) {
+        //                 setAllStudents(res.response.students);
+        //                 // setAllStatus(res.response.statuses)
+        //                 // setSearchResults(res.response.students);
+        //             } else {
+        //                 // Иначе обновляем данные
+        //                 setAllStudents(prevData => [...prevData, ...res.response.students]);
+        //                 // setAllStatus([...res.response.statuses])
+
+        //                 // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
+        //             }
+        //         }
+        //         setIsLoading(false);
+        //     })
+        // }
+    }, [offset, limit, studentsParam, debouncedInputValue])
 
     useEffect(() => {
         getAllDirectivities(true, (res) => {
@@ -196,6 +220,7 @@ function Admin_students() {
             setIsLoading(false);
         })
     }, []);
+
     useEffect(() => {
         if (modalActive || modalEditActive || modalDeleteActive) {
             document.body.classList.add('modal-open');
@@ -270,11 +295,34 @@ function Admin_students() {
         setSearchResults(allStudents)
     }, [allStudents])
 
-    const handleSettingClick = (userId) => {
-        setUserStates(prevUserStates => ({
-            ...prevUserStates,
-            [userId]: !prevUserStates[userId],
-        }));
+    const getParams = () => {
+        setIsLoading(true);
+        setOffset(0);
+
+        setStudentsParam({
+            groupId: filterGroup ? filterGroup.value : null,
+            gradeId: filterGrade ? filterGrade.value : null,
+            statusId: filterStatus ? filterStatus.value : null
+        });
+    };
+
+    // функция сброса фильтров
+    const resetFilters = () => {
+        setIsLoading(true);
+        setFilterGroup(null);
+        setFilterGrade(null);
+        setFilterStatus(null);
+        setOffset(0);
+
+        // параметры для сброса
+        setStudentsParam({
+            // disciplineId: null,
+            // teacherId: null,
+            // departmentId: null,
+            // groupId: null,
+            // workTypeId: null
+        })
+
     };
 
     function handleFilterGroup(data) {
@@ -324,17 +372,6 @@ function Admin_students() {
                         label: res.title,
                     }))}
                 />
-                {/* <Select
-                    styles={customStyles}
-                    placeholder="Направление"
-                    value={filterGrade}
-                    onChange={handleFilterDirection}
-                    isSearchable={true}
-                    options={allDirectivities.heads.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                /> */}
                 <Select
                     styles={customStyles}
                     placeholder="Степень образования"
@@ -357,10 +394,10 @@ function Admin_students() {
                         label: res.title,
                     }))}
                 />
-                <button className='get-params' type='submit'>Применить</button>
-                <button className='delete-params'>Сбросить</button>
-
+                <button className='get-params' type='submit' onClick={getParams}>Применить</button>
+                <button className='delete-params' onClick={resetFilters}>Сбросить</button>
             </div>
+
 
             <button className='add-student' onClick={() => setModalActive(true)}>
                 <FontAwesomeIcon icon={faPlusCircle} />

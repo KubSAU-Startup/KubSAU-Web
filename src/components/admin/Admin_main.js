@@ -26,7 +26,6 @@ function Admin_main() {
     // переменная для получения данных карточек из бэка
     const [mainData, setMainData] = useState([]);
 
-    // переменная для получения всех студентов из бэка
     const [journalParam, setJournalParam] = useState({});
 
     // переменная поиска
@@ -109,16 +108,16 @@ function Admin_main() {
         setSelectedTeacher(null);
         setSelectedDepartment(null);
         setSelectedGroup(null);
-        setSearchTerm('');
+        // setSearchTerm('');
         setOffset(0);
 
         // параметры для сброса
         setJournalParam({
-            disciplineId: null,
-            teacherId: null,
-            departmentId: null,
-            groupId: null,
-            workTypeId: null
+            // disciplineId: null,
+            // teacherId: null,
+            // departmentId: null,
+            // groupId: null,
+            // workTypeId: null
         })
 
     };
@@ -136,37 +135,35 @@ function Admin_main() {
             groupId: selectedGroup ? selectedGroup.value : null,
             workTypeId: selectedWorkType ? selectedWorkType.value : null,
         });
-        setInputValue('');
-
     };
 
-    useEffect(() => {
-        setIsLoading(true);
-        const filteredResults = mainData.filter(item => {
+    // useEffect(() => {
+    //     setIsLoading(true);
+    //     const filteredResults = mainData.filter(item => {
 
-            // Проверяем условие для каждого поля, по которому хотим искать
-            return (
-                item.student.fullName.toLowerCase().includes(searchTerm) ||
-                item.group.title.toLowerCase().includes(searchTerm) ||
-                item.work.type.title.toLowerCase().includes(searchTerm) ||
-                item.student.status.title.toLowerCase().includes(searchTerm) ||
-                item.discipline.title.toLowerCase().includes(searchTerm) ||
-                `${item.employee.lastName} ${item.employee.firstName} ${item.employee.middleName}`.toLowerCase().includes(searchTerm) ||
-                item.department.title.toLowerCase().includes(searchTerm) ||
-                (item.work.title && item.work.title.toLowerCase().includes(searchTerm))
-            );
-        });
-        setSearchResults(filteredResults);
-        setIsLoading(false);
-    }, [mainData])
+    //         // Проверяем условие для каждого поля, по которому хотим искать
+    //         return (
+    //             item.student.fullName.toLowerCase().includes(searchTerm) ||
+    //             item.group.title.toLowerCase().includes(searchTerm) ||
+    //             item.work.type.title.toLowerCase().includes(searchTerm) ||
+    //             item.student.status.title.toLowerCase().includes(searchTerm) ||
+    //             item.discipline.title.toLowerCase().includes(searchTerm) ||
+    //             `${item.employee.lastName} ${item.employee.firstName} ${item.employee.middleName}`.toLowerCase().includes(searchTerm) ||
+    //             item.department.title.toLowerCase().includes(searchTerm) ||
+    //             (item.work.title && item.work.title.toLowerCase().includes(searchTerm))
+    //         );
+    //     });
+    //     setSearchResults(filteredResults);
+    //     setIsLoading(false);
+    // }, [mainData])
 
     // Функция поиска
     const handleInputValue = (e) => {
-        setSelectedDiscipline(null);
-        setSelectedTeacher(null);
-        setSelectedDepartment(null);
-        setSelectedGroup(null);
-        setSelectedWorkType(null);
+        // setSelectedDiscipline(null);
+        // setSelectedTeacher(null);
+        // setSelectedDepartment(null);
+        // setSelectedGroup(null);
+        // setSelectedWorkType(null);
         setInputValue(e.target.value);
     };
 
@@ -182,56 +179,27 @@ function Admin_main() {
     useEffect(() => {
         setIsLoading(true);
         setHasMoreData(true);
-
-        if (inputValue === '') {
-            getDataAdminJournal(offset, limit, journalParam, (res) => {
-                if (res.error) {
-                    setTextError(getTextError(res.error));
-                    setErrorActive(true);
-                } else {
-                    if (res.response.entries.length < limit) {
-                        setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-                    }
-
-                    // Если это первая страница, просто устанавливаем новые данные
-                    if (offset === 0) {
-                        setMainData(res.response.entries);
-                        setSearchResults(res.response.entries);
-                    } else {
-                        // Иначе обновляем данные
-                        setMainData(prevData => [...prevData, ...res.response.entries]);
-                        setSearchResults(prevResults => [...prevResults, ...res.response.entries]);
-                    }
+        getDataAdminJournal(offset, limit, journalParam, debouncedInputValue, (res) => {
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
+            } else {
+                if (res.response.entries.length < limit) {
+                    setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
                 }
-                setIsLoading(false);
-            })
-        } else {
-            console.log(debouncedInputValue);
-            searchOfWorks(offset, limit, debouncedInputValue, (res) => {
-                if (res.error) {
-                    setTextError(getTextError(res.error));
-                    setErrorActive(true);
-                } else {
-                    if (res.response.entries.length < limit) {
-                        setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-                    }
 
-                    // Если это первая страница, просто устанавливаем новые данные
-                    if (offset === 0) {
-                        setMainData(res.response.entries);
-                        setSearchResults(res.response.entries);
-                    } else {
-                        // Иначе обновляем данные
-                        setMainData(prevData => [...prevData, ...res.response.entries]);
-                        setSearchResults(prevResults => [...prevResults, ...res.response.entries]);
-                    }
+                // Если это первая страница, просто устанавливаем новые данные
+                if (offset === 0) {
+                    setMainData(res.response.entries);
+                    setSearchResults(res.response.entries);
+                } else {
+                    // Иначе обновляем данные
+                    setMainData(prevData => [...prevData, ...res.response.entries]);
+                    setSearchResults(prevResults => [...prevResults, ...res.response.entries]);
                 }
-                setIsLoading(false);
-            })
+            }
             setIsLoading(false);
-
-        }
-
+        })
     }, [offset, limit, journalParam, debouncedInputValue]);
 
 

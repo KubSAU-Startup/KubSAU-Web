@@ -9,7 +9,7 @@ import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getDataForQR, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms } from '../../network';
+import { getAllGroups, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
@@ -48,20 +48,12 @@ function CreateQR() {
   });
 
   const [programQR, setProgramQR] = useState([]);
-  const [disciplinesPrograms, setDisciplinesPrograms] = useState([]);
+  const [allGroups, setAllGroups] = useState([]);
   const [directivitiesPrograms, setDirectivitiesPrograms] = useState([]);
 
-  const [groupQR, setGroupQR] = useState({
-    response: [],
-    error: null,
-    success: true
-  });
+  const [groupQR, setGroupQR] = useState();
 
-  const [studQR, setStudQR] = useState({
-    response: [],
-    error: null,
-    success: true
-  });
+  const [studQR, setStudQR] = useState([]);
 
   const [workTypes, setWorkTypes] = useState({});
   const [editWorkTypes, setEditWorkTypes] = useState({});
@@ -69,7 +61,7 @@ function CreateQR() {
   const [errorActive, setErrorActive] = useState(false);
   const [textError, setTextError] = useState('');
 
-  const [semester, setSemester] = useState(-1);
+  const [semester, setSemester] = useState(null);
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
 
@@ -78,13 +70,13 @@ function CreateQR() {
 
   const [qrParams, setQRParams] = useState({});
 
-  const [getSemester, setGetSemester] = useState(null);
+  const [directivityId, setDirectivityId] = useState(null);
   const [getProgram, setGetProgram] = useState(null);
   const [getSubject, setGetSubject] = useState(null);
 
   const [getProgId, setGetProgId] = useState(null);
   const [setting, setSetting] = useState(null);
-
+  const [idProgram, setIdProgram] = useState(null);
   const [getEditSemester, setGetEditSemester] = useState(null);
   const [getEditProgram, setGetEditProgram] = useState(null);
   const [getEditSubject, setGetEditSubject] = useState(null);
@@ -134,7 +126,7 @@ function CreateQR() {
 
     setIsLoading(true);
     setHasMoreData(true);
-    console.log(qrParams)
+    // console.log(qrParams)
     getDataPrograms(offset, limit, qrParams, debouncedInputValue, (res) => {
       console.log(res.response)
       if (res.error) {
@@ -191,7 +183,16 @@ function CreateQR() {
         setDirectivitiesPrograms(res.response.directivities);
       }
       setIsLoading(false);
-    })
+    });
+    getAllGroups((res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+      } else {
+        setAllGroups(res.response);
+      }
+      setIsLoading(false);
+    });
   }, []);
 
   //поиск программ
@@ -202,10 +203,10 @@ function CreateQR() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setOffset(0);
-        setDebouncedInputValue(inputValue);
+      setDebouncedInputValue(inputValue);
     }, 1000);
     return () => clearTimeout(timeoutId);
-}, [inputValue, 1000]);
+  }, [inputValue, 1000]);
 
   // кнопка выхода из системы
   const handleLogout = () => {
@@ -244,35 +245,43 @@ function CreateQR() {
     setIsLoading(true);
 
     const zip = new JSZip();
-    const folder = zip.folder(`${group.label}`);
-
-    getStudents(group.value, (res) => {
-      if (res.error) {
-        setTextError(getTextError(res.error));
-        setErrorActive(true);
-        setIsLoading(false);
-
-      } else {
-        setStudQR(res);
-      }
-    })
-
-    for (const stud of studQR.response) {
-      const studentFolder = folder.folder(`${stud.lastName} ${stud.firstName} ${stud.middleName}`);
-      const discResp = dataDisciplines.response.filter(discipline => discipline.programId === program.value);
-      for (const disc of discResp) {
-        for (const d of disc.disciplines) {
-          const qrCodeUrl = await generateQRCode(stud.id, d.discipline.id, d.workType.isEditable);
-          const response = await fetch(qrCodeUrl);
-          const qrCodeBlob = await response.blob();
-          studentFolder.file(`${d.discipline.title}.png`, qrCodeBlob);
-        }
+    let titleZip = ('');
+    for (const prog of programQR) {
+      if (prog.program.id === idProgram) {
+        titleZip = `${prog.directivity.title + '_' + prog.grade.title + '_' + prog.program.semester}`;
       }
     }
+    const folder = zip.folder(titleZip);
+    console.log(titleZip);
 
-    zip.generateAsync({ type: "blob" }).then(function (content) {
-      saveAs(content, `${group.label}.zip`);
-    });
+
+    // getAllStudents((res) => {
+    //   if (res.error) {
+    //     setTextError(getTextError(res.error));
+    //     setErrorActive(true);
+    //     setIsLoading(false);
+
+    //   } else {
+    //     setStudQR(res.students);
+    //   }
+    // })
+
+    // for (const stud of studQR.response) {
+    //   const studentFolder = folder.folder(`${stud.lastName} ${stud.firstName} ${stud.middleName}`);
+    //   const discResp = dataDisciplines.response.filter(discipline => discipline.programId === program.value);
+    //   for (const disc of discResp) {
+    //     for (const d of disc.disciplines) {
+    //       const qrCodeUrl = await generateQRCode(stud.id, d.discipline.id, d.workType.isEditable);
+    //       const response = await fetch(qrCodeUrl);
+    //       const qrCodeBlob = await response.blob();
+    //       studentFolder.file(`${d.discipline.title}.png`, qrCodeBlob);
+    //     }
+    //   }
+    // }
+
+    // zip.generateAsync({ type: "blob" }).then(function (content) {
+    //   saveAs(content, `${group.label}.zip`);
+    // });
     setIsLoading(false);
   };
 
@@ -282,6 +291,10 @@ function CreateQR() {
   }
   function handelSelectDirectivityFilter(data) {
     setDirectivityFilter(data);
+  }
+
+  function handelSelectGroupsQR(data) {
+    setGroupQR(data);
   }
 
   // функция фильтрации данных
@@ -426,51 +439,8 @@ function CreateQR() {
         <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
       </div>
 
-      {/* блок создания qr */}
+      {/* блок фильтров и поиска */}
       <div className='qr-options'>
-        {/* <div className='create-qr'>
-          <h2>Создать QR-код</h2>
-          <p>Выберите последовательно:</p>
-          <div className='filter-qr'>
-            <Select
-              styles={customStylesQR}
-              placeholder="Семестр"
-              value={semester}
-              onChange={handleSelectSemester}
-              isSearchable={true}
-              options={dataSemester}
-            /> */}
-        {/*<Select
-              styles={customStyles}
-              placeholder="Программа"
-              value={program}
-              onChange={handleSelectProgram}
-              isSearchable={true}
-              isDisabled={semester !== -1 ? false : true}
-              options={programQR.response.filter(response => response.semester === semester.value).map(response => ({
-                value: response.id,
-                label: response.title,
-              }))}
-            />
-             <Select
-              styles={customStylesQR}
-              placeholder="Группа"
-              value={group}
-              onChange={handleSelectGroup}
-              isSearchable={true}
-              isDisabled={(semester !== -1 && program !== null) ? false : true}
-              options={groupQR.response.map(groups => ({
-                value: groups.id,
-                label: groups.title,
-              }))} 
-            />*/}
-        {/* кнопка создания qr */}
-        {/* <button className='btn-create-qr' onClick={getQR} disabled={(semester !== null && program !== null && group !== null) ? false : true}>
-              Создать QR
-              <img src={require('../../img/qr_white.png')} />
-            </button>
-          </div>
-        </div> */}
 
         {/* поиск */}
         <div className='data-option'>
@@ -514,9 +484,9 @@ function CreateQR() {
       </div>
 
       {/* кнопка вызова модального окна для создания программы */}
-      <button className='add-qr-group' onClick={() => { setEmptyModalActive(true); setAddActive(true); }}>
+      {/* <button className='add-qr-group' onClick={() => { setEmptyModalActive(true); setAddActive(true); }}>
         <FontAwesomeIcon icon={faPlusCircle} />
-      </button>
+      </button> */}
 
       {/* все созданные программы */}
       {searchResults.map(value => (
@@ -557,15 +527,15 @@ function CreateQR() {
 
           {isSetOpen && selectedItemId === value.program.id && (
             <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
-              <button className='btn-create-qr' onClick={getQR}>
+              <button className='btn-create-qr' onClick={() => { setIdProgram(value.program.id); setDirectivityId(value.directivity.id); setEmptyModalActive(true) }}>
                 <img src={require('../../img/qr_white.png')} />
               </button>
               <button onClick={editPrograms}>
                 <img src={require('../../img/edit.png')} alt='edit' />
               </button>
-              <button>
+              {/* <button>
                 <img src={require('../../img/delete.png')} alt='delete' />
-              </button>
+              </button> */}
 
 
             </div>
@@ -579,133 +549,30 @@ function CreateQR() {
         </button>
       )}
 
-
-      {/* модальное окно создания или редактирования программы */}
-      {/* <Empty_modal active={emptyModalActive}>
-        <div className='modal-qr'>
-          <>
-            {addActive && (<>
-              <Select
-                styles={customStylesModal}
-                placeholder="Семестр"
-                value={getSemester}
-                onChange={handelGetSemester}
-                isSearchable={true}
-                options={dataSemester}
-              />
-              <Select
-                styles={customStylesModal}
-                placeholder="Программа"
-                value={getProgram}
-                onChange={handelGetProgram}
-                isSearchable={true}
-                options={programQR.response.map(response => ({
-                  value: response.id,
-                  label: response.title
-                }))}
-              />
-              <Select
-                styles={customStylesModal}
-                placeholder="Дисциплины"
-                value={getSubject}
-                onChange={handelGetSubject}
-                isSearchable={true}
-                isMulti={true}
-                options={allDisciplines.response.map(response => ({
-                  value: response.id,
-                  label: response.title
-                }))}
-              />
-            </>)}
-            {editActive && (
-              <>
-                <Select
-                  styles={customStylesModal}
-                  placeholder="Семестр"
-                  value={getEditSemester}
-                  onChange={handelGetEditSemester}
-                  isSearchable={true}
-                  options={dataSemester}
-                />
-
-                <Select
-                  styles={customStylesModal}
-                  placeholder="Программа"
-                  value={getEditProgram}
-                  onChange={handelGetEditProgram}
-                  isSearchable={true}
-                  options={programQR.response.map(response => ({
-                    value: response.id,
-                    label: response.title
-                  }))}
-                />
-
-                <Select
-                  styles={customStylesModal}
-                  placeholder="Дисциплины"
-                  value={getEditSubject}
-                  onChange={handelGetEditSubject}
-                  isSearchable={true}
-                  isMulti={true}
-                  options={allDisciplines.response.map(response => ({
-                    value: response.id,
-                    label: response.title
-                  }))}
-                />
-
-              </>)
-            }
-
-          </>
-        </div>
-
-        <div className='modal-button'>
-          <button onClick={() => setModalActive(true)}>Далее</button>
-          <button onClick={() => { setEmptyModalActive(false); setTimeout(() => { setAddActive(false); setEditActive(false) }, 400) }}>Отмена</button>
-        </div>
-      </Empty_modal> */}
-      {/* <Modal active={modalActive} setActive={setModalActive}>
-        <b className='h-discip'>Задайте тип работы выбранным дисциплинам</b>
-
-        {addActive && (getSubject !== null ? getSubject.map((subject) => (
-          <div className='content-discip' key={subject.value}>
-            <p>{subject.label}</p>
+      <Empty_modal active={emptyModalActive} setActive={setEmptyModalActive}>
+        <div className='modal-groups'>
+          <div><p><b>Выберите группы: </b></p></div>
+          <div>
             <Select
-              styles={customStylesTypeOfWork}
-              placeholder="Тип работы"
-              value={workTypes[subject.value]}
-              onChange={(selectedOption) => handleWorkTypeChange(selectedOption, subject.options)}
+              styles={customStylesModal}
+              placeholder="Группа"
+              value={groupQR}
+              onChange={handelSelectGroupsQR}
               isSearchable={true}
-              options={allWorkTypes.response.map(res => ({
+              isMulti={true}
+              options={allGroups.filter(r => r.directivityId === directivityId).map(res =>
+              ({
                 value: res.id,
                 label: res.title
-              }
-              ))}
-            />
+              })
+              )} />
           </div>
-        )) : '')}
-
-        {editActive && (getEditSubject !== null ? getEditSubject.map((subject) => (
-          <div className='content-discip' key={subject.value}>
-
-            <p>{subject.label}</p>
-            <Select
-              styles={customStylesTypeOfWork}
-              placeholder="Тип работы"
-              value={editWorkTypes[subject.value]} // Используйте значение из editWorkTypes для соответствующей дисциплины
-              onChange={(selectedOption) => handleWorkTypeChange(selectedOption, subject.value)}
-              isSearchable={true}
-              options={allWorkTypes.response.map(res => ({
-                value: res.id,
-                label: res.title
-              }))}
-            />
+          <div className='modal-button'>
+            <button onClick={() => { getQR(); setEmptyModalActive(false); setGroupQR(null); }}>Сохранить</button>
+            <button onClick={() => { setEmptyModalActive(false); }}>Отмена</button>
           </div>
-        )) : '')}
-
-
-
-      </Modal> */}
+        </div>
+      </Empty_modal>
 
       {/* модальное окно ошибки */}
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
