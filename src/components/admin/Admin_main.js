@@ -108,17 +108,10 @@ function Admin_main() {
         setSelectedTeacher(null);
         setSelectedDepartment(null);
         setSelectedGroup(null);
-        // setSearchTerm('');
         setOffset(0);
 
         // параметры для сброса
-        setJournalParam({
-            // disciplineId: null,
-            // teacherId: null,
-            // departmentId: null,
-            // groupId: null,
-            // workTypeId: null
-        })
+        setJournalParam({})
 
     };
 
@@ -137,33 +130,8 @@ function Admin_main() {
         });
     };
 
-    // useEffect(() => {
-    //     setIsLoading(true);
-    //     const filteredResults = mainData.filter(item => {
-
-    //         // Проверяем условие для каждого поля, по которому хотим искать
-    //         return (
-    //             item.student.fullName.toLowerCase().includes(searchTerm) ||
-    //             item.group.title.toLowerCase().includes(searchTerm) ||
-    //             item.work.type.title.toLowerCase().includes(searchTerm) ||
-    //             item.student.status.title.toLowerCase().includes(searchTerm) ||
-    //             item.discipline.title.toLowerCase().includes(searchTerm) ||
-    //             `${item.employee.lastName} ${item.employee.firstName} ${item.employee.middleName}`.toLowerCase().includes(searchTerm) ||
-    //             item.department.title.toLowerCase().includes(searchTerm) ||
-    //             (item.work.title && item.work.title.toLowerCase().includes(searchTerm))
-    //         );
-    //     });
-    //     setSearchResults(filteredResults);
-    //     setIsLoading(false);
-    // }, [mainData])
-
     // Функция поиска
     const handleInputValue = (e) => {
-        // setSelectedDiscipline(null);
-        // setSelectedTeacher(null);
-        // setSelectedDepartment(null);
-        // setSelectedGroup(null);
-        // setSelectedWorkType(null);
         setInputValue(e.target.value);
     };
 

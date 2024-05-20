@@ -23,7 +23,7 @@ function User_prof() {
 
     const [filterGroup, setFilterGroup] = useState(null);
     const [filterGrade, setFilterGrade] = useState(null);
-    const [filterStatus, setFilterStatus] = useState(null);
+    const [filterType, setFilterType] = useState(null);
 
     const [modalGroup, setModalGroup] = useState(null);
     const [modalEditGroup, setModalEditGroup] = useState(null);
@@ -295,8 +295,8 @@ function User_prof() {
         setFilterGrade(data);
     }
 
-    function handleFilterStatus(data) {
-        setFilterStatus(data);
+    function handleFilterType(data) {
+        setFilterType(data);
     }
 
     function handleModalGroup(data) {
@@ -313,9 +313,9 @@ function User_prof() {
     }
 
     const position = [
-        { id: 1, title: 'Администратор' },
-        { id: 2, title: 'Преподаватель' },
-        { id: 3, title: 'Лаборант' }
+        { value: 1, label: 'Администратор' },
+        { value: 2, label: 'Преподаватель' },
+        { value: 3, label: 'Лаборант' }
     ]
     return (
         <>
@@ -331,47 +331,11 @@ function User_prof() {
             <div className='filters'>
                 <Select
                     styles={customStyles}
-                    placeholder="Группа"
-                    value={filterGroup}
-                    onChange={handleFilterGroup}
+                    placeholder="Должность"
+                    value={filterType}
+                    onChange={handleFilterType}
                     isSearchable={true}
-                    options={allGroups.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                />
-                {/* <Select
-                    styles={customStyles}
-                    placeholder="Направление"
-                    value={filterGrade}
-                    onChange={handleFilterDirection}
-                    isSearchable={true}
-                    options={allDirectivities.heads.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                /> */}
-                <Select
-                    styles={customStyles}
-                    placeholder="Степень образования"
-                    value={filterGrade}
-                    onChange={handleFilterGrade}
-                    isSearchable={true}
-                    options={allDirectivities.grades.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                />
-                <Select
-                    styles={customStyles}
-                    placeholder="Статус"
-                    value={filterStatus}
-                    onChange={handleFilterStatus}
-                    isSearchable={true}
-                    options={allStatus.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
+                    options={position}
                 />
                 <button className='get-params' type='submit'>Применить</button>
                 <button className='delete-params'>Сбросить</button>
@@ -383,7 +347,7 @@ function User_prof() {
             </button>
             {searchResults.map(res => (
 
-                <div className='cart-stud'>
+                <div className='cart-stud' key={res.id}>
                     {/* <div className='data'>
                         {user.id}
                     </div> */}
@@ -393,7 +357,7 @@ function User_prof() {
 
                         </div>
                         <div className='col2'>
-                            <p><span>Должность:</span> {res.type && position.find(r => r.id === res.type)?.title}</p>
+                            <p><span>Должность:</span> {res.type && position.find(r => r.value === res.type)?.label}</p>
                         </div>
                     </div>
                     <button

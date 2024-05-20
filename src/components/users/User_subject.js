@@ -172,47 +172,11 @@ function User_subject() {
                     placeholder='Поиск...'
                 />
             </div>
-            <div className='filters'>
-                <Select
-                    styles={customStyles}
-                    placeholder="Семестр"
-                    value={filterSemester}
-                    onChange={handleFilterSemester}
-                    isSearchable={true}
-                    options={dataSemester.map(res => ({
-                        value: res.value,
-                        label: res.label,
-                    }))}
-                />
-                <Select
-                    styles={customStyles}
-                    placeholder="Степень образованя"
-                    value={filterGrade}
-                    onChange={handleFilterGrade}
-                    isSearchable={true}
-                    options={allDirectivities.grades.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                />
-
-
-                <button className='get-params' type='submit' onClick={getParams}>Применить</button>
-                <button className='delete-params' onClick={resetParams}>Сбросить</button>
-
-            </div>
 
             {searchResults.slice(0, visibleItems).map(res => (
                 <div className='cart-stud' key={res.id}>
                     <div className='content'>
-                        <div className='col1'>
-                            <p><span>Название:</span> {res.title}</p>
-                        </div>
-                        <div className='col2'>
-                            <p><span>Степень образования:</span> {res.title}</p>
-                            <p><span>Семестр:</span> {res.title}</p>
-
-                        </div>
+                            <p><span>Название:</span> {res.title}</p>                        
                     </div>
                 </div>
             ))}
