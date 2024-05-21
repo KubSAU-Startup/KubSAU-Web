@@ -55,7 +55,7 @@ function CreateQR() {
 
   const [groupQR, setGroupQR] = useState([]);
 
-  const [studQR, setStudQR] = useState([]);
+  const [studQR, setStudQR] = useState(null);
 
   const [workTypes, setWorkTypes] = useState({});
   const [editWorkTypes, setEditWorkTypes] = useState({});
@@ -129,7 +129,7 @@ function CreateQR() {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [isSetOpen]);
-  useEffect(() => { console.log(studQR) }, [studQR])
+  // useEffect(() => { console.log(studQR) }, [studQR])
 
   //загрузка данных с бэка
   useEffect(() => {
@@ -207,33 +207,13 @@ function CreateQR() {
 
   useEffect(() => {
     // console.log(studQR)
-    createZip();
+    if(studQR!== null){
+      createZip();
+    }
 
   }, [studQR])
 
-  useEffect(() => {
-    console.log(groupQR)
-    // createZip();
-
-  }, [groupQR])
-
-  useEffect(() => {
-
-  }, [arrayUInt8])
-
-  useEffect(() => {
-    const canvas = document.getElementById("123456");
-    const pngUrl = canvas.toDataURL("image/png");
-    const base64Data = pngUrl.replace(/^data:image\/png;base64,/, "");
-    const binaryData = atob(base64Data);
-    const uint8Array = new Uint8Array(binaryData.length);
-    for (let i = 0; i < binaryData.length; i++) {
-      uint8Array[i] = binaryData.charCodeAt(i);
-    }
-    setArrayUInt8(uint8Array);
-
-  }, [qrUrl])
-
+ 
   //поиск программ
   const handleInputValue = e => {
     setInputValue(e.target.value);
@@ -464,10 +444,11 @@ function CreateQR() {
 
 
 
-                  setQrUrl(disc.departmentId + ',' + disc.id + ',' + studName.id + ',' + disc.workTypeId);
+                  // setQrUrl(disc.departmentId + ',' + disc.title + ',' + studName.title + ',' + disc.workTypeId);
                   // QrCodeData.value = `${disc.departmentId + ',' + disc.title + ',' + studName.title + ',' + disc.workTypeId}`;
-                  await sleep(10);
 
+                  await setQrUrlAsync(disc.departmentId + ',' + disc.id + ',' + studName.id + ',' + disc.workTypeId);
+                  await sleep(10);
                   const canvas = document.getElementById("123456");
                   const pngUrl = canvas.toDataURL("image/png");
                   // const pngUrl = QrCodeData.toDataURL("image/png");
@@ -500,7 +481,7 @@ function CreateQR() {
       downloadLink.click();
       document.body.removeChild(downloadLink);
     });
-
+    setStudQR(null);
     setIsLoading(false);
     // }, 10000);
     // }, 1500);
@@ -554,6 +535,7 @@ function CreateQR() {
       </div>
 
       <QRCode
+        style={{display: 'none'}}
         id="123456"
         value={`${qrUrl}`}
         size={290}
