@@ -3,7 +3,8 @@ import './Admin_header.css';
 import './CreateQR.css'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
-import QRCode from 'qrcode';
+// import QRCode from 'qrcode';
+import QRCode from "qrcode.react";
 import JSZip, { filter, forEach } from "jszip";
 import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
@@ -26,6 +27,7 @@ function CreateQR() {
   const [searchResults, setSearchResults] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [qrUrl, setQrUrl] = useState('');
 
   const [addActive, setAddActive] = useState(false);
   const [editActive, setEditActive] = useState(false);
@@ -51,7 +53,7 @@ function CreateQR() {
   const [allGroups, setAllGroups] = useState([]);
   const [directivitiesPrograms, setDirectivitiesPrograms] = useState([]);
 
-  const [groupQR, setGroupQR] = useState();
+  const [groupQR, setGroupQR] = useState([]);
 
   const [studQR, setStudQR] = useState([]);
 
@@ -92,6 +94,13 @@ function CreateQR() {
   const [isSetOpen, setIsSetOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const modalRef = useRef(null);
+
+  const [arrayUInt8, setArrayUInt8] = useState([]);
+
+
+  const [inputText, setInputText] = useState('');
+  const [qrCodeText, setQRCodeText] = useState('');
+  let selectGroups = '';
 
   const openModal = (itemId) => {
     setSelectedItemId(itemId);
@@ -196,6 +205,35 @@ function CreateQR() {
     });
   }, []);
 
+  useEffect(() => {
+    // console.log(studQR)
+    createZip();
+
+  }, [studQR])
+
+  useEffect(() => {
+    console.log(groupQR)
+    // createZip();
+
+  }, [groupQR])
+
+  useEffect(() => {
+
+  }, [arrayUInt8])
+
+  useEffect(() => {
+    const canvas = document.getElementById("123456");
+    const pngUrl = canvas.toDataURL("image/png");
+    const base64Data = pngUrl.replace(/^data:image\/png;base64,/, "");
+    const binaryData = atob(base64Data);
+    const uint8Array = new Uint8Array(binaryData.length);
+    for (let i = 0; i < binaryData.length; i++) {
+      uint8Array[i] = binaryData.charCodeAt(i);
+    }
+    setArrayUInt8(uint8Array);
+
+  }, [qrUrl])
+
   //поиск программ
   const handleInputValue = e => {
     setInputValue(e.target.value);
@@ -232,77 +270,6 @@ function CreateQR() {
     setGroup(data);
   }
 
-  // функция создание qr
-  const generateQRCode = async (departmentId, subjectId, studentId, workTypeId) => {
-
-    const qrContent = `${departmentId},${subjectId},${studentId},${workTypeId}`;
-    const qrUrl = await QRCode.toDataURL(qrContent);
-    return qrUrl;
-  };
-
-  // функция создания папок и архивов
-  const getQR = async () => {
-
-    setIsLoading(true);
-
-    const zip = new JSZip();
-    let titleZip = ('');
-    for (const prog of programQR) {
-      if (prog.program.id === idProgram) {
-        titleZip = `${prog.directivity.title + '_' + prog.grade.title + '_' + prog.program.semester}`;
-      }
-    }
-    const folder = zip.folder(titleZip);
-
-    let selectGroups = '';
-    for (const group of groupQR) {
-      selectGroups = selectGroups + group.value + ',';
-    }
-
-    console.log(selectGroups);
-
-    await getStudentsByGroups(selectGroups, (res) => {
-      if (res.error) {
-        setTextError(getTextError(res.error));
-        setErrorActive(true);
-        setIsLoading(false);
-
-      } else {
-        setStudQR(res.response);
-      }
-    })
-
-    for (const group of groupQR) {
-      // Создаем папку для группы
-      const groupFolder = folder.folder(`${group.label}`);
-    
-      for (const stud of studQR) {
-        // Проверяем, принадлежит ли студент текущей группе
-        if (stud.groupId === group.value) {
-          for (const studName of stud.students) {
-            // Создаем папку для студента внутри папки группы
-            const studentFolder = groupFolder.folder(`${studName.title}`);
-    
-            for (const prog of programQR) {
-              if (prog.program.id === idProgram) {
-                for (const disc of prog.disciplines) {
-                  const qrCodeUrl = await generateQRCode(disc.departmentId, disc.id, studName.id, disc.workTypeId);
-                  const response = await fetch(qrCodeUrl);
-                  const qrCodeBlob = await response.blob();
-                  studentFolder.file(`${disc.title}.png`, qrCodeBlob);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    zip.generateAsync({ type: "blob" }).then(function (content) {
-      saveAs(content, `${titleZip}.zip`);
-    });
-    setIsLoading(false);
-  };
 
 
   // запись значений фильтров
@@ -316,6 +283,7 @@ function CreateQR() {
   function handelSelectGroupsQR(data) {
     setGroupQR(data);
   }
+
 
   // функция фильтрации данных
   const getParams = () => {
@@ -413,6 +381,132 @@ function CreateQR() {
       })));
   }
 
+
+
+  const generateQR = async (department, discipline, studName, workType) => {
+    // Генерируем QR-код и сохраняем его в формате PNG
+    // setTimeout(() => {
+
+    // }, 500)
+
+  }
+
+  const getQR = () => {
+    console.log(groupQR);
+    for (const group of groupQR) {
+      selectGroups = selectGroups + group.value + ',';
+    }
+    if (selectGroups !== '') {
+      getStudentsByGroups(selectGroups, (res) => {
+        if (res.error) {
+          setTextError(getTextError(res.error));
+          setErrorActive(true);
+          setIsLoading(false);
+        } else {
+          setStudQR(res.response);
+          console.log(res.response)
+        }
+      });
+    }
+  }
+
+  const setQrUrlAsync = (value) => {
+    return new Promise((resolve) => {
+      setQrUrl(value);
+      resolve();
+    });
+  }
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const createZip = async () => {
+    setIsLoading(true);
+    // const canvas = document.getElementById("123456");
+    // const pngUrl = canvas.toDataURL("image/png");
+
+    // // Получаем бинарные данные из Data URL
+    // const base64Data = pngUrl.replace(/^data:image\/png;base64,/, "");
+    // const binaryData = atob(base64Data);
+    // const uint8Array = new Uint8Array(binaryData.length);
+    // for (let i = 0; i < binaryData.length; i++) {
+    //   uint8Array[i] = binaryData.charCodeAt(i);
+    // }
+    // setTimeout(async () => {
+    let titleZip = '';
+    for (const prog of programQR) {
+      if (prog.program.id === idProgram) {
+        titleZip = `${prog.directivity.title}_${prog.grade.title}_${prog.program.semester}`;
+      }
+    }
+    // const QrCodeData = document.getElementById("123456");
+
+    // Создаем новый ZIP-архив
+    const zip = new JSZip();
+
+    for (const group of groupQR) {
+      // Создаем папку для группы
+      const groupFolder = zip.folder(group.label);
+
+      for (const stud of studQR) {
+        // Проверяем, принадлежит ли студент текущей группе
+        if (stud.groupId === group.value) {
+          for (const studName of stud.students) {
+            // Создаем папку для студента внутри папки группы
+            const studentFolder = groupFolder.folder(studName.title);
+
+            for (const prog of programQR) {
+              if (prog.program.id === idProgram) {
+                for (const disc of prog.disciplines) {
+                  // console.log(selectGroups);
+
+                  // Создаем QR URL для каждого дисциплины
+                  // await generateQR(disc.departmentId, disc.title, studName.title, disc.workTypeId);
+
+
+
+
+                  setQrUrl(disc.departmentId + ',' + disc.id + ',' + studName.id + ',' + disc.workTypeId);
+                  // QrCodeData.value = `${disc.departmentId + ',' + disc.title + ',' + studName.title + ',' + disc.workTypeId}`;
+                  await sleep(10);
+
+                  const canvas = document.getElementById("123456");
+                  const pngUrl = canvas.toDataURL("image/png");
+                  // const pngUrl = QrCodeData.toDataURL("image/png");
+                  const base64Data = pngUrl.replace(/^data:image\/png;base64,/, "");
+                  const binaryData = atob(base64Data);
+                  const uint8Array = new Uint8Array(binaryData.length);
+                  for (let i = 0; i < binaryData.length; i++) {
+                    uint8Array[i] = binaryData.charCodeAt(i);
+                  }
+                  console.log(pngUrl)
+
+                  // Сохраняем QR-код в папке студента
+                  studentFolder.file(`${disc.title}.png`, uint8Array);
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Генерируем ZIP-архив и скачиваем его
+    // setTimeout(async () => {
+    zip.generateAsync({ type: "blob" }).then((content) => {
+      const downloadLink = document.createElement("a");
+      downloadLink.href = URL.createObjectURL(content);
+      downloadLink.download = `${titleZip}.zip`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    });
+
+    setIsLoading(false);
+    // }, 10000);
+    // }, 1500);
+
+  }
+
   // массив для семестров
   const dataSemester = [{ value: 1, label: 1 },
   { value: 2, label: 2 },
@@ -458,6 +552,15 @@ function CreateQR() {
         <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
         <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
       </div>
+
+      <QRCode
+        id="123456"
+        value={`${qrUrl}`}
+        size={290}
+        level={"H"}
+        includeMargin={true}
+      />
+
 
       {/* блок фильтров и поиска */}
       <div className='qr-options'>
@@ -588,7 +691,7 @@ function CreateQR() {
               )} />
           </div>
           <div className='modal-button'>
-            <button onClick={() => { getQR(); setEmptyModalActive(false); setGroupQR(null); }}>Сохранить</button>
+            <button onClick={() => { getQR(); setEmptyModalActive(false); }}>Сохранить</button>
             <button onClick={() => { setEmptyModalActive(false); }}>Отмена</button>
           </div>
         </div>
