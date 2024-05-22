@@ -377,6 +377,51 @@ async function getAllEmployees(callback) {
         console.log(error)
     })
 }
+async function addNewEmployee(firstN, lastN, middleN, email, typeUser, callback) {
+    console.log(firstN, lastN, middleN, email, typeUser)
+    const url = `${baseUrl_test}/employees`;
+    await axios.post(url, {
+        firstName: firstN,
+        lastName: lastN,
+        middleName: middleN,
+        email: email,
+        employeeTypeId: typeUser
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
+async function editEmployee(id, firstN, lastN, middleN, email, typeUser, callback) {
+    const url = `${baseUrl_test}/employees/${id}`;
+    await axios.patch(url, {
+        firstName: firstN,
+        lastName: lastN,
+        middleName: middleN,
+        email: email,
+        employeeTypeId: typeUser
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+async function deleteEmployee(index, callback) {
+    const url = `${baseUrl_test}/employees/${index}`;
+    await axios.delete(url).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
 
 async function getStudentsByGroups(param, callback) {
     const url = `${baseUrl_test}/qr/groups/students`;
@@ -497,6 +542,6 @@ export {
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
-    searchOfWorks, searchOfStudents, getAllEmployees, getStudentsByGroups
+    searchOfWorks, searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee
 }
 

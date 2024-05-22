@@ -7,10 +7,7 @@ import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import Empty_modal from '../Modal/Empty_modal'
-import { getAllDirectivities, getAllGroups, getAllStudents, getTextError, addNewStudent, editStudent, deleteStudent, searchOfStudents, getAllEmployees } from '../../network';
-
-
-// const endpoint = 'https://jsonplaceholder.typicode.com/users';
+import { addNewEmployee, editEmployee, deleteEmployee, getTextError, getAllEmployees } from '../../network';
 
 
 function User_prof() {
@@ -25,9 +22,9 @@ function User_prof() {
     const [filterGrade, setFilterGrade] = useState(null);
     const [filterType, setFilterType] = useState(null);
 
-    const [modalGroup, setModalGroup] = useState(null);
+    const [modalStaff, setModalStaff] = useState(null);
     const [modalEditGroup, setModalEditGroup] = useState(null);
-    const [modalStatus, setModalStatus] = useState(null);
+    const [modalStaffEdit, setModalStaffEdit] = useState(null);
     const [modalEditStatus, setModalEditStatus] = useState(null);
 
     const [modalEditActive, setModalEditActive] = useState(false);
@@ -77,9 +74,12 @@ function User_prof() {
     const [lastN, setLastN] = useState(null);
     const [firstN, setFirstN] = useState(null);
     const [middleN, setMiddleN] = useState(null);
+    const [email, setEmail] = useState(null);
+
     const [lastNEdit, setLastNEdit] = useState(null);
     const [firstNEdit, setFirstNEdit] = useState(null);
     const [middleNEdit, setMiddleNEdit] = useState(null);
+    const [emailEdit, setEmailEdit] = useState(null);
 
     const [offset, setOffset] = useState(0);
     const limit = 30; // Количество элементов на странице
@@ -88,34 +88,34 @@ function User_prof() {
     // const loadMore = () => {
     //     setOffset(prevOffset => prevOffset + limit);
     // };
-    // const [isSetOpen, setIsSetOpen] = useState(false);
-    // const [selectedItemId, setSelectedItemId] = useState(null);
+    const [isSetOpen, setIsSetOpen] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
 
-    // const openModal = (itemId) => {
-    //     setSelectedItemId(itemId);
-    //     setIsSetOpen(true);
-    // };
+    const openModal = (itemId) => {
+        setSelectedItemId(itemId);
+        setIsSetOpen(true);
+    };
 
-    // const closeModal = () => {
-    //     setIsSetOpen(false);
-    // };
+    const closeModal = () => {
+        setIsSetOpen(false);
+    };
 
-    // useEffect(() => {
-    //     // Функция, которая вызывается при клике вне меню
-    //     const handleClickOutside = (event) => {
-    //         if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
-    //             closeModal();
-    //         }
-    //     };
+    useEffect(() => {
+        // Функция, которая вызывается при клике вне меню
+        const handleClickOutside = (event) => {
+            if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
+                closeModal();
+            }
+        };
 
-    //     // Добавление обработчика события клика для всего документа
-    //     document.addEventListener("click", handleClickOutside);
+        // Добавление обработчика события клика для всего документа
+        document.addEventListener("click", handleClickOutside);
 
-    //     // Очистка обработчика при размонтировании компонента
-    //     return () => {
-    //         document.removeEventListener("click", handleClickOutside);
-    //     };
-    // }, []);
+        // Очистка обработчика при размонтировании компонента
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
 
     // useEffect(() => {
     //     setIsLoading(true);
@@ -189,27 +189,7 @@ function User_prof() {
             setIsLoading(false);
 
         })
-        getAllDirectivities(true, (res) => {
-            setIsLoading(true);
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-            } else {
-                setAllDirectivities(res.response);
-            }
-            setIsLoading(false);
-        })
 
-        getAllGroups((res) => {
-            setIsLoading(true);
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-            } else {
-                setAllGroups(res.response);
-            }
-            setIsLoading(false);
-        })
     }, []);
     useEffect(() => {
         if (modalActive || modalEditActive || modalDeleteActive) {
@@ -230,87 +210,71 @@ function User_prof() {
         return () => clearTimeout(timeoutId);
     }, [inputValue, 1000]);
 
-    // async function addData() {
-    //     await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
-    //         if (res.success) {
-    //             setAllStudents(prevData => [res.response, ...prevData]);
-    //         } else {
-    //             console.log(res);
-    //         }
-    //     });
-    // }
-    // console.log(searchResults)
-
-    // async function editData() {
-    //     await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
-    //         if (res.success) {
-    //             console.log(res.response);
-
-    //             const editStudent = allStudents.map(elem => {
-    //                 if (elem.id === editId) {
-    //                     return {
-    //                         ...elem, // копируем все свойства из исходного объекта
-    //                         firstName: firstNEdit,
-    //                         lastName: lastNEdit,
-    //                         middleName: middleNEdit,
-    //                         groupId: modalEditGroup.value,
-    //                         statusId: modalEditStatus.value
-    //                     };
-    //                 } else {
-    //                     return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-    //                 }
-    //             });
-
-    //             setAllStudents(editStudent);
-
-    //         } else {
-    //             console.log(res.response);
-    //         }
-    //     });
-    // }
-    // async function deleteData() {
-    //     await deleteStudent(deleteId, (res) => {
-    //         if (res.success) {
-    //             console.log(res.response);
-    //             setAllStudents(allStudents.filter((a) => a.id !== deleteId));
-
-    //         } else {
-    //             console.log(res.response);
-    //         }
-    //     });
-
-    // }
-
-    // useEffect(() => {
-    //     setSearchResults(allStudents)
-    // }, [allStudents])
-
-
-
-    function handleFilterGroup(data) {
-        setFilterGroup(data);
+    async function addData() {
+        console.log(firstN, lastN, middleN, email, modalStaff.value);
+        await addNewEmployee(firstN, lastN, middleN, email, modalStaff.value, (res) => {
+            if (res.success) {
+                setAllEmployees(prevData => [res.response, ...prevData]);
+            } else {
+                console.log(res);
+            }
+        });
     }
 
-    function handleFilterGrade(data) {
-        setFilterGrade(data);
+    async function editData() {
+        await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit.value, (res) => {
+            if (res.success) {
+                console.log(res.response);
+
+                const editData = allEmployees.map(elem => {
+                    if (elem.id === editId) {
+                        return {
+                            ...elem, // копируем все свойства из исходного объекта
+                            firstName: firstNEdit,
+                            lastName: lastNEdit,
+                            middleName: middleNEdit,
+                            email: emailEdit,
+                            employeeTypeId: modalStaffEdit.value
+                        };
+                    } else {
+                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                    }
+                });
+
+                setAllEmployees(editData);
+
+            } else {
+                console.log(res.response);
+            }
+        });
     }
+    async function deleteData() {
+        await deleteEmployee(deleteId, (res) => {
+            if (res.success) {
+                console.log(res.response);
+                setAllEmployees(allEmployees.filter((a) => a.id !== deleteId));
+
+            } else {
+                console.log(res.response);
+            }
+        });
+
+    }
+
+    useEffect(() => {
+        setSearchResults(allEmployees)
+    }, [allEmployees])
 
     function handleFilterType(data) {
         setFilterType(data);
     }
+    function handleModalStaff(data) {
+        setModalStaff(data);
+    }
+    function handleModalStaffEdit(data) {
+        setModalStaffEdit(data);
+    }
 
-    function handleModalGroup(data) {
-        setModalGroup(data);
-    }
-    function handleModalStatus(data) {
-        setModalStatus(data);
-    }
-    function handleModalEditGroup(data) {
-        setModalEditGroup(data);
-    }
-    function handleModalEditStatus(data) {
-        setModalEditStatus(data);
-    }
 
     const position = [
         { value: 1, label: 'Администратор' },
@@ -362,53 +326,41 @@ function User_prof() {
                     </div>
                     <button
                         className='qr-setting'
-                    // onClick={() => {
-                    //     if (isSetOpen === true && res.id !== selectedItemId) {
-                    //         closeModal();
-                    //         openModal(res.id);
-                    //     }
-                    //     else if (isSetOpen === true) {
-                    //         closeModal();
-                    //     }
-                    //     else {
-                    //         openModal(res.id);
-                    //     }
-                    // }}
-                    // className='student-setting'
+                        onClick={() => {
+                            if (isSetOpen === true && res.id !== selectedItemId) {
+                                closeModal();
+                                openModal(res.id);
+                            }
+                            else if (isSetOpen === true) {
+                                closeModal();
+                            }
+                            else {
+                                openModal(res.id);
+                            }
+                        }}
+                    // className='department-setting'
                     // onClick={() => handleSettingClick(res.id)}
                     >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
-                    {/* {isSetOpen && selectedItemId === res.id && (
+                    {isSetOpen && selectedItemId === res.id && (
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
                             <button onClick={() => {
-                                setEditId(res.id);
-                                setLastNEdit(res.lastName);
-                                setFirstNEdit(res.firstName);
-                                setMiddleNEdit(res.middleName);
-                                setModalEditGroup({
-                                    value: allGroups.find(el => el.id === res.groupId)?.id,
-                                    label: allGroups.find(el => el.id === res.groupId)?.title
-                                })
-                                setModalEditStatus({
-                                    value: allStatus.find(el =>
-                                        el.id === allStudents.find(r =>
-                                            r.id === res.id).statusId)?.id,
-                                    label: allStatus.find(el =>
-                                        el.id === allStudents.find(r =>
-                                            r.id === res.id).statusId)?.title
-                                })
                                 setModalEditActive(true);
+                                setFirstNEdit(res.firstName);
+                                setLastNEdit(res.lastName);
+                                setMiddleNEdit(res.middleName);
+                                setEmailEdit(res.email);
+                                setModalStaffEdit({ value: res.type, label: position.find(r => r.value === res.type).label });
+                                setEditId(res.id);
+
                             }}>
                                 <img src={require('../../img/edit.png')} alt='edit' />
                             </button>
-                            <button onClick={() => {
-                                // setDeleteId(res.id);
-                                // setModalDeleteActive(true);
-                            }}>
+                            <button onClick={() => { setModalDeleteActive(true); setDeleteId(res.id) }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
                             </button>
-                        </div>)} */}
+                        </div>)}
                 </div>
             ))}
             {/* {hasMoreData && (
@@ -417,7 +369,7 @@ function User_prof() {
                 </button>
             )} */}
 
-            {/* <Empty_modal active={modalActive} setActive={setModalActive}>
+            <Empty_modal active={modalActive} setActive={setModalActive}>
 
                 <div className='modal-students'>
                     <div className='input-conteiner'>
@@ -432,41 +384,30 @@ function User_prof() {
                         <input type='text' className='name-stud' placeholder=' ' value={middleN} onChange={e => setMiddleN(e.target.value)} />
                         <label className='label-name'>Отчество</label>
                     </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' value={email} onChange={e => setEmail(e.target.value)} />
+                        <label className='label-name'>e-mail</label>
+                    </div>
 
 
                     <Select
                         styles={customStylesModal}
-                        placeholder="Группа"
-                        value={modalGroup}
+                        placeholder="Должность"
+                        value={modalStaff}
                         maxMenuHeight={120}
-                        onChange={handleModalGroup}
+                        onChange={handleModalStaff}
                         isSearchable={true}
-                        options={allGroups.map(el => ({
-                            value: el.id,
-                            label: el.title,
-                        }))}
+                        options={position}
                     />
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Статус"
-                        value={modalStatus}
-                        maxMenuHeight={120}
-                        onChange={handleModalStatus}
-                        isSearchable={true}
-                        options={allStatus.map(el =>
-                        ({
-                            value: el.id,
-                            label: el.title
-                        }))}
-                    />
+
                     <div className='modal-button'>
                         <button onClick={() => {
                             addData();
                             setLastN('');
                             setFirstN('');
                             setMiddleN('');
-                            setModalGroup(null);
-                            setModalStatus(null);
+                            setEmail('');
+                            setModalStaff(null);
                             setModalActive(false);
                         }}>Сохранить</button>
                         <button onClick={() => { setModalActive(false) }}>Отмена</button>
@@ -489,32 +430,20 @@ function User_prof() {
                         <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
                         <label className='label-name'>Отчество</label>
                     </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-stud' placeholder=' ' value={emailEdit} onChange={e => setEmailEdit(e.target.value)} />
+                        <label className='label-name'>e-mail</label>
+                    </div>
 
 
                     <Select
                         styles={customStylesModal}
-                        placeholder="Группа"
-                        value={modalEditGroup}
+                        placeholder="Должность"
+                        value={modalStaffEdit}
                         maxMenuHeight={120}
-                        onChange={handleModalEditGroup}
+                        onChange={handleModalStaffEdit}
                         isSearchable={true}
-                        options={allGroups.map(el => ({
-                            value: el.id,
-                            label: el.title,
-                        }))}
-                    />
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Статус"
-                        value={modalEditStatus}
-                        maxMenuHeight={120}
-                        onChange={handleModalEditStatus}
-                        isSearchable={true}
-                        options={allStatus.map(el =>
-                        ({
-                            value: el.id,
-                            label: el.title
-                        }))}
+                        options={position}
                     />
                     <div className='modal-button'>
                         <button onClick={() => {
@@ -534,7 +463,7 @@ function User_prof() {
                         <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
                     </div>
                 </div>
-            </Empty_modal> */}
+            </Empty_modal>
         </>
 
     );
