@@ -1,21 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Admin_header.css';
 import './CreateQR.css'
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
-// import QRCode from 'qrcode';
-import QRCode from "qrcode.react";
-import JSZip, { filter, forEach } from "jszip";
-import Modal from '../Modal/Modal';
+import JSZip from "jszip";
 import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getAllGroups, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents, getStudentsByGroups } from '../../network';
+import { getAllGroups, getTextError, getDataPrograms, getDirectivitiesPrograms, getStudentsByGroups } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
-import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
+import { customStyles, customStylesModal, customStylesQR } from '../Select_style/Select_style';
 import Empty_modal from '../Modal/Empty_modal';
-import Admin_header from './Admin_header';
 
 import QRCode2 from "qrcode";
 
@@ -29,7 +25,6 @@ function CreateQR() {
   const [searchResults, setSearchResults] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [qrUrl, setQrUrl] = useState('');
 
   const [addActive, setAddActive] = useState(false);
   const [editActive, setEditActive] = useState(false);
@@ -363,16 +358,6 @@ function CreateQR() {
       })));
   }
 
-
-
-  const generateQR = async (department, discipline, studName, workType) => {
-    // Генерируем QR-код и сохраняем его в формате PNG
-    // setTimeout(() => {
-
-    // }, 500)
-
-  }
-
   const getQR = () => {
     console.log(groupQR);
     for (const group of groupQR) {
@@ -391,14 +376,6 @@ function CreateQR() {
       });
     }
   }
-
-  const setQrUrlAsync = (value) => {
-    return new Promise((resolve) => {
-      setQrUrl(value);
-      resolve();
-    });
-  }
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   const createZip = async () => {
     setIsLoading(true);
@@ -466,21 +443,14 @@ function CreateQR() {
 
     await Promise.all(qrCodePromises)
 
-    // Генерируем ZIP-архив и скачиваем его
-    // setTimeout(async () => {
     zip.generateAsync({ type: "blob" }).then((content) => {
-      const downloadLink = document.createElement("a");
-      downloadLink.href = URL.createObjectURL(content);
-      downloadLink.download = `${titleZip}.zip`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+      saveAs(content, `${titleZip}.zip`);
+      setIsLoading(false);
+    }).catch(error=>{
+      setIsLoading(false);
     });
-    setStudQR(null);
-    setIsLoading(false);
-    // }, 10000);
-    // }, 1500);
 
+    setStudQR(null);
   }
 
   // массив для семестров
@@ -528,16 +498,6 @@ function CreateQR() {
         <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
         <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
       </div>
-
-      <QRCode
-        style={{display: 'none'}}
-        id="123456"
-        value={`${qrUrl}`}
-        size={290}
-        level={"H"}
-        includeMargin={true}
-      />
-
 
       {/* блок фильтров и поиска */}
       <div className='qr-options'>
