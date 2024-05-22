@@ -17,6 +17,8 @@ import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork
 import Empty_modal from '../Modal/Empty_modal';
 import Admin_header from './Admin_header';
 
+import QRCode2 from "qrcode";
+
 function CreateQR() {
   const [isOpen, setOpen] = useState(false);
   const [emptyModalActive, setEmptyModalActive] = useState(false);
@@ -420,7 +422,21 @@ function CreateQR() {
     // const QrCodeData = document.getElementById("123456");
 
     // Создаем новый ZIP-архив
-    const zip = new JSZip();
+    const zip = new JSZip()
+
+    const createQRCode = (folder, value, filename)=>new Promise(async(resolve,reject)=>{
+      try {
+        const qrCodeUrl = await QRCode2.toDataURL(value, {errorCorrectionLevel: 'H'});
+        const base64Data = qrCodeUrl.split(',')[1];
+        folder.file(filename, base64Data, {base64:true})
+        resolve()
+      } catch (error) {
+        console.log(error);
+        reject(error)
+      }
+    });
+
+    const qrCodePromises = [];
 
     for (const group of groupQR) {
       // Создаем папку для группы
@@ -436,33 +452,10 @@ function CreateQR() {
             for (const prog of programQR) {
               if (prog.program.id === idProgram) {
                 for (const disc of prog.disciplines) {
-                  // console.log(selectGroups);
+                  const qrValue = disc.departmentId + ',' + disc.id + ',' + studName.id + ',' + disc.workTypeId
+                  const fileName = `${disc.title}.png`;
 
-                  // Создаем QR URL для каждого дисциплины
-                  // await generateQR(disc.departmentId, disc.title, studName.title, disc.workTypeId);
-
-
-
-
-                  // setQrUrl(disc.departmentId + ',' + disc.title + ',' + studName.title + ',' + disc.workTypeId);
-                  // QrCodeData.value = `${disc.departmentId + ',' + disc.title + ',' + studName.title + ',' + disc.workTypeId}`;
-
-                  await setQrUrlAsync(disc.departmentId + ',' + disc.id + ',' + studName.id + ',' + disc.workTypeId);
-                  await sleep(10);
-                  const canvas = document.getElementById("123456");
-                  const pngUrl = canvas.toDataURL("image/png");
-                  // const pngUrl = QrCodeData.toDataURL("image/png");
-                  const base64Data = pngUrl.replace(/^data:image\/png;base64,/, "");
-                  const binaryData = atob(base64Data);
-                  const uint8Array = new Uint8Array(binaryData.length);
-                  for (let i = 0; i < binaryData.length; i++) {
-                    uint8Array[i] = binaryData.charCodeAt(i);
-                  }
-                  console.log(pngUrl)
-
-                  // Сохраняем QR-код в папке студента
-                  studentFolder.file(`${disc.title}.png`, uint8Array);
-
+                  qrCodePromises.push(createQRCode(studentFolder, qrValue, fileName))
                 }
               }
             }
@@ -470,6 +463,8 @@ function CreateQR() {
         }
       }
     }
+
+    await Promise.all(qrCodePromises)
 
     // Генерируем ZIP-архив и скачиваем его
     // setTimeout(async () => {
