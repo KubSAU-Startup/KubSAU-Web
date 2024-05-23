@@ -162,15 +162,6 @@ function Admin_department() {
 
     }
 
-
-    // const addDepartment = () => {
-    //     addNewDepartment(titleDepartment, phoneDepartment, (res) => {
-    //         console.log(res)
-    //     })
-
-
-    // }
-
     // функция пагинации
     const loadMore = () => {
         setVisibleItems(prevVisibleItems => prevVisibleItems + 30);
@@ -185,22 +176,6 @@ function Admin_department() {
             setIsPaginationVisible(true); // Показать 
         }
     }, [searchResults, visibleItems]);
-
-    // function editData(index, title, phone) {
-    //     editDepartment(index, title, phone, (res) => {
-    //         console.log(res);
-
-    //     });
-
-    // }
-
-    // async function deleteData(index) {
-    //     await deleteDepartment(index, (res) => {
-    //         console.log(res.data.success);
-
-    //     });
-
-    // }
 
     return (
         <>

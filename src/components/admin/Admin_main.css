@@ -124,9 +124,9 @@
 
 .col2 {
     width: 50%;
-} 
+}
 
- .cart span,
+.cart span,
 .data {
     font-weight: 700;
 }
@@ -134,5 +134,20 @@
 .cart p,
 .data {
     margin: 10px 0;
-} 
+}
+.modal-main{
+    max-width: 700px;
+}
+.modal-main .name-dapartment,
+.modal-main .label-name {
+    margin-top: 20px;
+}
 
+.grid {
+    display: grid;
+    grid-template-columns: 20% auto;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    /* grid-template-rows: auto; */
+}

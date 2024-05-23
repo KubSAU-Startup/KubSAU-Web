@@ -4,8 +4,11 @@ import Admin_header from './Admin_header';
 import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, searchOfWorks } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
-import { customStyles } from '../Select_style/Select_style';
+import { customStyles, customStylesModal } from '../Select_style/Select_style';
 import Loading from '../Modal/Loading';
+import Empty_modal from '../Modal/Empty_modal';
+import "flatpickr/dist/themes/material_green.css";
+import Flatpickr from "react-flatpickr";
 
 function Admin_main() {
     const [errorActive, setErrorActive] = useState(false);
@@ -22,6 +25,16 @@ function Admin_main() {
     const [filterEmployees, setFilterEmployees] = useState([]);
     const [filterGroup, setFilterGroup] = useState([]);
     const [filterDepartments, setFilterDepartments] = useState([]);
+    const [modalActive, setModalActive] = useState(false);
+    const [modalEditActive, setModalEditActive] = useState(false);
+    const [modalDeleteActive, setModalDeleteActive] = useState(false);
+    const [dateTime, setDateTime] = useState(null);
+
+    const [studentEdit, setStudentEdit] = useState(null);
+    const [disciplineEdit, setDisciplineEdit] = useState(null);
+    const [workTypeEdit, setWorkTypeEdit] = useState(null);
+    const [departmentEdit, setDepartmentEdit] = useState(null);
+    const [titleEdit, setTitleEdit] = useState(null);
 
     // переменная для получения данных карточек из бэка
     const [mainData, setMainData] = useState([]);
@@ -33,7 +46,8 @@ function Admin_main() {
 
     // перменная запроса на поиск
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [editId, setEditId] = useState(null);
+    const [deleteId, setDeleteId] = useState(null);
     const [hasMoreData, setHasMoreData] = useState(true);
 
     const [inputValue, setInputValue] = useState("");
@@ -45,7 +59,34 @@ function Admin_main() {
     const loadMore = () => {
         setOffset(prevOffset => prevOffset + limit);
     };
+    const [isSetOpen, setIsSetOpen] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
 
+    const openModal = (itemId) => {
+        setSelectedItemId(itemId);
+        setIsSetOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsSetOpen(false);
+    };
+
+    useEffect(() => {
+        // Функция, которая вызывается при клике вне меню
+        const handleClickOutside = (event) => {
+            if (event.srcElement.offsetParent && !(event.srcElement.offsetParent.className === 'qr-setting')) {
+                closeModal();
+            }
+        };
+
+        // Добавление обработчика события клика для всего документа
+        document.addEventListener("click", handleClickOutside);
+
+        // Очистка обработчика при размонтировании компонента
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
 
     // получение данных для фильтров с бэка
     useEffect(() => {
@@ -188,6 +229,21 @@ function Admin_main() {
     function handleSelectDepartment(data) {
         setSelectedDepartment(data);
     }
+    function handleDateTime(data) {
+        setDateTime(data);
+    }
+    function handleModalDisciplene(data) {
+        setDisciplineEdit(data);
+    }
+    function handleModalStudent(data) {
+        setStudentEdit(data);
+    }
+    function handleModalWorkType(data) {
+        setWorkTypeEdit(data);
+    }
+    function handleModalDepartment(data) {
+        setDepartmentEdit(data);
+    }
 
     return (
         <>
@@ -283,7 +339,7 @@ function Admin_main() {
             {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
 
             {searchResults.map(entries => (
-                <div className='cart-stud' >
+                <div className='cart-stud' key={entries.work.id}>
                     <div className='data'>
                         {new Date(entries.work.registrationDate * 1000).toLocaleString("ru-ru")}
                     </div>
@@ -301,9 +357,45 @@ function Admin_main() {
                             {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
                         </div>
                     </div>
-                    <button className='qr-setting'>
+                    <button
+                        className='qr-setting'
+                        onClick={() => {
+                            if (isSetOpen === true && entries.work.id !== selectedItemId) {
+                                closeModal();
+                                openModal(entries.work.id);
+                            }
+                            else if (isSetOpen === true) {
+                                closeModal();
+                            }
+                            else {
+                                openModal(entries.work.id);
+                            }
+                        }}
+                    >
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
+                    {isSetOpen && selectedItemId === entries.work.id && (
+                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === entries.work.id ? 'active' : ''}`}>
+                            <button onClick={() => {
+                                setEditId(entries.work.id);
+                                setDateTime(new Date(entries.work.registrationDate * 1000).toLocaleString("ru-ru"));
+                                // setStudentEdit({ value: entries.student.id, label: entries.student.title });
+                                // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
+                                // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });
+                                // setDepartmentEdit({ value: entries.department.id, label: entries.department.title });setStudentEdit({ value: entries.student.id, label: entries.student.title });
+                                setStudentEdit(entries.student.fullName);
+                                setDisciplineEdit(entries.discipline.title);
+                                setWorkTypeEdit(entries.work.type.title);
+                                setDepartmentEdit(entries.department.title);
+                                entries.work.title && setTitleEdit(entries.work.title);
+                                setModalEditActive(true)
+                            }}>
+                                <img src={require('../../img/edit.png')} alt='edit' />
+                            </button>
+                            <button onClick={() => { setModalDeleteActive(true); setDeleteId(entries.work.id) }}>
+                                <img src={require('../../img/delete.png')} alt='delete' />
+                            </button>
+                        </div>)}
                 </div>
             ))}
 
@@ -315,6 +407,130 @@ function Admin_main() {
                 </button>
             )}
 
+            <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
+                <div className='modal-main'>
+                    <div className='grid'>
+                        <div>
+                            <p>Дата регистрации: </p>
+                        </div>
+                        <div>
+                            <Flatpickr
+                                style={{
+                                    fontSize: "16px",
+                                    padding: "10px",
+                                    border: "3px solid #1e971c",
+                                    borderRadius: "5px"
+                                }}
+                                value={dateTime}
+                                onChange={handleDateTime}
+                                options={{
+                                    dateFormat: "d.m.Y, H:i:S",
+                                    enableTime: true,
+                                    time_24hr: true
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <p>ФИО студента: </p>
+                        </div>
+                        <div>
+                        <p>{studentEdit}</p>
+
+                        </div>
+                        {/* <Select
+                            styles={customStylesModal}
+                            placeholder="Студент"
+                            value={studentEdit}
+                            maxMenuHeight={120}
+                            onChange={handleModalStudent}
+                            isSearchable={true}
+                            options={filterDiscipline.map(el => ({
+                                value: el.id,
+                                label: el.title,
+                            }))}
+                        /> */}
+                        <div>
+                            <p>Дисциплина: </p>
+                        </div>
+                        <div>
+                            <p>{disciplineEdit}</p>
+                            {/* <Select
+                                styles={customStylesModal}
+                                placeholder="Дисциплина"
+                                value={disciplineEdit}
+                                maxMenuHeight={120}
+                                onChange={handleModalDisciplene}
+                                isSearchable={true}
+                                options={filterDiscipline.map(el => ({
+                                    value: el.id,
+                                    label: el.title,
+                                }))}
+                            /> */}
+                        </div>
+                        <div>
+                            <p>Тип работы: </p>
+                        </div>
+                        <div>
+                            <p>{workTypeEdit}</p>
+
+                            {/* <Select
+                                styles={customStylesModal}
+                                placeholder="Тип работы"
+                                value={workTypeEdit}
+                                maxMenuHeight={120}
+                                onChange={handleModalWorkType}
+                                isSearchable={true}
+                                options={filterWorkType.map(el => ({
+                                    value: el.id,
+                                    label: el.title,
+                                }))}
+                            /> */}
+                        </div>
+                        <div>
+                            <p>Кафедра: </p>
+                        </div>
+                        <div>
+                            <p>{departmentEdit}</p>
+
+                            {/* <Select
+                                styles={customStylesModal}
+                                placeholder="Кафедра"
+                                value={departmentEdit}
+                                maxMenuHeight={120}
+                                onChange={handleModalDepartment}
+                                isSearchable={true}
+                                options={filterDepartments.map(el => ({
+                                    value: el.id,
+                                    label: el.title,
+                                }))}
+                            /> */}
+                        </div>
+
+                    </div>
+                    <div className='input-conteiner'>
+                        <input type='text' className='name-dapartment' placeholder=' ' value={titleEdit} onChange={e => setTitleEdit(e.target.value)} />
+                        <label className='label-name'>Название работы</label>
+                    </div>
+                </div>
+                <div className='modal-button'>
+                    <button onClick={() => {
+                        // editData(editId, newTitle, newPhone); 
+                        setModalEditActive(false);
+                    }}>Сохранить</button>
+                    <button onClick={() => { setModalEditActive(false); }}>Отмена</button>
+                </div>
+            </Empty_modal>
+            <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
+                <div className='content-delete'>
+                    <p className='text-delete'>Вы уверены, что хотите удалить?</p>
+                    <div className='modal-button'>
+                        <button onClick={() => { 
+                            // deleteData(deleteId); 
+                            setModalDeleteActive(false); }}>Удалить</button>
+                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
+                    </div>
+                </div>
+            </Empty_modal>
 
             {/* модальное окно ошибки */}
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
