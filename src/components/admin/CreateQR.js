@@ -236,6 +236,28 @@ function CreateQR() {
 
   }, [studQR])
 
+  useEffect(() => {
+    console.log(editTypes);
+  }, [editTypes]);
+
+  useEffect(() => {
+    if (programQR) {
+      const program = programQR.find(res => res.program.id === idProgram);
+      if (program) {
+        const initialEditTypes = program.disciplines.reduce((acc, discipline) => {
+          acc[discipline.id] = {
+            value: discipline.workTypeId,
+            label: allWorkTypes.find(r => r.id === discipline.workTypeId)?.title || ''
+          };
+          return acc;
+        }, {});
+        // console.log(initialEditTypes);
+
+        setEditTypes(initialEditTypes);
+      }
+    }
+  }, [programQR, idProgram, allWorkTypes]);
+  // console.log(editTypes);
 
   //поиск программ
   const handleInputValue = e => {
@@ -370,21 +392,14 @@ function CreateQR() {
   };
 
   // задать тип работы для дисциплин
-  const handleWorkTypeChange = (selectedOption, typeId) => {
-    setEditTypes(prevEditTypes => ({
-      ...prevEditTypes,
-      [typeId]: selectedOption
+  const handleWorkTypeChange = (selectedOption, disciplineId) => {
+    setEditTypes(prevState => ({
+      ...prevState,
+      [disciplineId]: selectedOption
     }));
+  };
 
-    // editActive && (
-
-    //   setEditWorkTypes(prevWorkTypes => ({
-    //     ...prevWorkTypes,
-    //     [subjectId]: selectedOption
-    //   })));
-  }
-
-
+  
 
   const generateQR = async (department, discipline, studName, workType) => {
     // Генерируем QR-код и сохраняем его в формате PNG
@@ -729,19 +744,18 @@ function CreateQR() {
 
 
       <Empty_modal active={editModalActive} setActive={setEditModalActive}>
-        <div className='modal-disciplines'>
-          <p><b>{titleProgram}</b></p>
-          {(programQR !== null ? (
+      <div className='modal-disciplines'>
+        <p><b>{titleProgram}</b></p>
+        <div className='edit-conteiner'>
+          {programQR !== null ? (
             programQR.find(res => res.program.id === idProgram)?.disciplines.map(val => (
               <div className='edit-content' key={val.id}>
-                {/* {setEditTypes({ value: val.workTypeId, label: allWorkTypes.find(r => r.id === val.workTypeId)?.title })} */}
                 <p>{val.title}</p>
-                {/* <p>Методы и средства операционных систем в катапультах дальнего действия на Камчатке в 1946 году на полуострове Ямал</p> */}
                 <Select
                   styles={customStylesTypeOfWork}
                   placeholder="Выберите тип работы"
                   value={editTypes[val.id]}
-                  onChange={(selectedOption) => handleWorkTypeChange(selectedOption, editTypes[val.id])}
+                  onChange={(selectedOption) => handleWorkTypeChange(selectedOption, val.id)}
                   isSearchable={true}
                   options={allWorkTypes.map(res => ({
                     value: res.id,
@@ -750,23 +764,23 @@ function CreateQR() {
                 />
               </div>
             ))
-          ) : '')}
-          <div className='modal-button'>
-            <button onClick={() => {
-              setEditModalActive(false);
-              document.body.style.overflow = 'auto';
-
-            }}>Сохранить</button>
-
-            <button onClick={() => {
-              setEditModalActive(false);
-              document.body.style.overflow = 'auto';
-
-            }}>Отмена</button>
-          </div>
+          ) : ''}
         </div>
-      </Empty_modal>
 
+        <div className='modal-button'>
+          <button onClick={() => {
+            // Здесь можно отправить данные на сервер или выполнить другие действия для сохранения данных
+            console.log('Сохраненные данные:', editTypes);
+            setEditModalActive(false);
+            document.body.style.overflow = 'auto';
+          }}>Сохранить</button>
+          <button onClick={() => {
+            setEditModalActive(false);
+            document.body.style.overflow = 'auto';
+          }}>Отмена</button>
+        </div>
+      </div>
+    </Empty_modal>
 
 
 
