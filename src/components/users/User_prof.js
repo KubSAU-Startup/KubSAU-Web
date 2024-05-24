@@ -306,7 +306,11 @@ function User_prof() {
 
             </div>
 
-            <button className='add-student' onClick={() => setModalActive(true)}>
+            <button className='add-student' onClick={() => {
+                setModalActive(true);
+                document.body.style.overflow = 'hidden';
+
+            }}>
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button>
             {searchResults.map(res => (
@@ -346,6 +350,8 @@ function User_prof() {
                     {isSetOpen && selectedItemId === res.id && (
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
                             <button onClick={() => {
+                                document.body.style.overflow = 'hidden';
+
                                 setModalEditActive(true);
                                 setFirstNEdit(res.firstName);
                                 setLastNEdit(res.lastName);
@@ -357,7 +363,11 @@ function User_prof() {
                             }}>
                                 <img src={require('../../img/edit.png')} alt='edit' />
                             </button>
-                            <button onClick={() => { setModalDeleteActive(true); setDeleteId(res.id) }}>
+                            <button onClick={() => {
+                                setModalDeleteActive(true); setDeleteId(res.id);
+                                document.body.style.overflow = 'hidden';
+
+                            }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
                             </button>
                         </div>)}
@@ -402,6 +412,8 @@ function User_prof() {
 
                     <div className='modal-button'>
                         <button onClick={() => {
+                            document.body.style.overflow = 'auto';
+
                             addData();
                             setLastN('');
                             setFirstN('');
@@ -410,7 +422,11 @@ function User_prof() {
                             setModalStaff(null);
                             setModalActive(false);
                         }}>Сохранить</button>
-                        <button onClick={() => { setModalActive(false) }}>Отмена</button>
+                        <button onClick={() => {
+                            setModalActive(false);
+                            document.body.style.overflow = 'auto';
+
+                        }}>Отмена</button>
                     </div>
 
                 </div>
@@ -447,10 +463,16 @@ function User_prof() {
                     />
                     <div className='modal-button'>
                         <button onClick={() => {
+                            document.body.style.overflow = 'auto';
+
                             editData();
                             setModalEditActive(false);
                         }}>Сохранить</button>
-                        <button onClick={() => { setModalEditActive(false) }}>Отмена</button>
+                        <button onClick={() => {
+                            setModalEditActive(false);
+                            document.body.style.overflow = 'auto';
+
+                        }}>Отмена</button>
                     </div>
 
                 </div>
@@ -459,8 +481,16 @@ function User_prof() {
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
-                        <button onClick={() => { deleteData(); setModalDeleteActive(false); }}>Удалить</button>
-                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
+                        <button onClick={() => {
+                            deleteData(); setModalDeleteActive(false);
+                            document.body.style.overflow = 'auto';
+
+                        }}>Удалить</button>
+                        <button onClick={() => {
+                            setModalDeleteActive(false);
+                            document.body.style.overflow = 'auto';
+
+                        }}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>

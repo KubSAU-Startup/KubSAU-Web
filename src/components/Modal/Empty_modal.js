@@ -7,6 +7,8 @@ function Empty_modal({ active, children, setActive }) {
     const handleCloseModal = (event) => {
         if (!modalRef.current.contains(event.target)) {
             setActive(false); // Закрыть модальное окно только если клик был снаружи
+            document.body.style.overflow = 'auto';
+            console.log('document.body.style.overflow ');
         }
     };
 

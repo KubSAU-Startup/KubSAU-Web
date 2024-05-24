@@ -341,7 +341,7 @@ function Admin_main() {
             {searchResults.map(entries => (
                 <div className='cart-stud' key={entries.work.id}>
                     <div className='data'>
-                        {new Date(entries.work.registrationDate * 1000).toLocaleString("ru-ru")}
+                        {new Date(entries.work.registrationDate).toLocaleString("ru-ru")}
                     </div>
                     <div className='content'>
                         <div className='col1'>
@@ -377,8 +377,10 @@ function Admin_main() {
                     {isSetOpen && selectedItemId === entries.work.id && (
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === entries.work.id ? 'active' : ''}`}>
                             <button onClick={() => {
+                                document.body.style.overflow = 'hidden';
+
                                 setEditId(entries.work.id);
-                                setDateTime(new Date(entries.work.registrationDate * 1000).toLocaleString("ru-ru"));
+                                setDateTime(new Date(entries.work.registrationDate).toLocaleString("ru-ru"));
                                 // setStudentEdit({ value: entries.student.id, label: entries.student.title });
                                 // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
                                 // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });
@@ -392,7 +394,11 @@ function Admin_main() {
                             }}>
                                 <img src={require('../../img/edit.png')} alt='edit' />
                             </button>
-                            <button onClick={() => { setModalDeleteActive(true); setDeleteId(entries.work.id) }}>
+                            <button onClick={() => {
+                                setModalDeleteActive(true); setDeleteId(entries.work.id);
+                                document.body.style.overflow = 'hidden';
+
+                            }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
                             </button>
                         </div>)}
@@ -434,7 +440,7 @@ function Admin_main() {
                             <p>ФИО студента: </p>
                         </div>
                         <div>
-                        <p>{studentEdit}</p>
+                            <p>{studentEdit}</p>
 
                         </div>
                         {/* <Select
@@ -516,18 +522,30 @@ function Admin_main() {
                     <button onClick={() => {
                         // editData(editId, newTitle, newPhone); 
                         setModalEditActive(false);
+                        document.body.style.overflow = 'auto';
+
                     }}>Сохранить</button>
-                    <button onClick={() => { setModalEditActive(false); }}>Отмена</button>
+                    <button onClick={() => {
+                        setModalEditActive(false);
+                        document.body.style.overflow = 'auto';
+
+                    }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
-                        <button onClick={() => { 
+                        <button onClick={() => {
                             // deleteData(deleteId); 
-                            setModalDeleteActive(false); }}>Удалить</button>
-                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
+                            setModalDeleteActive(false);
+                            document.body.style.overflow = 'auto';
+                        }}>Удалить</button>
+                        <button onClick={() => {
+                            setModalDeleteActive(false);
+                            document.body.style.overflow = 'auto';
+
+                        }}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>

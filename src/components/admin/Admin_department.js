@@ -195,7 +195,10 @@ function Admin_department() {
                         placeholder='Поиск...'
                     />
                 </div>
-                <button className='add-student' onClick={() => setModalActive(true)}>
+                <button className='add-student' onClick={() => {
+                    setModalActive(true);
+                    document.body.style.overflow = 'hidden';
+                }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
             </div>
@@ -236,6 +239,7 @@ function Admin_department() {
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
                             {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
                             <button onClick={() => {
+                                document.body.style.overflow = 'hidden';
                                 setModalEditActive(true);
                                 setEditId(res.id);
                                 allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
@@ -243,7 +247,11 @@ function Admin_department() {
                             }}>
                                 <img src={require('../../img/edit.png')} alt='edit' />
                             </button>
-                            <button onClick={() => { setModalDeleteActive(true); setDeleteId(res.id) }}>
+                            <button onClick={() => {
+                                document.body.style.overflow = 'hidden';
+                                setModalDeleteActive(true);
+                                setDeleteId(res.id);
+                            }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
                             </button>
                         </div>)}
@@ -267,8 +275,11 @@ function Admin_department() {
                     </div>
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { addDepartment(); setModalActive(false); setTitleDepartment(''); setPhoneDepartment(''); }}>Сохранить</button>
-                    <button onClick={() => { setModalActive(false); }}>Отмена</button>
+                    <button onClick={() => {
+                        addDepartment(); setModalActive(false); document.body.style.overflow = 'auto';
+                        setTitleDepartment(''); setPhoneDepartment('');
+                    }}>Сохранить</button>
+                    <button onClick={() => { setModalActive(false); document.body.style.overflow = 'auto'; }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
@@ -283,16 +294,16 @@ function Admin_department() {
                     </div>
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { editData(editId, newTitle, newPhone); setModalEditActive(false); }}>Сохранить</button>
-                    <button onClick={() => { setModalEditActive(false); }}>Отмена</button>
+                    <button onClick={() => { editData(editId, newTitle, newPhone); setModalEditActive(false); document.body.style.overflow = 'auto'; }}>Сохранить</button>
+                    <button onClick={() => { setModalEditActive(false); document.body.style.overflow = 'auto';}}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
-                        <button onClick={() => { deleteData(deleteId); setModalDeleteActive(false); }}>Удалить</button>
-                        <button onClick={() => { setModalDeleteActive(false); }}>Отмена</button>
+                        <button onClick={() => { deleteData(deleteId); setModalDeleteActive(false); document.body.style.overflow = 'auto';}}>Удалить</button>
+                        <button onClick={() => { setModalDeleteActive(false); document.body.style.overflow = 'auto';}}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>

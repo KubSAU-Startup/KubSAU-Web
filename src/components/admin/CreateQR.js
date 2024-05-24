@@ -20,7 +20,7 @@ import Admin_header from './Admin_header';
 function CreateQR() {
   const [isOpen, setOpen] = useState(false);
   const [emptyModalActive, setEmptyModalActive] = useState(false);
-  const [modalActive, setModalActive] = useState(false);
+  const [editModalActive, setEditModalActive] = useState(false);
   const [userStates, setUserStates] = useState({});
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,6 +66,7 @@ function CreateQR() {
   const [semester, setSemester] = useState(null);
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
+  const [editTypes, setEditTypes] = useState({});
 
   const [semesterFilter, setSemesterFilter] = useState(null);
   const [directivityFilter, setDirectivityFilter] = useState(null);
@@ -95,6 +96,9 @@ function CreateQR() {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const modalRef = useRef(null);
 
+  const [titleProgram, setTitleProgram] = useState('');
+
+  const [disciplineAndType, setDisciplineAndType] = useState([]);
   const [arrayUInt8, setArrayUInt8] = useState([]);
 
 
@@ -103,30 +107,40 @@ function CreateQR() {
   let selectGroups = '';
 
   const openModal = (itemId) => {
+
+
     setSelectedItemId(itemId);
     setIsSetOpen(true);
   };
 
   const closeModal = () => {
     setIsSetOpen(false);
+
   };
 
   // Обработчик клика вне модального окна
   const handleClickOutside = (event) => {
+
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       closeModal();
-    }
-  };
+
+    }};
   useEffect(() => {
+    
     // Добавляем обработчик клика вне модального окна при открытии модального окна
     if (isSetOpen) {
       document.addEventListener('click', handleClickOutside);
+
     } else {
       document.removeEventListener('click', handleClickOutside);
+
     }
+
     // Очищаем обработчик при размонтировании компонента
     return () => {
+
       document.removeEventListener('click', handleClickOutside);
+
     };
   }, [isSetOpen]);
   // useEffect(() => { console.log(studQR) }, [studQR])
@@ -203,17 +217,26 @@ function CreateQR() {
       }
       setIsLoading(false);
     });
+    getAllWorkTypes((res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+      } else {
+        setAllWorkTypes(res.response);
+      }
+      setIsLoading(false);
+    });
   }, []);
 
   useEffect(() => {
     // console.log(studQR)
-    if(studQR!== null){
+    if (studQR !== null) {
       createZip();
     }
 
   }, [studQR])
 
- 
+
   //поиск программ
   const handleInputValue = e => {
     setInputValue(e.target.value);
@@ -347,18 +370,18 @@ function CreateQR() {
   };
 
   // задать тип работы для дисциплин
-  const handleWorkTypeChange = (selectedOption, subjectId) => {
-    addActive && (setWorkTypes(prevWorkTypes => ({
-      ...prevWorkTypes,
-      [subjectId]: selectedOption
-    })));
+  const handleWorkTypeChange = (selectedOption, typeId) => {
+    setEditTypes(prevEditTypes => ({
+      ...prevEditTypes,
+      [typeId]: selectedOption
+    }));
 
-    editActive && (
+    // editActive && (
 
-      setEditWorkTypes(prevWorkTypes => ({
-        ...prevWorkTypes,
-        [subjectId]: selectedOption
-      })));
+    //   setEditWorkTypes(prevWorkTypes => ({
+    //     ...prevWorkTypes,
+    //     [subjectId]: selectedOption
+    //   })));
   }
 
 
@@ -535,7 +558,7 @@ function CreateQR() {
       </div>
 
       <QRCode
-        style={{display: 'none'}}
+        style={{ display: 'none' }}
         id="123456"
         value={`${qrUrl}`}
         size={290}
@@ -632,10 +655,24 @@ function CreateQR() {
 
           {isSetOpen && selectedItemId === value.program.id && (
             <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
-              <button className='btn-create-qr' onClick={() => { setIdProgram(value.program.id); setDirectivityId(value.directivity.id); setEmptyModalActive(true) }}>
+              <button className='btn-create-qr' onClick={() => {
+                document.body.style.overflow = 'hidden';
+
+
+                setIdProgram(value.program.id);
+                setDirectivityId(value.directivity.id);
+                setEmptyModalActive(true)
+              }}>
                 <img src={require('../../img/qr_white.png')} />
               </button>
-              <button onClick={editPrograms}>
+              <button onClick={() => {
+                document.body.style.overflow = 'hidden';
+
+                setIdProgram(value.program.id);
+                setTitleProgram(`${value.directivity.title}, ${value.grade.title.toLowerCase()}, ${value.program.semester} семестр`);
+                // setDisciplineAndType({});
+                setEditModalActive(true);
+              }}>
                 <img src={require('../../img/edit.png')} alt='edit' />
               </button>
               {/* <button>
@@ -673,11 +710,66 @@ function CreateQR() {
               )} />
           </div>
           <div className='modal-button'>
-            <button onClick={() => { getQR(); setEmptyModalActive(false); }}>Сохранить</button>
-            <button onClick={() => { setEmptyModalActive(false); }}>Отмена</button>
+            <button onClick={() => {
+              getQR();
+              setEmptyModalActive(false);
+              document.body.style.overflow = 'auto';
+
+
+            }}>Сохранить</button>
+
+            <button onClick={() => {
+              setEmptyModalActive(false);
+              document.body.style.overflow = 'auto';
+
+            }}>Отмена</button>
           </div>
         </div>
       </Empty_modal>
+
+
+      <Empty_modal active={editModalActive} setActive={setEditModalActive}>
+        <div className='modal-disciplines'>
+          <p><b>{titleProgram}</b></p>
+          {(programQR !== null ? (
+            programQR.find(res => res.program.id === idProgram)?.disciplines.map(val => (
+              <div className='edit-content' key={val.id}>
+                {/* {setEditTypes({ value: val.workTypeId, label: allWorkTypes.find(r => r.id === val.workTypeId)?.title })} */}
+                <p>{val.title}</p>
+                {/* <p>Методы и средства операционных систем в катапультах дальнего действия на Камчатке в 1946 году на полуострове Ямал</p> */}
+                <Select
+                  styles={customStylesTypeOfWork}
+                  placeholder="Выберите тип работы"
+                  value={editTypes[val.id]}
+                  onChange={(selectedOption) => handleWorkTypeChange(selectedOption, editTypes[val.id])}
+                  isSearchable={true}
+                  options={allWorkTypes.map(res => ({
+                    value: res.id,
+                    label: res.title
+                  }))}
+                />
+              </div>
+            ))
+          ) : '')}
+          <div className='modal-button'>
+            <button onClick={() => {
+              setEditModalActive(false);
+              document.body.style.overflow = 'auto';
+
+            }}>Сохранить</button>
+
+            <button onClick={() => {
+              setEditModalActive(false);
+              document.body.style.overflow = 'auto';
+
+            }}>Отмена</button>
+          </div>
+        </div>
+      </Empty_modal>
+
+
+
+
 
       {/* модальное окно ошибки */}
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
