@@ -7,7 +7,7 @@ import Select from 'react-select';
 import QRCode from "qrcode.react";
 import JSZip, { filter, forEach } from "jszip";
 import Modal from '../Modal/Modal';
-import { faFilter, faUndo, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faUndo, faCheckCircle, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
 import { getAllGroups, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents, getStudentsByGroups } from '../../network';
@@ -37,19 +37,13 @@ function CreateQR() {
     success: true
   });
 
-  const [allDisciplines, setAllDisciplines] = useState({
-    response: [],
-    error: null,
-    success: true
-  });
+  const [allDisciplines, setAllDisciplines] = useState([]);
 
-  const [allWorkTypes, setAllWorkTypes] = useState({
-    response: [],
-    error: null,
-    success: true
-  });
+  const [allWorkTypes, setAllWorkTypes] = useState([]);
 
   const [programQR, setProgramQR] = useState([]);
+  const [copyData, setCopyData] = useState([]);
+
   const [allGroups, setAllGroups] = useState([]);
   const [directivitiesPrograms, setDirectivitiesPrograms] = useState([]);
 
@@ -66,7 +60,7 @@ function CreateQR() {
   const [semester, setSemester] = useState(null);
   const [program, setProgram] = useState(null);
   const [group, setGroup] = useState(null);
-  const [editTypes, setEditTypes] = useState({});
+  const [editTypes, setEditTypes] = useState([]);
 
   const [semesterFilter, setSemesterFilter] = useState(null);
   const [directivityFilter, setDirectivityFilter] = useState(null);
@@ -97,6 +91,8 @@ function CreateQR() {
   const modalRef = useRef(null);
 
   const [titleProgram, setTitleProgram] = useState('');
+  const [newTypes, setNewType] = useState(null);
+  const [newDisc, setNewDisc] = useState(null);
 
   const [disciplineAndType, setDisciplineAndType] = useState([]);
   const [arrayUInt8, setArrayUInt8] = useState([]);
@@ -124,9 +120,10 @@ function CreateQR() {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       closeModal();
 
-    }};
+    }
+  };
   useEffect(() => {
-    
+
     // Добавляем обработчик клика вне модального окна при открытии модального окна
     if (isSetOpen) {
       document.addEventListener('click', handleClickOutside);
@@ -165,16 +162,18 @@ function CreateQR() {
         if (offset === 0) {
           setProgramQR(res.response.entries);
           setSearchResults(res.response.entries);
+
         } else {
           // Иначе обновляем данные
           setProgramQR(prevData => [...prevData, ...res.response.entries]);
           setSearchResults(prevResults => [...prevResults, ...res.response.entries]);
+
         }
       }
       setIsLoading(false);
     })
 
-  }, [offset, limit, qrParams, debouncedInputValue]);
+  }, [offset, limit, qrParams, debouncedInputValue, editModalActive]);
 
   useEffect(() => {
     // Функция, которая вызывается при клике вне меню
@@ -195,6 +194,7 @@ function CreateQR() {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
 
 
   useEffect(() => {
@@ -226,6 +226,15 @@ function CreateQR() {
       }
       setIsLoading(false);
     });
+    getAllDisciplines((res) => {
+      if (res.error) {
+        setTextError(getTextError(res.error));
+        setErrorActive(true);
+      } else {
+        setAllDisciplines(res.response);
+      }
+      setIsLoading(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -250,13 +259,13 @@ function CreateQR() {
             label: allWorkTypes.find(r => r.id === discipline.workTypeId)?.title || ''
           };
           return acc;
-        }, {});
+        }, []);
         // console.log(initialEditTypes);
 
         setEditTypes(initialEditTypes);
       }
     }
-  }, [programQR, idProgram, allWorkTypes]);
+  }, [programQR, idProgram, allWorkTypes, editModalActive]);
   // console.log(editTypes);
 
   //поиск программ
@@ -309,6 +318,12 @@ function CreateQR() {
     setGroupQR(data);
   }
 
+  function handleNewDisciplineChange(data) {
+    setNewDisc(data);
+  }
+  function handleNewWorkTypeChange(data) {
+    setNewType(data);
+  }
 
   // функция фильтрации данных
   const getParams = () => {
@@ -399,7 +414,7 @@ function CreateQR() {
     }));
   };
 
-  
+
 
   const generateQR = async (department, discipline, studName, workType) => {
     // Генерируем QR-код и сохраняем его в формате PNG
@@ -525,7 +540,45 @@ function CreateQR() {
     // }, 1500);
 
   }
+  // useEffect(() => {
+  //   if (programQR) {
+  //     const program = programQR.find(res => res.program.id === idProgram);
+  //     if (program) {
+  //       const initialEditTypes = program.disciplines.reduce((acc, discipline) => {
+  //         acc[discipline.id] = {
+  //           value: discipline.workTypeId,
+  //           label: allWorkTypes.find(r => r.id === discipline.workTypeId)?.title || ''
+  //         };
+  //         return acc;
+  //       }, {});
+  //       // console.log(initialEditTypes);
 
+  //       setEditTypes(initialEditTypes);
+  //     }
+  //   }
+  // }, [programQR, idProgram, allWorkTypes, editModalActive]);
+  const addDiscipline = () => {
+
+  }
+
+  const deleteData = (IdData) => {
+    const newData = programQR.map(res => {
+      if (res.program.id === idProgram) {
+        res.disciplines = res.disciplines.filter(a => a.id !== IdData)
+      }
+      return res
+    });
+    // const newData = programQR.filter(r=>r.program.id === idProgram).map(res => {
+    //     res.disciplines = res.disciplines.filter(a => a.id !== IdData)
+    // });
+    setProgramQR(newData);
+    // console.log('jfk', dataDisciplines)
+    // console.log(programQR.find(res => res.program.id === idProgram).disciplines.filter((a) => a.id !== IdData))
+    // setProgramQR(programQR.find(res => res.program.id === idProgram).disciplines.filter((a) => a.id !== IdData))
+    // setEditTypes(editTypes.filter((a) => a.id !== IdData));
+
+  }
+  console.log(programQR)
   // массив для семестров
   const dataSemester = [{ value: 1, label: 1 },
   { value: 2, label: 2 },
@@ -682,10 +735,8 @@ function CreateQR() {
               </button>
               <button onClick={() => {
                 document.body.style.overflow = 'hidden';
-
                 setIdProgram(value.program.id);
                 setTitleProgram(`${value.directivity.title}, ${value.grade.title.toLowerCase()}, ${value.program.semester} семестр`);
-                // setDisciplineAndType({});
                 setEditModalActive(true);
               }}>
                 <img src={require('../../img/edit.png')} alt='edit' />
@@ -731,7 +782,7 @@ function CreateQR() {
               document.body.style.overflow = 'auto';
 
 
-            }}>Сохранить</button>
+            }}>Сгенерировать</button>
 
             <button onClick={() => {
               setEmptyModalActive(false);
@@ -744,43 +795,77 @@ function CreateQR() {
 
 
       <Empty_modal active={editModalActive} setActive={setEditModalActive}>
-      <div className='modal-disciplines'>
-        <p><b>{titleProgram}</b></p>
-        <div className='edit-conteiner'>
-          {programQR !== null ? (
-            programQR.find(res => res.program.id === idProgram)?.disciplines.map(val => (
-              <div className='edit-content' key={val.id}>
-                <p>{val.title}</p>
-                <Select
-                  styles={customStylesTypeOfWork}
-                  placeholder="Выберите тип работы"
-                  value={editTypes[val.id]}
-                  onChange={(selectedOption) => handleWorkTypeChange(selectedOption, val.id)}
-                  isSearchable={true}
-                  options={allWorkTypes.map(res => ({
-                    value: res.id,
-                    label: res.title
-                  }))}
-                />
-              </div>
-            ))
-          ) : ''}
-        </div>
+        <div className='modal-disciplines'>
+          <p><b>{titleProgram}</b></p>
+          <div className='add-content'>
+            <Select
+              styles={customStylesTypeOfWork}
+              placeholder="Дисциплина"
+              value={newDisc}
+              onChange={handleNewDisciplineChange}
+              isSearchable={true}
+              options={allDisciplines.map(res => ({
+                value: res.id,
+                label: res.title
+              }))} />
+            <Select
+              styles={customStylesTypeOfWork}
+              placeholder="Тип работы"
+              value={newTypes}
+              onChange={handleNewWorkTypeChange}
+              isSearchable={true}
+              options={allWorkTypes.map(res => ({
+                value: res.id,
+                label: res.title
+              }))} />
+            <button onClick={() => {
+              addDiscipline();
+            }}>
+              <FontAwesomeIcon icon={faCheckCircle} />
+            </button>
+          </div>
+          <div className='edit-conteiner'>
 
-        <div className='modal-button'>
-          <button onClick={() => {
-            // Здесь можно отправить данные на сервер или выполнить другие действия для сохранения данных
-            console.log('Сохраненные данные:', editTypes);
-            setEditModalActive(false);
-            document.body.style.overflow = 'auto';
-          }}>Сохранить</button>
-          <button onClick={() => {
-            setEditModalActive(false);
-            document.body.style.overflow = 'auto';
-          }}>Отмена</button>
+            {searchResults !== null ? (
+              searchResults.find(res => res.program.id === idProgram)?.disciplines.map(val => (
+                <>
+                  <div className='edit-content' key={val.id}>
+                    <p>{val.title}</p>
+                    <Select
+                      styles={customStylesTypeOfWork}
+                      placeholder="Выберите тип работы"
+                      value={editTypes[val.id]}
+                      onChange={(selectedOption) => handleWorkTypeChange(selectedOption, val.id)}
+                      isSearchable={true}
+                      options={allWorkTypes.map(res => ({
+                        value: res.id,
+                        label: res.title
+                      }))} />
+                    <button onClick={() => {
+                      deleteData(val.id);
+                    }}>
+                      <FontAwesomeIcon icon={faXmarkCircle} />
+                    </button>
+                  </div></>
+              ))
+            ) : ''}
+          </div>
+
+          <div className='modal-button'>
+            <button onClick={() => {
+              // Здесь можно отправить данные на сервер или выполнить другие действия для сохранения данных
+              console.log('Сохраненные данные:', editTypes);
+              setEditModalActive(false);
+              document.body.style.overflow = 'auto';
+            }}>Сохранить</button>
+            <button onClick={() => {
+              setSearchResults(programQR)
+              setEditModalActive(false);
+              document.body.style.overflow = 'auto';
+            }}>Отмена</button>
+          </div>
         </div>
-      </div>
-    </Empty_modal>
+      </Empty_modal>
 
 
 
