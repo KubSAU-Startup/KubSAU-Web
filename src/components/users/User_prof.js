@@ -13,56 +13,24 @@ import { addNewEmployee, editEmployee, deleteEmployee, getTextError, getAllEmplo
 function User_prof() {
 
     const [modalActive, setModalActive] = useState(false);
-    const [modalContActive, setModalContActive] = useState(false);
-    const [userStates, setUserStates] = useState({});
-    const [allUsers, setAllUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
-
-    const [filterGroup, setFilterGroup] = useState(null);
-    const [filterGrade, setFilterGrade] = useState(null);
     const [filterType, setFilterType] = useState(null);
 
     const [modalStaff, setModalStaff] = useState(null);
-    const [modalEditGroup, setModalEditGroup] = useState(null);
     const [modalStaffEdit, setModalStaffEdit] = useState(null);
-    const [modalEditStatus, setModalEditStatus] = useState(null);
 
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
-    const [allStudents, setAllStudents] = useState([]);
-    const [allStatus, setAllStatus] = useState([]);
-    const [allDirectivities, setAllDirectivities] = useState({
-        directivities: [],
-        heads: [],
-        grades: []
-    });
+
     const [allEmployees, setAllEmployees] = useState([]);
+    const [filterData, setFilterData] = useState([]);
 
-    const [inputValue, setInputValue] = useState("");
-    const [debouncedInputValue, setDebouncedInputValue] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [hasMoreData, setHasMoreData] = useState(true);
-
-    const [allGroups, setAllGroups] = useState([]);
-
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-    const [cartStates, setCartStates] = useState({});
-    const [numberGroup, setNumberGroup] = useState('');
-    const [newNumberGroup, setNewNumberGroup] = useState(null);
 
-
-    const [newDirectivity, setNewDirectivity] = useState(null);
-    const [newHead, setNewHead] = useState(null);
-
-
-    const [head, setHead] = useState(null);
-    const [directivity, setDirectivity] = useState(null);
-
-    const [abbGroup, setAbbGroup] = useState('');
-    const [newAbbGroup, setNewAbbGroup] = useState('');
+    const [searchDone, setSearchDone] = useState([]);
 
 
     const [editId, setEditId] = useState(null);
@@ -81,13 +49,6 @@ function User_prof() {
     const [middleNEdit, setMiddleNEdit] = useState(null);
     const [emailEdit, setEmailEdit] = useState(null);
 
-    const [offset, setOffset] = useState(0);
-    const limit = 30; // Количество элементов на странице
-
-    // функция загрузки данных пагинации
-    // const loadMore = () => {
-    //     setOffset(prevOffset => prevOffset + limit);
-    // };
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
 
@@ -117,66 +78,9 @@ function User_prof() {
         };
     }, []);
 
-    // useEffect(() => {
-    //     setIsLoading(true);
-    //     setHasMoreData(true);
-
-    //     if (inputValue === '') {
-    //         getAllStudents(offset, limit, (res) => {
-    //             if (res.error) {
-    //                 setTextError(getTextError(res.error));
-    //                 setErrorActive(true);
-    //             } else {
-    //                 if (res.response.students.length < limit) {
-    //                     setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-    //                 }
-
-    //                 // Если это первая страница, просто устанавливаем новые данные
-    //                 if (offset === 0) {
-    //                     setAllStudents(res.response.students);
-    //                     setAllStatus(res.response.statuses)
-    //                     // setSearchResults(res.response.students);
-    //                 } else {
-    //                     // Иначе обновляем данные
-    //                     setAllStudents(prevData => [...prevData, ...res.response.students]);
-    //                     setAllStatus([...res.response.statuses])
-
-    //                     // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
-    //                 }
-    //             }
-    //             setIsLoading(false);
-    //         })
-    //     } else {
-    //         console.log(debouncedInputValue);
-    //         searchOfStudents(offset, limit, debouncedInputValue, (res) => {
-    //             if (res.error) {
-    //                 setTextError(getTextError(res.error));
-    //                 setErrorActive(true);
-    //             } else {
-    //                 if (res.response.students.length < limit) {
-    //                     setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-    //                 }
-
-    //                 // Если это первая страница, просто устанавливаем новые данные
-    //                 if (offset === 0) {
-    //                     setAllStudents(res.response.students);
-    //                     // setAllStatus(res.response.statuses)
-    //                     // setSearchResults(res.response.students);
-    //                 } else {
-    //                     // Иначе обновляем данные
-    //                     setAllStudents(prevData => [...prevData, ...res.response.students]);
-    //                     // setAllStatus([...res.response.statuses])
-
-    //                     // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
-    //                 }
-    //             }
-    //             setIsLoading(false);
-    //         })
-    //     }
-    // }, [offset, limit, debouncedInputValue])
-
     useEffect(() => {
         setIsLoading(true);
+        setVisibleItems(30);
 
         getAllEmployees((res) => {
             if (res.error) {
@@ -191,6 +95,17 @@ function User_prof() {
         })
 
     }, []);
+
+    //скрытие кнопки пагинации, если закончились данные для отображения
+    useEffect(() => {
+
+        if (searchResults.length <= visibleItems) {
+            setIsPaginationVisible(false); // Скрыть кнопку пагинации
+        } else {
+            setIsPaginationVisible(true); // Показать 
+        }
+    }, [searchResults, visibleItems]);
+
     useEffect(() => {
         if (modalActive || modalEditActive || modalDeleteActive) {
             document.body.classList.add('modal-open');
@@ -199,16 +114,10 @@ function User_prof() {
         }
     }, [modalActive, modalEditActive, modalDeleteActive]);
 
-    const handleInputValue = (e) => {
-        setInputValue(e.target.value);
+    // функция пагинации
+    const loadMore = () => {
+        setVisibleItems(prevVisibleItems => prevVisibleItems + 30);
     };
-
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            setDebouncedInputValue(inputValue);
-        }, 1000);
-        return () => clearTimeout(timeoutId);
-    }, [inputValue, 1000]);
 
     async function addData() {
         console.log(firstN, lastN, middleN, email, modalStaff.value);
@@ -234,7 +143,7 @@ function User_prof() {
                             lastName: lastNEdit,
                             middleName: middleNEdit,
                             email: emailEdit,
-                            employeeTypeId: modalStaffEdit.value
+                            type: modalStaffEdit.value
                         };
                     } else {
                         return elem; // если элемент не подлежит изменению, возвращаем его без изменений
@@ -262,9 +171,65 @@ function User_prof() {
     }
 
     useEffect(() => {
-        setSearchResults(allEmployees)
+        setSearchResults(allEmployees);
     }, [allEmployees])
 
+    // Функция поиска
+    const handleChange = (e) => {
+        const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
+        setSearchTerm(searchTerm);
+        setIsLoading(true);
+        let filteredResults = [...allEmployees]; // Создаем копию исходных данных для фильтрации
+        if (filterType !== null) {
+            filteredResults = filteredResults.filter(res => res.type === filterType.value);
+        }
+
+        filteredResults = filteredResults.filter(item => {
+
+            // Проверяем условие для каждого поля, по которому хотим искать
+            return (
+                item.lastName.toLowerCase().includes(searchTerm) ||
+                item.firstName.toLowerCase().includes(searchTerm) ||
+                item.middleName.toLowerCase().includes(searchTerm) ||
+                (item.type && position.find((el) => el.value === item.type)?.label.toLowerCase().includes(searchTerm))
+            );
+        });
+        setSearchResults(filteredResults);
+        setSearchDone(searchTerm !== null ? true : false);
+
+        setIsLoading(false);
+    };
+
+
+    const getParams = () => {
+        let filteredResults = [...allEmployees]; // Создаем копию исходных данных для фильтрации
+        if (searchTerm) {
+
+            filteredResults = filteredResults.filter(item => {
+
+                // Проверяем условие для каждого поля, по которому хотим искать
+                return (
+                    item.lastName.toLowerCase().includes(searchTerm) ||
+                    item.firstName.toLowerCase().includes(searchTerm) ||
+                    item.middleName.toLowerCase().includes(searchTerm) ||
+                    (item.type && position.find((el) => el.value === item.type)?.label.toLowerCase().includes(searchTerm))
+                );
+            });
+        }
+        if (filterType !== null) {
+            filteredResults = filteredResults.filter(res => res.type === filterType.value);
+        }
+        setFilterData(filteredResults);
+        setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
+        console.log(filteredResults)
+    }
+
+    const resetParams = () => {
+        setFilterType(null);
+
+        // setSearchTerm('');
+        setSearchResults(allEmployees);
+    }
     function handleFilterType(data) {
         setFilterType(data);
     }
@@ -287,8 +252,8 @@ function User_prof() {
             <div className='admin-main-search'>
                 <input
                     type='text'
-                    value={inputValue}
-                    onChange={handleInputValue}
+                    value={searchTerm}
+                    onChange={handleChange}
                     placeholder='Поиск...'
                 />
             </div>
@@ -301,8 +266,8 @@ function User_prof() {
                     isSearchable={true}
                     options={position}
                 />
-                <button className='get-params' type='submit'>Применить</button>
-                <button className='delete-params'>Сбросить</button>
+                <button className='get-params' type='submit' onClick={getParams}>Применить</button>
+                <button className='delete-params' onClick={resetParams}>Сбросить</button>
 
             </div>
 
@@ -313,12 +278,9 @@ function User_prof() {
             }}>
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button>
-            {searchResults.map(res => (
+            {searchResults.slice(0, visibleItems).map(res => (
 
                 <div className='cart-stud' key={res.id}>
-                    {/* <div className='data'>
-                        {user.id}
-                    </div> */}
                     <div className='content'>
                         <div className='col1'>
                             <p><span>ФИО сотрудника:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
@@ -373,11 +335,12 @@ function User_prof() {
                         </div>)}
                 </div>
             ))}
-            {/* {hasMoreData && (
+            {/* кнопка пагинации */}
+            {isPaginationVisible && (
                 <button className='btn-loadMore' onClick={loadMore}>
                     Загрузить ещё
                 </button>
-            )} */}
+            )}
 
             <Empty_modal active={modalActive} setActive={setModalActive}>
 

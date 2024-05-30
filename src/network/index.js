@@ -385,7 +385,7 @@ async function addNewEmployee(firstN, lastN, middleN, email, typeUser, callback)
         lastName: lastN,
         middleName: middleN,
         email: email,
-        employeeTypeId: typeUser
+        type: typeUser
     }, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
@@ -403,7 +403,7 @@ async function editEmployee(id, firstN, lastN, middleN, email, typeUser, callbac
         lastName: lastN,
         middleName: middleN,
         email: email,
-        employeeTypeId: typeUser
+        type: typeUser
     }, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
