@@ -162,18 +162,20 @@ function CreateQR() {
         if (offset === 0) {
           setProgramQR(res.response.entries);
           setSearchResults(res.response.entries);
+          setCopyData(structuredClone(res.response.entries));
 
         } else {
           // Иначе обновляем данные
           setProgramQR(prevData => [...prevData, ...res.response.entries]);
           setSearchResults(prevResults => [...prevResults, ...res.response.entries]);
+          setCopyData(prevData => structuredClone([...prevData, ...res.response.entries]));
 
         }
       }
       setIsLoading(false);
     })
 
-  }, [offset, limit, qrParams, debouncedInputValue, editModalActive]);
+  }, [offset, limit, qrParams, debouncedInputValue]);
 
   useEffect(() => {
     // Функция, которая вызывается при клике вне меню
@@ -250,8 +252,8 @@ function CreateQR() {
   }, [editTypes]);
 
   useEffect(() => {
-    if (programQR) {
-      const program = programQR.find(res => res.program.id === idProgram);
+    if (copyData) {
+      const program = copyData.find(res => res.program.id === idProgram);
       if (program) {
         const initialEditTypes = program.disciplines.reduce((acc, discipline) => {
           acc[discipline.id] = {
@@ -263,7 +265,7 @@ function CreateQR() {
         setEditTypes(initialEditTypes);
       }
     }
-  }, [programQR, idProgram, allWorkTypes, editModalActive]);
+  }, [copyData, idProgram, allWorkTypes, editModalActive]);
   // console.log(editTypes);
 
   //поиск программ
@@ -278,6 +280,10 @@ function CreateQR() {
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [inputValue, 1000]);
+
+  useEffect(() => {
+    setSearchResults(programQR);
+  }, [programQR])
 
   // кнопка выхода из системы
   const handleLogout = () => {
@@ -342,63 +348,6 @@ function CreateQR() {
   }
 
 
-
-  const editPrograms = () => {
-    setEditActive(true);
-    setEmptyModalActive(true);
-    setGetEditSemester(programQR.response.find(program => program.id === getProgId) ?
-      {
-        value: programQR.response.find(program => program.id === getProgId).semester,
-        label: programQR.response.find(program => program.id === getProgId).semester
-      } : null);
-    setGetEditProgram(programQR.response.find(program => program.id === getProgId) ?
-      {
-        value: programQR.response.find(program => program.id === getProgId).id,
-        label: programQR.response.find(program => program.id === getProgId).title
-      } : null);
-    setGetEditSubject(dataDisciplines.response
-      .filter(resp => resp.programId === getProgId) ?
-      dataDisciplines.response
-        .filter(resp => resp.programId === getProgId)
-        .flatMap(resp =>
-          resp.disciplines && resp.disciplines.map(disc => ({
-            value: disc.discipline.id,
-            label: disc.discipline.title
-          }))
-        ) : null
-    );
-
-    // setEditWorkTypes(dataDisciplines.response
-    //   .filter(resp => resp.programId === getProgId) ?
-    //   dataDisciplines.response
-    //     .filter(resp => resp.programId === getProgId)
-    //     .flatMap(resp =>
-    //       resp.disciplines && resp.disciplines.map(disc => ({
-    //         value: disc.workType.id,
-    //         label: disc.workType.title
-    //       }))
-    //     ) : null)
-
-    setEditWorkTypes(
-      dataDisciplines.response.filter(resp => resp.programId === getProgId) ? () => {
-        let result = {};
-        console.log(dataDisciplines.response)
-        dataDisciplines.response
-          .filter(resp => resp.programId === getProgId)
-          .forEach((resp) => {
-            resp.disciplines && resp.disciplines.forEach((disc) => {
-              result[disc.discipline.id] = {
-                value: disc.workType.id,
-                label: disc.workType.title
-              }
-            })
-          })
-        return result
-      } : null
-    )
-
-  }
-
   // функция загрузки данных пагинации
   const loadMore = () => {
     setOffset(prevOffset => prevOffset + limit);
@@ -418,23 +367,7 @@ function CreateQR() {
       if (res.success) {
         console.log(res.response);
 
-        // const editProgram = programQR.map(elem => {
-        //   if (elem.program.id === editId) {
-        //     return {
-        //       ...elem, // копируем все свойства из исходного объекта
-        //       work: {
-        //         ...elem.work,
-        //         registrationDate: dateTime,
-        //         title: titleEdit
-        //       }
-
-        //     };
-        //   } else {
-        //     return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-        //   }
-        // });
-
-        // setProgramQR(editProgram);
+        setProgramQR(structuredClone(copyData));
         setIsLoading(false);
 
       } else {
@@ -445,9 +378,7 @@ function CreateQR() {
     });
   }
 
-  // useEffect(() => {
-  //   setSearchResults(programQR);
-  // }, [programQR])
+
 
   const handleSave = () => {
     const disciplineIds = Object.keys(editTypes).join(',');
@@ -460,6 +391,7 @@ function CreateQR() {
 
   const handleCancel = () => {
     setSearchResults(programQR);
+    setCopyData(structuredClone(programQR));
     setEditModalActive(false);
     document.body.style.overflow = 'auto';
   };
@@ -588,33 +520,17 @@ function CreateQR() {
     // }, 1500);
 
   }
-  // useEffect(() => {
-  //   if (programQR) {
-  //     const program = programQR.find(res => res.program.id === idProgram);
-  //     if (program) {
-  //       const initialEditTypes = program.disciplines.reduce((acc, discipline) => {
-  //         acc[discipline.id] = {
-  //           value: discipline.workTypeId,
-  //           label: allWorkTypes.find(r => r.id === discipline.workTypeId)?.title || ''
-  //         };
-  //         return acc;
-  //       }, {});
-  //       // console.log(initialEditTypes);
 
-  //       setEditTypes(initialEditTypes);
-  //     }
-  //   }
-  // }, [programQR, idProgram, allWorkTypes, editModalActive]);
   const addDiscipline = () => {
     if (newDisc && newTypes) {
       setEditTypes(prevState => ({
         ...prevState,
         [newDisc.value]: newTypes
       }));
-      setSearchResults(prevState => {
+      setCopyData(prevState => {
         const updatedProgram = prevState.find(res => res.program.id === idProgram);
         if (updatedProgram) {
-          updatedProgram.disciplines = [{ id: newDisc.value, title: newDisc.label, workTypeId: newTypes.value }, ...updatedProgram.disciplines];
+          updatedProgram.disciplines = [{ id: newDisc.value, title: newDisc.label, workTypeId: newTypes.value, departmentId: allDisciplines.find(r => r.id === newDisc.value).departmentId }, ...updatedProgram.disciplines];
         }
         return [...prevState];
       });
@@ -624,7 +540,7 @@ function CreateQR() {
   };
 
   const deleteData = (disciplineId) => {
-    setSearchResults(prevState => {
+    setCopyData(prevState => {
       const updatedProgram = prevState.find(res => res.program.id === idProgram);
       if (updatedProgram) {
         updatedProgram.disciplines = updatedProgram.disciplines.filter(discipline => discipline.id !== disciplineId);
@@ -637,6 +553,7 @@ function CreateQR() {
       return updatedEditTypes;
     });
   };
+  // console.log(programQR)
   // массив для семестров
   const dataSemester = [{ value: 1, label: 1 },
   { value: 2, label: 2 },
@@ -881,8 +798,8 @@ function CreateQR() {
             </button>
           </div>
           <div className='edit-conteiner'>
-            {searchResults !== null ? (
-              searchResults.find(res => res.program.id === idProgram)?.disciplines.map(val => (
+            {copyData !== null ? (
+              copyData.find(res => res.program.id === idProgram)?.disciplines.map(val => (
                 <div className='edit-content' key={val.id}>
                   <p>{val.title}</p>
                   <Select
@@ -895,7 +812,8 @@ function CreateQR() {
                       value: res.id,
                       label: res.title
                     }))} />
-                  <button onClick={() => deleteData(val.id)}>
+
+                  <button onClick={() => {deleteData(val.id); console.log(programQR.find(res => res.program.id === idProgram))}}>
                     <FontAwesomeIcon icon={faXmarkCircle} />
                   </button>
                 </div>
