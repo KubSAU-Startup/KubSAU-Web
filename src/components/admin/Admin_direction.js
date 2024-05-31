@@ -102,10 +102,8 @@ function Admin_direction() {
     const handleChange = (e) => {
 
         const searchTerm = e.target.value.toLowerCase(); // Приводим введенный текст к нижнему регистру для удобства сравнения
-
-        setSearchTerm(e.target.value);
+        setSearchTerm(searchTerm);
         setIsLoading(true);
-
         let filteredResults = [...allDirectivities.directivities]; // Создаем копию исходных данных для фильтрации
         if (filterDirectivity !== null) {
             filteredResults = filteredResults.filter(res => res.id === filterDirectivity.value);
@@ -132,10 +130,20 @@ function Admin_direction() {
         setIsLoading(false);
     };
 
-
     const getParams = () => {
         let filteredResults = [...allDirectivities.directivities]; // Создаем копию исходных данных для фильтрации
+        if (searchTerm) {
 
+            filteredResults = filteredResults.filter(item => {
+
+                // Проверяем условие для каждого поля, по которому хотим искать
+                return (
+                    item.title.toLowerCase().includes(searchTerm) ||
+                    (item.headId && allDirectivities.heads.find((el) => el.id === item.headId)?.title.toLowerCase().includes(searchTerm)) ||
+                    (item.headId && allDirectivities.grades.find((el) => el.id === item.gradeId)?.title.toLowerCase().includes(searchTerm))
+                );
+            });
+        }
         if (filterDirectivity !== null) {
             filteredResults = filteredResults.filter(res => res.id === filterDirectivity.value);
         }
@@ -145,18 +153,29 @@ function Admin_direction() {
         if (filterGrade !== null) {
             filteredResults = filteredResults.filter(res => res.gradeId === filterGrade.value);
         }
-        setFilterData(filteredResults);
         setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
-        console.log(filteredResults)
     }
 
     const resetParams = () => {
         setFilterDirection(null);
         setFilterDirectivity(null);
         setFilterGrade(null);
-        setSearchTerm('');
-        setSearchResults(allDirectivities.directivities);
+        let filteredResults = [...allDirectivities.directivities]; // Создаем копию исходных данных для фильтрации
+        if (searchTerm) {
+
+            filteredResults = filteredResults.filter(item => {
+
+                // Проверяем условие для каждого поля, по которому хотим искать
+                return (
+                    item.title.toLowerCase().includes(searchTerm) ||
+                    (item.headId && allDirectivities.heads.find((el) => el.id === item.headId)?.title.toLowerCase().includes(searchTerm)) ||
+                    (item.headId && allDirectivities.grades.find((el) => el.id === item.gradeId)?.title.toLowerCase().includes(searchTerm))
+                );
+            });
+        }
+        setSearchResults(filteredResults);
     }
+
     // функция пагинации
     const loadMore = () => {
         setVisibleItems(prevVisibleItems => prevVisibleItems + 30);

@@ -173,6 +173,7 @@ function User_prof() {
     useEffect(() => {
         setSearchResults(allEmployees);
     }, [allEmployees])
+    
 
     // Функция поиска
     const handleChange = (e) => {
@@ -221,14 +222,25 @@ function User_prof() {
         }
         setFilterData(filteredResults);
         setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
-        console.log(filteredResults)
     }
 
     const resetParams = () => {
         setFilterType(null);
+        let filteredResults = [...allEmployees]; // Создаем копию исходных данных для фильтрации
+        if (searchTerm) {
 
-        // setSearchTerm('');
-        setSearchResults(allEmployees);
+            filteredResults = filteredResults.filter(item => {
+
+                // Проверяем условие для каждого поля, по которому хотим искать
+                return (
+                    item.lastName.toLowerCase().includes(searchTerm) ||
+                    item.firstName.toLowerCase().includes(searchTerm) ||
+                    item.middleName.toLowerCase().includes(searchTerm) ||
+                    (item.type && position.find((el) => el.value === item.type)?.label.toLowerCase().includes(searchTerm))
+                );
+            });
+        }
+        setSearchResults(filteredResults);
     }
     function handleFilterType(data) {
         setFilterType(data);

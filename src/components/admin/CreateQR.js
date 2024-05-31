@@ -10,7 +10,7 @@ import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faCheckCircle, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getAllGroups, getTextError, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents, getStudentsByGroups } from '../../network';
+import { getAllGroups, getTextError, editDisciplines, getGroups, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents, getStudentsByGroups } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
@@ -265,7 +265,7 @@ function CreateQR() {
     }
   }, [programQR, idProgram, allWorkTypes, editModalActive]);
   // console.log(editTypes);
-  
+
   //поиск программ
   const handleInputValue = e => {
     setInputValue(e.target.value);
@@ -412,10 +412,48 @@ function CreateQR() {
     }));
   };
 
+  async function editData(discip, type) {
+    setIsLoading(true);
+    await editDisciplines(idProgram, discip, type, (res) => {
+      if (res.success) {
+        console.log(res.response);
+
+        // const editProgram = programQR.map(elem => {
+        //   if (elem.program.id === editId) {
+        //     return {
+        //       ...elem, // копируем все свойства из исходного объекта
+        //       work: {
+        //         ...elem.work,
+        //         registrationDate: dateTime,
+        //         title: titleEdit
+        //       }
+
+        //     };
+        //   } else {
+        //     return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+        //   }
+        // });
+
+        // setProgramQR(editProgram);
+        setIsLoading(false);
+
+      } else {
+        console.log(res.response);
+        setIsLoading(false);
+
+      }
+    });
+  }
+
+  // useEffect(() => {
+  //   setSearchResults(programQR);
+  // }, [programQR])
+
   const handleSave = () => {
     const disciplineIds = Object.keys(editTypes).join(',');
     const workTypeIds = Object.values(editTypes).map(type => type.value).join(',');
     console.log(`Сохраненные данные: дисциплины - ${disciplineIds}, типы работ - ${workTypeIds}`);
+    editData(disciplineIds, workTypeIds);
     setEditModalActive(false);
     document.body.style.overflow = 'auto';
   };
@@ -599,7 +637,6 @@ function CreateQR() {
       return updatedEditTypes;
     });
   };
-  console.log(programQR)
   // массив для семестров
   const dataSemester = [{ value: 1, label: 1 },
   { value: 2, label: 2 },
@@ -816,61 +853,61 @@ function CreateQR() {
 
 
       <Empty_modal active={editModalActive} setActive={setEditModalActive}>
-      <div className='modal-disciplines'>
-        <p><b>{titleProgram}</b></p>
-        <div className='add-content'>
-          <Select
-            styles={customStylesTypeOfWork}
-            placeholder="Дисциплина"
-            value={newDisc}
-            onChange={handleNewDisciplineChange}
-            isSearchable={true}
-            options={allDisciplines.map(res => ({
-              value: res.id,
-              label: res.title
-            }))} />
-          <Select
-            styles={customStylesTypeOfWork}
-            placeholder="Тип работы"
-            value={newTypes}
-            onChange={handleNewWorkTypeChange}
-            isSearchable={true}
-            options={allWorkTypes.map(res => ({
-              value: res.id,
-              label: res.title
-            }))} />
-          <button onClick={addDiscipline}>
-            <FontAwesomeIcon icon={faCheckCircle} />
-          </button>
+        <div className='modal-disciplines'>
+          <p><b>{titleProgram}</b></p>
+          <div className='add-content'>
+            <Select
+              styles={customStylesTypeOfWork}
+              placeholder="Дисциплина"
+              value={newDisc}
+              onChange={handleNewDisciplineChange}
+              isSearchable={true}
+              options={allDisciplines.map(res => ({
+                value: res.id,
+                label: res.title
+              }))} />
+            <Select
+              styles={customStylesTypeOfWork}
+              placeholder="Тип работы"
+              value={newTypes}
+              onChange={handleNewWorkTypeChange}
+              isSearchable={true}
+              options={allWorkTypes.map(res => ({
+                value: res.id,
+                label: res.title
+              }))} />
+            <button onClick={addDiscipline}>
+              <FontAwesomeIcon icon={faCheckCircle} />
+            </button>
+          </div>
+          <div className='edit-conteiner'>
+            {searchResults !== null ? (
+              searchResults.find(res => res.program.id === idProgram)?.disciplines.map(val => (
+                <div className='edit-content' key={val.id}>
+                  <p>{val.title}</p>
+                  <Select
+                    styles={customStylesTypeOfWork}
+                    placeholder="Выберите тип работы"
+                    value={editTypes[val.id]}
+                    onChange={(selectedOption) => handleWorkTypeChange(selectedOption, val.id)}
+                    isSearchable={true}
+                    options={allWorkTypes.map(res => ({
+                      value: res.id,
+                      label: res.title
+                    }))} />
+                  <button onClick={() => deleteData(val.id)}>
+                    <FontAwesomeIcon icon={faXmarkCircle} />
+                  </button>
+                </div>
+              ))
+            ) : ''}
+          </div>
+          <div className='modal-button'>
+            <button onClick={handleSave}>Сохранить</button>
+            <button onClick={handleCancel}>Отмена</button>
+          </div>
         </div>
-        <div className='edit-conteiner'>
-          {searchResults !== null ? (
-            searchResults.find(res => res.program.id === idProgram)?.disciplines.map(val => (
-              <div className='edit-content' key={val.id}>
-                <p>{val.title}</p>
-                <Select
-                  styles={customStylesTypeOfWork}
-                  placeholder="Выберите тип работы"
-                  value={editTypes[val.id]}
-                  onChange={(selectedOption) => handleWorkTypeChange(selectedOption, val.id)}
-                  isSearchable={true}
-                  options={allWorkTypes.map(res => ({
-                    value: res.id,
-                    label: res.title
-                  }))} />
-                <button onClick={() => deleteData(val.id)}>
-                  <FontAwesomeIcon icon={faXmarkCircle} />
-                </button>
-              </div>
-            ))
-          ) : ''}
-        </div>
-        <div className='modal-button'>
-          <button onClick={handleSave}>Сохранить</button>
-          <button onClick={handleCancel}>Отмена</button>
-        </div>
-      </div>
-    </Empty_modal>
+      </Empty_modal>
 
 
 

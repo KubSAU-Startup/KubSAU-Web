@@ -110,21 +110,36 @@ async function getDataAdminJournal(offset, limit, par, query, callback) {
     })
 }
 
-async function searchOfWorks(offset, limit, str, callback) {
-    const url = `${baseUrl_test}/works/latest/search`;
-
-    await axios.get(url, {
-        params: {
-            offset: offset,
-            limit: limit,
-            query: str
-        }
+async function editWork(id, date, title, callback) {
+    const url = `${baseUrl_test}/works/${id}`;
+    await axios.patch(url, {
+        registrationDate: date,
+        title: title
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
+        console.log(res);
         callback(res.data);
     }).catch((error) => {
         console.log(error)
     })
 }
+
+// async function searchOfWorks(offset, limit, str, callback) {
+//     const url = `${baseUrl_test}/works/latest/search`;
+
+//     await axios.get(url, {
+//         params: {
+//             offset: offset,
+//             limit: limit,
+//             query: str
+//         }
+//     }).then((res) => {
+//         callback(res.data);
+//     }).catch((error) => {
+//         console.log(error)
+//     })
+// }
 
 async function getDataPrograms(offset, limit, param, text, callback) {
     const url = `${baseUrl_test}/programs/search`;
@@ -144,6 +159,21 @@ async function getDataPrograms(offset, limit, param, text, callback) {
     })
     console.log(offset, limit, param)
 
+}
+
+async function editDisciplines(id, disciplineIds, workTypeIds, callback) {
+    const url = `${baseUrl_test}/programs/${id}/disciplines`;
+    await axios.patch(url, {
+        disciplineIds: disciplineIds,
+        workTypeIds: workTypeIds
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
 }
 
 async function getDirectivitiesPrograms(callback) {
@@ -542,6 +572,6 @@ export {
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
-    searchOfWorks, searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee
+    searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines
 }
 

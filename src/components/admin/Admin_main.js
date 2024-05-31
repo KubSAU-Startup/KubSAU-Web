@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Admin_main.css';
 import Admin_header from './Admin_header';
-import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, searchOfWorks } from '../../network';
+import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, editWork } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
 import { customStyles, customStylesModal } from '../Select_style/Select_style';
@@ -211,7 +211,46 @@ function Admin_main() {
         })
     }, [offset, limit, journalParam, debouncedInputValue]);
 
+    async function editData() {
+        
+        console.log(dateTime);
+        
+        // console.log(timestamp);
 
+        if (workTypeEdit !== 'Курсовая')
+            setTitleEdit(null);
+
+        await editWork(editId, dateTime, titleEdit, (res) => {
+            if (res.success) {
+                console.log(res.response);
+
+                const editWork = mainData.map(elem => {
+                    if (elem.work.id === editId) {
+                        return {
+                            ...elem, // копируем все свойства из исходного объекта
+                            work: {
+                                ...elem.work,
+                                registrationDate: dateTime,
+                                title: titleEdit
+                            }
+
+                        };
+                    } else {
+                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                    }
+                });
+
+                setMainData(editWork);
+
+            } else {
+                console.log(res.response);
+            }
+        });
+    }
+
+    useEffect(() => {
+        setSearchResults(mainData);
+    }, [mainData])
 
     // получения данных о необходимой фильтрации
     function handleSelectDiscipline(data) {
@@ -230,7 +269,9 @@ function Admin_main() {
         setSelectedDepartment(data);
     }
     function handleDateTime(data) {
-        setDateTime(data);
+        let dateObject = new Date(data);
+        let timestamp = dateObject.getTime();
+        setDateTime(timestamp);
     }
     function handleModalDisciplene(data) {
         setDisciplineEdit(data);
@@ -380,7 +421,7 @@ function Admin_main() {
                                 document.body.style.overflow = 'hidden';
 
                                 setEditId(entries.work.id);
-                                setDateTime(new Date(entries.work.registrationDate).toLocaleString("ru-ru"));
+                                setDateTime(entries.work.registrationDate);
                                 // setStudentEdit({ value: entries.student.id, label: entries.student.title });
                                 // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
                                 // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });
@@ -388,6 +429,9 @@ function Admin_main() {
                                 setStudentEdit(entries.student.fullName);
                                 setDisciplineEdit(entries.discipline.title);
                                 setWorkTypeEdit(entries.work.type.title);
+                                // setEmplLastN();
+                                // setEmplFirstN();
+                                // setEmplMiddleN();
                                 setDepartmentEdit(entries.department.title);
                                 entries.work.title && setTitleEdit(entries.work.title);
                                 setModalEditActive(true)
@@ -417,7 +461,7 @@ function Admin_main() {
                 <div className='modal-main'>
                     <div className='grid'>
                         <div>
-                            <p>Дата регистрации: </p>
+                            <p><b>Дата регистрации: </b></p>
                         </div>
                         <div>
                             <Flatpickr
@@ -437,7 +481,7 @@ function Admin_main() {
                             />
                         </div>
                         <div>
-                            <p>ФИО студента: </p>
+                            <p><b>ФИО студента: </b></p>
                         </div>
                         <div>
                             <p>{studentEdit}</p>
@@ -456,7 +500,7 @@ function Admin_main() {
                             }))}
                         /> */}
                         <div>
-                            <p>Дисциплина: </p>
+                            <p><b>Дисциплина: </b></p>
                         </div>
                         <div>
                             <p>{disciplineEdit}</p>
@@ -474,7 +518,7 @@ function Admin_main() {
                             /> */}
                         </div>
                         <div>
-                            <p>Тип работы: </p>
+                            <p><b>Тип работы: </b></p>
                         </div>
                         <div>
                             <p>{workTypeEdit}</p>
@@ -493,7 +537,7 @@ function Admin_main() {
                             /> */}
                         </div>
                         <div>
-                            <p>Кафедра: </p>
+                            <p><b>Кафедра: </b></p>
                         </div>
                         <div>
                             <p>{departmentEdit}</p>
@@ -513,14 +557,14 @@ function Admin_main() {
                         </div>
 
                     </div>
-                    <div className='input-conteiner'>
+                    {workTypeEdit === 'Курсовая' && <div className='input-conteiner'>
                         <input type='text' className='name-dapartment' placeholder=' ' value={titleEdit} onChange={e => setTitleEdit(e.target.value)} />
                         <label className='label-name'>Название работы</label>
-                    </div>
+                    </div>}
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
-                        // editData(editId, newTitle, newPhone); 
+                        editData();
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
 
