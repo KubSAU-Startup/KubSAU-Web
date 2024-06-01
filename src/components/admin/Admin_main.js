@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Admin_main.css';
 import Admin_header from './Admin_header';
-import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, editWork } from '../../network';
+import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, editWork, deleteWork } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
 import { customStyles, customStylesModal } from '../Select_style/Select_style';
@@ -246,6 +246,19 @@ function Admin_main() {
                 console.log(res.response);
             }
         });
+    }
+
+    async function deleteData() {
+        await deleteWork(deleteId, (res) => {
+            if (res.success) {
+                console.log(res.response);
+                setMainData(mainData.filter((a) => a.work.id !== deleteId));
+
+            } else {
+                console.log(res.response);
+            }
+        });
+
     }
 
     useEffect(() => {
@@ -581,7 +594,7 @@ function Admin_main() {
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
                         <button onClick={() => {
-                            // deleteData(deleteId); 
+                            deleteData(); 
                             setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
                         }}>Удалить</button>

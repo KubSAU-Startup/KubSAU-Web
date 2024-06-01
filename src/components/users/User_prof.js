@@ -30,7 +30,6 @@ function User_prof() {
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
 
-    const [searchDone, setSearchDone] = useState([]);
 
 
     const [editId, setEditId] = useState(null);
@@ -152,6 +151,7 @@ function User_prof() {
 
                 setAllEmployees(editData);
 
+
             } else {
                 console.log(res.response);
             }
@@ -172,8 +172,11 @@ function User_prof() {
 
     useEffect(() => {
         setSearchResults(allEmployees);
+        if (searchTerm !== '' || filterType !== null) {
+            getParams()
+        }
     }, [allEmployees])
-    
+
 
     // Функция поиска
     const handleChange = (e) => {
@@ -196,7 +199,6 @@ function User_prof() {
             );
         });
         setSearchResults(filteredResults);
-        setSearchDone(searchTerm !== null ? true : false);
 
         setIsLoading(false);
     };

@@ -151,7 +151,21 @@ function Admin_groups() {
     }
 
     useEffect(() => {
-        setSearchResults(allGroups)
+        if (searchTerm) {
+            const filteredResults = allGroups.filter(item => {
+
+                // Проверяем условие для каждого поля, по которому хотим искать
+                return (
+                    item.title.toLowerCase().includes(searchTerm) ||
+                    allDirectivities.find((el) => el.id === item.directivityId).title.toLowerCase().includes(searchTerm) ||
+                    allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === item.directivityId).headId).title.toLowerCase().includes(searchTerm)
+                );
+            });
+            setSearchResults(filteredResults);
+        } else {
+            setSearchResults(allGroups)
+
+        }
     }, [allGroups])
 
     async function editData(index, abb, num, dir) {

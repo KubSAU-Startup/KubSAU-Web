@@ -121,7 +121,21 @@ function Admin_department() {
     }
 
     useEffect(() => {
-        setSearchResults(allDepartments)
+        if(searchTerm){
+            const filteredResults = allDepartments.filter(item => {
+
+                // Проверяем условие для каждого поля, по которому хотим искать
+                return (
+                    item.title.toLowerCase().includes(searchTerm) ||
+                    item.phone.toLowerCase().includes(searchTerm)
+                );
+            });
+            setSearchResults(filteredResults);
+        }else{
+
+            setSearchResults(allDepartments)
+
+        }
     }, [allDepartments])
 
     async function editData(index, title, phone) {

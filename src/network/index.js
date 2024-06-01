@@ -125,6 +125,16 @@ async function editWork(id, date, title, callback) {
     })
 }
 
+async function deleteWork(index, callback) {
+    const url = `${baseUrl_test}/works/${index}`;
+    await axios.delete(url).then((res) => {
+        console.log(res);
+        callback(res.data);
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
 // async function searchOfWorks(offset, limit, str, callback) {
 //     const url = `${baseUrl_test}/works/latest/search`;
 
@@ -572,6 +582,6 @@ export {
     getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
     getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
-    searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines
+    searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines, deleteWork
 }
 
