@@ -387,6 +387,8 @@ function CreateQR() {
     editData(disciplineIds, workTypeIds);
     setEditModalActive(false);
     document.body.style.overflow = 'auto';
+    document.body.style.paddingRight = `0px`;
+
   };
 
   const handleCancel = () => {
@@ -394,6 +396,8 @@ function CreateQR() {
     setCopyData(structuredClone(programQR));
     setEditModalActive(false);
     document.body.style.overflow = 'auto';
+    document.body.style.paddingRight = `0px`;
+
   };
 
   const generateQR = async (department, discipline, studName, workType) => {
@@ -568,6 +572,9 @@ function CreateQR() {
   { value: 11, label: 11 },
   { value: 12, label: 12 }];
 
+  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflowX = 'hidden';
+
   return (
     <>
       {/* окно загрузки */}
@@ -700,6 +707,7 @@ function CreateQR() {
             <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
               <button className='btn-create-qr' onClick={() => {
                 document.body.style.overflow = 'hidden';
+                    document.body.style.paddingRight = `${scrollBarWidth}px`;
 
 
                 setIdProgram(value.program.id);
@@ -710,6 +718,8 @@ function CreateQR() {
               </button>
               <button onClick={() => {
                 document.body.style.overflow = 'hidden';
+                document.body.style.paddingRight = `${scrollBarWidth}px`;
+
                 setIdProgram(value.program.id);
                 setTitleProgram(`${value.directivity.title}, ${value.grade.title.toLowerCase()}, ${value.program.semester} семестр`);
                 setEditModalActive(true);
@@ -755,6 +765,7 @@ function CreateQR() {
               getQR();
               setEmptyModalActive(false);
               document.body.style.overflow = 'auto';
+              document.body.style.paddingRight = `0px`;
 
 
             }}>Сгенерировать</button>
@@ -762,6 +773,7 @@ function CreateQR() {
             <button onClick={() => {
               setEmptyModalActive(false);
               document.body.style.overflow = 'auto';
+              document.body.style.paddingRight = `0px`;
 
             }}>Отмена</button>
           </div>

@@ -26,6 +26,7 @@ function Admin_header() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+    document.body.style.overflowX = 'hidden';
 
     const handleLogout = () => {
         localStorage.removeItem('token');

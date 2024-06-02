@@ -10,9 +10,11 @@ function User_header() {
     const menuRef = useRef(null);
 
     useEffect(() => {
+        
+
         // Функция, которая будет вызываться при клике вне меню
         const handleClickOutside = (event) => {
-            
+
             // Проверяем, имеет ли меню атрибут open
             if (menuRef.current && !menuRef.current.contains(event.target)) {
                 setOpen(false); // Закрыть меню, если клик был вне его и меню не было уже открыто
@@ -28,17 +30,22 @@ function User_header() {
         };
     }, []);
 
+    document.body.style.overflowX = 'hidden';
+
+       
     const handleLogout = () => {
         localStorage.removeItem('token');
         setIsAuthenticated(false);
     };
+
+
     if (isAuthenticated == false) {
         return <Navigate to='/' />
     }
     return (
         <div className='ad_main_header'>
             <img className='ad_main_logo' src={require('../../img/logo1.png')} />
-            <button className='menu_button' ref={menuRef}  onClick={() => setOpen(!isOpen)}>Журналы
+            <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
                 <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
             </button>
             <nav className={`menu ${isOpen ? "active" : ""}`}>

@@ -243,6 +243,7 @@ function Admin_groups() {
     function handleNewDirectivityChange(data) {
         setNewDirectivity(data);
     }
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     return (
         <>
@@ -265,6 +266,8 @@ function Admin_groups() {
                 <button className='add-student' onClick={() => {
                     setModalActive(true);
                     document.body.style.overflow = 'hidden';
+                    document.body.style.paddingRight = `${scrollBarWidth}px`;
+
                 }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
@@ -307,6 +310,7 @@ function Admin_groups() {
                             {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                                 setModalEditActive(true);
                                 setEditId(res.id);
@@ -328,6 +332,7 @@ function Admin_groups() {
                             <button onClick={() => {
                                 setModalDeleteActive(true); setDeleteId(res.id);
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                             }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
@@ -384,9 +389,13 @@ function Admin_groups() {
                         addData(); setModalActive(false); setHead(null);
                         setDirectivity(null); setAbbGroup(''); setNumberGroup('');
                         document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
+
                     }}>Сохранить</button>
 
-                    <button onClick={() => { setModalActive(false); document.body.style.overflow = 'auto'; }}>Отмена</button>
+                    <button onClick={() => {
+                        setModalActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                    }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
@@ -428,12 +437,14 @@ function Admin_groups() {
                     <button onClick={() => {
                         editData(editId, newAbbGroup, newNumberGroup, newDirectivity.value);
                         document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
 
                         setModalEditActive(false); setNewDirectivity(null); setNewAbbGroup(null); setNewHead(null); setNewNumberGroup(null)
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
 
                     }}>Отмена</button>
                 </div>
@@ -445,11 +456,13 @@ function Admin_groups() {
                         <button onClick={() => {
                             deleteData(deleteId); setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Отмена</button>
                     </div>

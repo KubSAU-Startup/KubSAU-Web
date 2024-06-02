@@ -212,9 +212,9 @@ function Admin_main() {
     }, [offset, limit, journalParam, debouncedInputValue]);
 
     async function editData() {
-        
+
         console.log(dateTime);
-        
+
         // console.log(timestamp);
 
         if (workTypeEdit !== 'Курсовая')
@@ -298,6 +298,8 @@ function Admin_main() {
     function handleModalDepartment(data) {
         setDepartmentEdit(data);
     }
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+
 
     return (
         <>
@@ -432,6 +434,7 @@ function Admin_main() {
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === entries.work.id ? 'active' : ''}`}>
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                                 setEditId(entries.work.id);
                                 setDateTime(entries.work.registrationDate);
@@ -454,6 +457,7 @@ function Admin_main() {
                             <button onClick={() => {
                                 setModalDeleteActive(true); setDeleteId(entries.work.id);
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                             }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
@@ -580,11 +584,13 @@ function Admin_main() {
                         editData();
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
 
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
 
                     }}>Отмена</button>
                 </div>
@@ -594,13 +600,17 @@ function Admin_main() {
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
                         <button onClick={() => {
-                            deleteData(); 
+                            deleteData();
                             setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
+
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
+
 
                         }}>Отмена</button>
                     </div>

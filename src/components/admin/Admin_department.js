@@ -121,7 +121,7 @@ function Admin_department() {
     }
 
     useEffect(() => {
-        if(searchTerm){
+        if (searchTerm) {
             const filteredResults = allDepartments.filter(item => {
 
                 // Проверяем условие для каждого поля, по которому хотим искать
@@ -131,7 +131,7 @@ function Admin_department() {
                 );
             });
             setSearchResults(filteredResults);
-        }else{
+        } else {
 
             setSearchResults(allDepartments)
 
@@ -190,6 +190,7 @@ function Admin_department() {
             setIsPaginationVisible(true); // Показать 
         }
     }, [searchResults, visibleItems]);
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     return (
         <>
@@ -212,6 +213,8 @@ function Admin_department() {
                 <button className='add-student' onClick={() => {
                     setModalActive(true);
                     document.body.style.overflow = 'hidden';
+                    document.body.style.paddingRight = `${scrollBarWidth}px`;
+
                 }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
@@ -254,6 +257,8 @@ function Admin_department() {
                             {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
+
                                 setModalEditActive(true);
                                 setEditId(res.id);
                                 allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
@@ -263,6 +268,8 @@ function Admin_department() {
                             </button>
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
+
                                 setModalDeleteActive(true);
                                 setDeleteId(res.id);
                             }}>
@@ -291,9 +298,13 @@ function Admin_department() {
                 <div className='modal-button'>
                     <button onClick={() => {
                         addDepartment(); setModalActive(false); document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
+
                         setTitleDepartment(''); setPhoneDepartment('');
                     }}>Сохранить</button>
-                    <button onClick={() => { setModalActive(false); document.body.style.overflow = 'auto'; }}>Отмена</button>
+                    <button onClick={() => {
+                        setModalActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                    }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
@@ -308,16 +319,25 @@ function Admin_department() {
                     </div>
                 </div>
                 <div className='modal-button'>
-                    <button onClick={() => { editData(editId, newTitle, newPhone); setModalEditActive(false); document.body.style.overflow = 'auto'; }}>Сохранить</button>
-                    <button onClick={() => { setModalEditActive(false); document.body.style.overflow = 'auto';}}>Отмена</button>
+                    <button onClick={() => {
+                        editData(editId, newTitle, newPhone); setModalEditActive(false);
+                        document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                    }}>Сохранить</button>
+                    <button onClick={() => {
+                        setModalEditActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                    }}>Отмена</button>
                 </div>
             </Empty_modal>
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
-                        <button onClick={() => { deleteData(deleteId); setModalDeleteActive(false); document.body.style.overflow = 'auto';}}>Удалить</button>
-                        <button onClick={() => { setModalDeleteActive(false); document.body.style.overflow = 'auto';}}>Отмена</button>
+                        <button onClick={() => {
+                            deleteData(deleteId); setModalDeleteActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                        }}>Удалить</button>
+                        <button onClick={() => {
+                            setModalDeleteActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                        }}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>

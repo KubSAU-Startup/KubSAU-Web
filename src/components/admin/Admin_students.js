@@ -131,70 +131,19 @@ function Admin_students() {
                 // Если это первая страница, просто устанавливаем новые данные
                 if (offset === 0) {
                     setAllStudents(res.response.students);
-                    // setAllStatus(res.response.statuses)
+                    setAllStatus(res.response.statuses)
                     setSearchResults(res.response.students);
                 } else {
                     // Иначе обновляем данные
                     setAllStudents(prevData => [...prevData, ...res.response.students]);
-                    // setAllStatus([...res.response.statuses])
+                    setAllStatus([...res.response.statuses])
 
                     setSearchResults(prevResults => [...prevResults, ...res.response.students]);
                 }
             }
             setIsLoading(false);
         })
-        // if (inputValue === '') {
-        //     getAllStudents(offset, limit, (res) => {
-        //         if (res.error) {
-        //             setTextError(getTextError(res.error));
-        //             setErrorActive(true);
-        //         } else {
-        //             if (res.response.students.length < limit) {
-        //                 setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-        //             }
 
-        //             // Если это первая страница, просто устанавливаем новые данные
-        //             if (offset === 0) {
-        //                 setAllStudents(res.response.students);
-        //                 setAllStatus(res.response.statuses)
-        //                 // setSearchResults(res.response.students);
-        //             } else {
-        //                 // Иначе обновляем данные
-        //                 setAllStudents(prevData => [...prevData, ...res.response.students]);
-        //                 setAllStatus([...res.response.statuses])
-
-        //                 // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
-        //             }
-        //         }
-        //         setIsLoading(false);
-        //     })
-        // } else {
-        //     console.log(debouncedInputValue);
-        //     searchOfStudents(offset, limit, debouncedInputValue, (res) => {
-        //         if (res.error) {
-        //             setTextError(getTextError(res.error));
-        //             setErrorActive(true);
-        //         } else {
-        //             if (res.response.students.length < limit) {
-        //                 setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
-        //             }
-
-        //             // Если это первая страница, просто устанавливаем новые данные
-        //             if (offset === 0) {
-        //                 setAllStudents(res.response.students);
-        //                 // setAllStatus(res.response.statuses)
-        //                 // setSearchResults(res.response.students);
-        //             } else {
-        //                 // Иначе обновляем данные
-        //                 setAllStudents(prevData => [...prevData, ...res.response.students]);
-        //                 // setAllStatus([...res.response.statuses])
-
-        //                 // setSearchResults(prevResults => [...prevResults, ...res.response.students]);
-        //             }
-        //         }
-        //         setIsLoading(false);
-        //     })
-        // }
     }, [offset, limit, studentsParam, debouncedInputValue])
 
     useEffect(() => {
@@ -315,16 +264,15 @@ function Admin_students() {
         setOffset(0);
 
         // параметры для сброса
-        setStudentsParam({
-            // disciplineId: null,
-            // teacherId: null,
-            // departmentId: null,
-            // groupId: null,
-            // workTypeId: null
-        })
+        setStudentsParam({})
 
     };
+    const statuses = [
+        { value: 1, label: 'Учится' },
+        { value: 2, label: 'Отчислен' },
+        { value: 3, label: 'Академ' },
 
+    ]
     function handleFilterGroup(data) {
         setFilterGroup(data);
     }
@@ -349,6 +297,8 @@ function Admin_students() {
     function handleModalEditStatus(data) {
         setModalEditStatus(data);
     }
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+
     return (
         <>
             <Admin_header />
@@ -389,10 +339,7 @@ function Admin_students() {
                     value={filterStatus}
                     onChange={handleFilterStatus}
                     isSearchable={true}
-                    options={allStatus.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
+                    options={statuses}
                 />
                 <button className='get-params' type='submit' onClick={getParams}>Применить</button>
                 <button className='delete-params' onClick={resetFilters}>Сбросить</button>
@@ -401,6 +348,7 @@ function Admin_students() {
 
             <button className='add-student' onClick={() => {
                 document.body.style.overflow = 'hidden';
+                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                 setModalActive(true)
             }}>
@@ -447,9 +395,9 @@ function Admin_students() {
                                     )?.title}</p>}
 
                             {res.id && <p><span>Статус: </span>{
-                                allStatus.find(el =>
-                                    el.id === allStudents.find(r =>
-                                        r.id === res.id)?.statusId)?.title}</p>}
+                                statuses.find(el =>
+                                    el.value === allStudents.find(r =>
+                                        r.id === res.id)?.statusId)?.label}</p>}
 
                         </div>
                     </div>
@@ -477,6 +425,7 @@ function Admin_students() {
                             {/* <div className={`button-edit-delete ${userStates[res.id] ? 'active' : ''}`}> */}
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                                 setEditId(res.id);
                                 setLastNEdit(res.lastName);
@@ -500,6 +449,7 @@ function Admin_students() {
                             </button>
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                                 setDeleteId(res.id);
                                 setModalDeleteActive(true);
@@ -551,15 +501,12 @@ function Admin_students() {
                         maxMenuHeight={120}
                         onChange={handleModalStatus}
                         isSearchable={true}
-                        options={allStatus.map(el =>
-                        ({
-                            value: el.id,
-                            label: el.title
-                        }))}
+                        options={statuses}
                     />
                     <div className='modal-button'>
                         <button onClick={() => {
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                             addData();
                             setLastN('');
@@ -572,6 +519,7 @@ function Admin_students() {
                         <button onClick={() => {
                             setModalActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Отмена</button>
                     </div>
@@ -625,11 +573,13 @@ function Admin_students() {
                             editData();
                             setModalEditActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Сохранить</button>
                         <button onClick={() => {
                             setModalEditActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Отмена</button>
                     </div>
@@ -643,11 +593,13 @@ function Admin_students() {
                         <button onClick={() => {
                             deleteData(); setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Отмена</button>
                     </div>

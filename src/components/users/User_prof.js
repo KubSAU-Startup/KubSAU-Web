@@ -254,6 +254,7 @@ function User_prof() {
         setModalStaffEdit(data);
     }
 
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     const position = [
         { value: 1, label: 'Администратор' },
@@ -288,6 +289,7 @@ function User_prof() {
             <button className='add-student' onClick={() => {
                 setModalActive(true);
                 document.body.style.overflow = 'hidden';
+                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
             }}>
                 <FontAwesomeIcon icon={faPlusCircle} />
@@ -327,6 +329,7 @@ function User_prof() {
                         <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                                 setModalEditActive(true);
                                 setFirstNEdit(res.firstName);
@@ -342,6 +345,7 @@ function User_prof() {
                             <button onClick={() => {
                                 setModalDeleteActive(true); setDeleteId(res.id);
                                 document.body.style.overflow = 'hidden';
+                                document.body.style.paddingRight = `${scrollBarWidth}px`;
 
                             }}>
                                 <img src={require('../../img/delete.png')} alt='delete' />
@@ -390,6 +394,7 @@ function User_prof() {
                     <div className='modal-button'>
                         <button onClick={() => {
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                             addData();
                             setLastN('');
@@ -402,6 +407,7 @@ function User_prof() {
                         <button onClick={() => {
                             setModalActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Отмена</button>
                     </div>
@@ -441,6 +447,7 @@ function User_prof() {
                     <div className='modal-button'>
                         <button onClick={() => {
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                             editData();
                             setModalEditActive(false);
@@ -448,6 +455,7 @@ function User_prof() {
                         <button onClick={() => {
                             setModalEditActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Отмена</button>
                     </div>
@@ -461,11 +469,13 @@ function User_prof() {
                         <button onClick={() => {
                             deleteData(); setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
 
                         }}>Отмена</button>
                     </div>
