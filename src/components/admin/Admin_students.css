@@ -27,7 +27,7 @@
     margin: 10px 0;
 }
 
-.cart-stud span{
+.cart-stud span {
     font-weight: 700;
 }
 
@@ -65,7 +65,7 @@
     border-color: #1e971c;
 }
 
-.add-student{
+.add-student {
     display: flex;
     margin: 0 70px 10px auto;
     background: none;
@@ -78,7 +78,7 @@
 .modal-students {
     display: grid;
     justify-content: left;
-    grid-gap: -40px; 
+    grid-gap: -40px;
 
 }
 
@@ -130,3 +130,9 @@
     color: #4a4a4a;
 }
 
+.inputModalError {
+    color: red;
+    font-size: 12px;
+    margin-top: -25px;
+    position: absolute;
+}

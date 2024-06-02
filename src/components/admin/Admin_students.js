@@ -19,6 +19,13 @@ function Admin_students() {
     const [allUsers, setAllUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
 
+    const [errorFirstN, setErrorFirstN] = useState('');
+    const [errorLastN, setErrorLastN] = useState('');
+    const [errorMiddleN, setErrorMiddleN] = useState('');
+    const [errorGroup, setErrorGroup] = useState('');
+    const [errorStatus, setErrorStatus] = useState('');
+
+
     const [filterGroup, setFilterGroup] = useState(null);
     const [filterGrade, setFilterGrade] = useState(null);
     const [filterStatus, setFilterStatus] = useState(null);
@@ -73,12 +80,12 @@ function Admin_students() {
     const [visibleItems, setVisibleItems] = useState(10);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
-    const [lastN, setLastN] = useState(null);
-    const [firstN, setFirstN] = useState(null);
-    const [middleN, setMiddleN] = useState(null);
-    const [lastNEdit, setLastNEdit] = useState(null);
-    const [firstNEdit, setFirstNEdit] = useState(null);
-    const [middleNEdit, setMiddleNEdit] = useState(null);
+    const [lastN, setLastN] = useState('');
+    const [firstN, setFirstN] = useState('');
+    const [middleN, setMiddleN] = useState('');
+    const [lastNEdit, setLastNEdit] = useState('');
+    const [firstNEdit, setFirstNEdit] = useState('');
+    const [middleNEdit, setMiddleNEdit] = useState('');
 
     const [offset, setOffset] = useState(0);
     const limit = 30; // Количество элементов на странице
@@ -190,42 +197,119 @@ function Admin_students() {
     }, [inputValue, 1000]);
 
     async function addData() {
-        await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
-            if (res.success) {
-                setAllStudents(prevData => [res.response, ...prevData]);
-            } else {
-                console.log(res);
+        setErrorLastN('');
+        setErrorFirstN('');
+        setErrorMiddleN('');
+        setErrorGroup('');
+        setErrorStatus('');
+        if (firstN === '' || lastN === '' || middleN === '' || modalGroup === null || modalStatus === null) {
+
+            if (firstN === '') {
+                setErrorFirstN('Заполните имя');
             }
-        });
+            if (lastN === '') {
+                setErrorLastN('Заполните фамилию');
+            }
+            if (middleN === '') {
+                setErrorMiddleN('Заполните отчество');
+            }
+            if (modalGroup === null) {
+                setErrorGroup('Выберите группу');
+            }
+            if (modalStatus === null) {
+                setErrorStatus('Выберите статус студента');
+            }
+        } else {
+            await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
+                if (res.success) {
+                    setAllStudents(prevData => [res.response, ...prevData]);
+                } else {
+                    console.log(res);
+                }
+            });
+
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+
+            setLastN('');
+            setFirstN('');
+            setMiddleN('');
+            setModalGroup(null);
+            setModalStatus(null);
+            setModalActive(false);
+            setErrorLastN('');
+            setErrorFirstN('');
+            setErrorMiddleN('');
+            setErrorGroup('');
+            setErrorStatus('');
+        }
     }
     // console.log(searchResults)
 
     async function editData() {
-        await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
-            if (res.success) {
-                console.log(res.response);
+        setErrorLastN('');
+        setErrorFirstN('');
+        setErrorMiddleN('');
+        setErrorGroup('');
+        setErrorStatus('');
 
-                const editStudent = allStudents.map(elem => {
-                    if (elem.id === editId) {
-                        return {
-                            ...elem, // копируем все свойства из исходного объекта
-                            firstName: firstNEdit,
-                            lastName: lastNEdit,
-                            middleName: middleNEdit,
-                            groupId: modalEditGroup.value,
-                            statusId: modalEditStatus.value
-                        };
-                    } else {
-                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-                    }
-                });
+        if (firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || modalEditGroup === null || modalEditStatus === null) {
 
-                setAllStudents(editStudent);
-
-            } else {
-                console.log(res.response);
+            if (firstNEdit === '') {
+                setErrorFirstN('Заполните имя');
             }
-        });
+            if (lastNEdit === '') {
+                setErrorLastN('Заполните фамилию');
+            }
+            if (middleNEdit === '') {
+                setErrorMiddleN('Заполните отчество');
+            }
+            if (modalEditGroup === null) {
+                setErrorGroup('Выберите группу');
+            }
+            if (modalEditStatus === null) {
+                setErrorStatus('Выберите статус студента');
+            }
+        } else {
+            await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
+                if (res.success) {
+                    console.log(res.response);
+
+                    const editStudent = allStudents.map(elem => {
+                        if (elem.id === editId) {
+                            return {
+                                ...elem, // копируем все свойства из исходного объекта
+                                firstName: firstNEdit,
+                                lastName: lastNEdit,
+                                middleName: middleNEdit,
+                                groupId: modalEditGroup.value,
+                                statusId: modalEditStatus.value
+                            };
+                        } else {
+                            return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                        }
+                    });
+
+                    setAllStudents(editStudent);
+
+                } else {
+                    console.log(res.response);
+                }
+            });
+            setModalEditActive(false);
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+            setLastNEdit('');
+            setFirstNEdit('');
+            setMiddleNEdit('');
+            setModalEditGroup(null);
+            setModalEditStatus(null);
+            setErrorLastN('');
+            setErrorFirstN('');
+            setErrorMiddleN('');
+            setErrorGroup('');
+            setErrorStatus('');
+        }
     }
     async function deleteData() {
         await deleteStudent(deleteId, (res) => {
@@ -468,59 +552,79 @@ function Admin_students() {
             <Empty_modal active={modalActive} setActive={setModalActive}>
 
                 <div className='modal-students'>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={lastN} onChange={e => setLastN(e.target.value)} />
-                        <label className='label-name'>Фамилия</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={lastN} onChange={e => setLastN(e.target.value)} />
+                            <label className='label-name'>Фамилия</label>
+                        </div>
+                        {(errorLastN !== '') && <p className='inputModalError' >{errorLastN}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={firstN} onChange={e => setFirstN(e.target.value)} />
-                        <label className='label-name'>Имя</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={firstN} onChange={e => setFirstN(e.target.value)} />
+                            <label className='label-name'>Имя</label>
+                        </div>
+                        {(errorFirstN !== '') && <p className='inputModalError' >{errorFirstN}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={middleN} onChange={e => setMiddleN(e.target.value)} />
-                        <label className='label-name'>Отчество</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={middleN} onChange={e => setMiddleN(e.target.value)} />
+                            <label className='label-name'>Отчество</label>
+                        </div>
+                        {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
+
                     </div>
 
+                    <div style={{ marginBottom: '20px' }}>
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Группа"
+                            value={modalGroup}
+                            maxMenuHeight={120}
+                            onChange={handleModalGroup}
+                            isSearchable={true}
+                            options={allGroups.map(el => ({
+                                value: el.id,
+                                label: el.title,
+                            }))}
+                        />
+                        {(errorGroup !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorGroup}</p>}
 
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Группа"
-                        value={modalGroup}
-                        maxMenuHeight={120}
-                        onChange={handleModalGroup}
-                        isSearchable={true}
-                        options={allGroups.map(el => ({
-                            value: el.id,
-                            label: el.title,
-                        }))}
-                    />
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Статус"
-                        value={modalStatus}
-                        maxMenuHeight={120}
-                        onChange={handleModalStatus}
-                        isSearchable={true}
-                        options={statuses}
-                    />
+                    </div>
+
+                    <div>
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Статус"
+                            value={modalStatus}
+                            maxMenuHeight={120}
+                            onChange={handleModalStatus}
+                            isSearchable={true}
+                            options={statuses}
+                        />
+                        {(errorStatus !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorStatus}</p>}
+
+                    </div>
                     <div className='modal-button'>
+                        <button onClick={() => {
+                            addData();
+
+                        }}>Сохранить</button>
                         <button onClick={() => {
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
+                            setErrorFirstN('');
+                            setErrorLastN('');
+                            setErrorMiddleN('');
 
-                            addData();
                             setLastN('');
                             setFirstN('');
                             setMiddleN('');
                             setModalGroup(null);
                             setModalStatus(null);
                             setModalActive(false);
-                        }}>Сохранить</button>
-                        <button onClick={() => {
-                            setModalActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
-
                         }}>Отмена</button>
                     </div>
 
@@ -529,58 +633,87 @@ function Admin_students() {
 
             <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
                 <div className='modal-students'>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={lastNEdit} onChange={e => setLastNEdit(e.target.value)} />
-                        <label className='label-name'>Фамилия</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={lastNEdit} onChange={e => setLastNEdit(e.target.value)} />
+                            <label className='label-name'>Фамилия</label>
+                        </div>
+                        {(errorLastN !== '') && <p className='inputModalError' >{errorLastN}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={firstNEdit} onChange={e => setFirstNEdit(e.target.value)} />
-                        <label className='label-name'>Имя</label>
+
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={firstNEdit} onChange={e => setFirstNEdit(e.target.value)} />
+                            <label className='label-name'>Имя</label>
+                        </div>
+                        {(errorFirstN !== '') && <p className='inputModalError' >{errorFirstN}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
-                        <label className='label-name'>Отчество</label>
+
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
+                            <label className='label-name'>Отчество</label>
+                        </div>
+                        {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
+
                     </div>
 
 
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Группа"
-                        value={modalEditGroup}
-                        maxMenuHeight={120}
-                        onChange={handleModalEditGroup}
-                        isSearchable={true}
-                        options={allGroups.map(el => ({
-                            value: el.id,
-                            label: el.title,
-                        }))}
-                    />
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Статус"
-                        value={modalEditStatus}
-                        maxMenuHeight={120}
-                        onChange={handleModalEditStatus}
-                        isSearchable={true}
-                        options={allStatus.map(el =>
-                        ({
-                            value: el.id,
-                            label: el.title
-                        }))}
-                    />
+                    <div style={{ marginBottom: '20px' }}>
+
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Группа"
+                            value={modalEditGroup}
+                            maxMenuHeight={120}
+                            onChange={handleModalEditGroup}
+                            isSearchable={true}
+                            options={allGroups.map(el => ({
+                                value: el.id,
+                                label: el.title,
+                            }))}
+                        />
+                        {(errorGroup !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorGroup}</p>}
+
+                    </div>
+                    <div>
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Статус"
+                            value={modalEditStatus}
+                            maxMenuHeight={120}
+                            onChange={handleModalEditStatus}
+                            isSearchable={true}
+                            options={allStatus.map(el =>
+                            ({
+                                value: el.id,
+                                label: el.title
+                            }))}
+                        />
+                        {(errorStatus !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorStatus}</p>}
+
+                    </div>
+
                     <div className='modal-button'>
                         <button onClick={() => {
                             editData();
-                            setModalEditActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
 
                         }}>Сохранить</button>
                         <button onClick={() => {
                             setModalEditActive(false);
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
+                            setErrorFirstN('');
+                            setErrorLastN('');
+                            setErrorMiddleN('');
 
+                            setLastNEdit('');
+                            setFirstNEdit('');
+                            setMiddleNEdit('');
+                            setModalEditGroup(null);
+                            setModalEditStatus(null);
                         }}>Отмена</button>
                     </div>
 

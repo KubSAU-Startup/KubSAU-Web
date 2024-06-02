@@ -29,6 +29,12 @@ function User_prof() {
     const [isLoading, setIsLoading] = useState(true);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
+    const [error, setError] = useState('');
+    const [errorEmail, setErrorEmail] = useState('');
+    const [errorFirstN, setErrorFirstN] = useState('');
+    const [errorLastN, setErrorLastN] = useState('');
+    const [errorMiddleN, setErrorMiddleN] = useState('');
+    const [errorStaff, setErrorStaff] = useState('');
 
 
 
@@ -38,15 +44,15 @@ function User_prof() {
     const [visibleItems, setVisibleItems] = useState(10);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
-    const [lastN, setLastN] = useState(null);
-    const [firstN, setFirstN] = useState(null);
-    const [middleN, setMiddleN] = useState(null);
-    const [email, setEmail] = useState(null);
+    const [lastN, setLastN] = useState('');
+    const [firstN, setFirstN] = useState('');
+    const [middleN, setMiddleN] = useState('');
+    const [email, setEmail] = useState('');
 
-    const [lastNEdit, setLastNEdit] = useState(null);
-    const [firstNEdit, setFirstNEdit] = useState(null);
-    const [middleNEdit, setMiddleNEdit] = useState(null);
-    const [emailEdit, setEmailEdit] = useState(null);
+    const [lastNEdit, setLastNEdit] = useState('');
+    const [firstNEdit, setFirstNEdit] = useState('');
+    const [middleNEdit, setMiddleNEdit] = useState('');
+    const [emailEdit, setEmailEdit] = useState('');
 
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
@@ -119,43 +125,120 @@ function User_prof() {
     };
 
     async function addData() {
-        console.log(firstN, lastN, middleN, email, modalStaff.value);
-        await addNewEmployee(firstN, lastN, middleN, email, modalStaff.value, (res) => {
-            if (res.success) {
-                setAllEmployees(prevData => [res.response, ...prevData]);
-            } else {
-                console.log(res);
+        setErrorEmail('');
+        setErrorLastN('');
+        setErrorFirstN('');
+        setErrorMiddleN('');
+        setErrorStaff('');
+        if (!isValidEmail(email) || firstN === '' || lastN === '' || middleN === '' || modalStaff === null) {
+            if (!isValidEmail(email) && email !== '') {
+                setErrorEmail('Электронный адрес записан некорректно');
             }
-        });
+            if (firstN === '') {
+                setErrorFirstN('Заполните имя');
+            }
+            if (lastN === '') {
+                setErrorLastN('Заполните фамилию');
+            }
+            if (middleN === '') {
+                setErrorMiddleN('Заполните отчество');
+            }
+            if (modalStaff === null) {
+                setErrorStaff('Выберите должность');
+            }
+        } else {
+            // console.log(firstN, lastN, middleN, email, modalStaff.value);
+            await addNewEmployee(firstN, lastN, middleN, email, modalStaff.value, (res) => {
+                if (res.success) {
+                    setAllEmployees(prevData => [res.response, ...prevData]);
+                } else {
+                    console.log(res);
+                }
+            });
+
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+            setLastN('');
+            setFirstN('');
+            setMiddleN('');
+            setEmail('');
+            setModalStaff(null);
+            setModalActive(false);
+            setErrorEmail('');
+            setErrorLastN('');
+            setErrorFirstN('');
+            setErrorMiddleN('');
+            setErrorStaff('');
+            setErrorEmail('');
+        }
+
     }
 
     async function editData() {
-        await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit.value, (res) => {
-            if (res.success) {
-                console.log(res.response);
-
-                const editData = allEmployees.map(elem => {
-                    if (elem.id === editId) {
-                        return {
-                            ...elem, // копируем все свойства из исходного объекта
-                            firstName: firstNEdit,
-                            lastName: lastNEdit,
-                            middleName: middleNEdit,
-                            email: emailEdit,
-                            type: modalStaffEdit.value
-                        };
-                    } else {
-                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-                    }
-                });
-
-                setAllEmployees(editData);
-
-
-            } else {
-                console.log(res.response);
+        setErrorEmail('');
+        setErrorLastN('');
+        setErrorFirstN('');
+        setErrorMiddleN('');
+        setErrorStaff('');
+        if (!isValidEmail(emailEdit) || firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || modalStaffEdit === null) {
+            if (!isValidEmail(emailEdit) && emailEdit !== '') {
+                setErrorEmail('Электронный адрес записан некорректно');
             }
-        });
+            if (firstNEdit === '') {
+                setErrorFirstN('Заполните имя');
+            }
+            if (lastNEdit === '') {
+                setErrorLastN('Заполните фамилию');
+            }
+            if (middleNEdit === '') {
+                setErrorMiddleN('Заполните отчетсво');
+            }
+            if (modalStaffEdit === null) {
+                setErrorStaff('Выберите должность');
+            }
+        } else {
+
+            await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit.value, (res) => {
+                if (res.success) {
+                    console.log(res.response);
+
+                    const editData = allEmployees.map(elem => {
+                        if (elem.id === editId) {
+                            return {
+                                ...elem, // копируем все свойства из исходного объекта
+                                firstName: firstNEdit,
+                                lastName: lastNEdit,
+                                middleName: middleNEdit,
+                                email: emailEdit,
+                                type: modalStaffEdit.value
+                            };
+                        } else {
+                            return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                        }
+                    });
+
+                    setAllEmployees(editData);
+
+
+                } else {
+                    console.log(res.response);
+                }
+            });
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+            setLastNEdit('');
+            setFirstNEdit('');
+            setMiddleNEdit('');
+            setEmailEdit('');
+            setModalStaffEdit(null);
+            setModalEditActive(false);
+            setErrorEmail('');
+            setErrorLastN('');
+            setErrorFirstN('');
+            setErrorMiddleN('');
+            setErrorStaff('');
+            setErrorEmail('');
+        }
     }
     async function deleteData() {
         await deleteEmployee(deleteId, (res) => {
@@ -256,6 +339,15 @@ function User_prof() {
 
     const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
+    function isValidEmail(email) {
+        if (email === '') {
+            return true;
+        } else {
+            return /\S+@\S+\.\S+/.test(email);
+
+        }
+    }
+
     const position = [
         { value: 1, label: 'Администратор' },
         { value: 2, label: 'Преподаватель' },
@@ -319,10 +411,7 @@ function User_prof() {
                             else {
                                 openModal(res.id);
                             }
-                        }}
-                    // className='department-setting'
-                    // onClick={() => handleSettingClick(res.id)}
-                    >
+                        }}>
                         <img src={require('../../img/setting.png')} alt='setting' />
                     </button>
                     {isSetOpen && selectedItemId === res.id && (
@@ -363,52 +452,69 @@ function User_prof() {
             <Empty_modal active={modalActive} setActive={setModalActive}>
 
                 <div className='modal-students'>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={lastN} onChange={e => setLastN(e.target.value)} />
-                        <label className='label-name'>Фамилия</label>
+                    {/* {error && <p style={{ color: 'red' }}>{error}</p>} */}
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={lastN} onChange={e => setLastN(e.target.value)} />
+                            <label className='label-name'>Фамилия</label>
+                        </div>
+                        {(errorLastN !== '') && <p className='inputModalError' >{errorLastN}</p>}
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={firstN} onChange={e => setFirstN(e.target.value)} />
-                        <label className='label-name'>Имя</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={firstN} onChange={e => setFirstN(e.target.value)} />
+                            <label className='label-name'>Имя</label>
+                        </div>
+                        {(errorFirstN !== '') && <p className='inputModalError' >{errorFirstN}</p>}
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={middleN} onChange={e => setMiddleN(e.target.value)} />
-                        <label className='label-name'>Отчество</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={middleN} onChange={e => setMiddleN(e.target.value)} />
+                            <label className='label-name'>Отчество</label>
+                        </div>
+                        {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={email} onChange={e => setEmail(e.target.value)} />
-                        <label className='label-name'>e-mail</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={email} onChange={e => setEmail(e.target.value)} />
+                            <label className='label-name'>e-mail</label>
+                        </div>
+                        {(errorEmail && email !== '') && <p className='inputModalError' >{errorEmail}</p>}
                     </div>
+                    <div>
 
-
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Должность"
-                        value={modalStaff}
-                        maxMenuHeight={120}
-                        onChange={handleModalStaff}
-                        isSearchable={true}
-                        options={position}
-                    />
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Должность"
+                            value={modalStaff}
+                            maxMenuHeight={120}
+                            onChange={handleModalStaff}
+                            isSearchable={true}
+                            options={position}
+                        />
+                        {(errorStaff !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }}>{errorStaff}</p>}
+                    </div>
 
                     <div className='modal-button'>
                         <button onClick={() => {
+                            addData();
+
+                        }}>Сохранить</button>
+                        <button onClick={() => {
+
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
-
-                            addData();
                             setLastN('');
                             setFirstN('');
                             setMiddleN('');
                             setEmail('');
                             setModalStaff(null);
                             setModalActive(false);
-                        }}>Сохранить</button>
-                        <button onClick={() => {
-                            setModalActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
-
+                            setErrorLastN('');
+                            setErrorFirstN('');
+                            setErrorMiddleN('');
+                            setErrorStaff('');
+                            setErrorEmail('');
                         }}>Отмена</button>
                     </div>
 
@@ -417,45 +523,73 @@ function User_prof() {
 
             <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
                 <div className='modal-students'>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={lastNEdit} onChange={e => setLastNEdit(e.target.value)} />
-                        <label className='label-name'>Фамилия</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={lastNEdit} onChange={e => setLastNEdit(e.target.value)} />
+                            <label className='label-name'>Фамилия</label>
+                        </div>
+                        {(errorLastN !== '') && <p className='inputModalError' >{errorLastN}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={firstNEdit} onChange={e => setFirstNEdit(e.target.value)} />
-                        <label className='label-name'>Имя</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={firstNEdit} onChange={e => setFirstNEdit(e.target.value)} />
+                            <label className='label-name'>Имя</label>
+                        </div>
+                        {(errorFirstN !== '') && <p className='inputModalError' >{errorFirstN}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
-                        <label className='label-name'>Отчество</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
+                            <label className='label-name'>Отчество</label>
+                        </div>
+                        {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-stud' placeholder=' ' value={emailEdit} onChange={e => setEmailEdit(e.target.value)} />
-                        <label className='label-name'>e-mail</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-stud' placeholder=' ' value={emailEdit} onChange={e => setEmailEdit(e.target.value)} />
+                            <label className='label-name'>e-mail</label>
+                        </div>
+                        {(errorEmail !== '') && <p className='inputModalError' >{errorEmail}</p>}
+
                     </div>
+                    <div>
 
 
-                    <Select
-                        styles={customStylesModal}
-                        placeholder="Должность"
-                        value={modalStaffEdit}
-                        maxMenuHeight={120}
-                        onChange={handleModalStaffEdit}
-                        isSearchable={true}
-                        options={position}
-                    />
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Должность"
+                            value={modalStaffEdit}
+                            maxMenuHeight={120}
+                            onChange={handleModalStaffEdit}
+                            isSearchable={true}
+                            options={position}
+                        />
+                        {(errorStaff !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }}>{errorStaff}</p>}
+
+                    </div>
+
                     <div className='modal-button'>
                         <button onClick={() => {
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
-
                             editData();
-                            setModalEditActive(false);
                         }}>Сохранить</button>
                         <button onClick={() => {
-                            setModalEditActive(false);
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
+                            setLastNEdit('');
+                            setFirstNEdit('');
+                            setMiddleNEdit('');
+                            setEmailEdit('');
+                            setModalStaffEdit(null);
+                            setModalEditActive(false);
+                            setErrorEmail('');
+                            setErrorLastN('');
+                            setErrorFirstN('');
+                            setErrorMiddleN('');
+                            setErrorStaff('');
+                            setErrorEmail('');
 
                         }}>Отмена</button>
                     </div>

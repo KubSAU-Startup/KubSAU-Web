@@ -502,39 +502,39 @@ async function getDataForQR(callback) {
 //     })
 // }
 
-async function getDisciplinesForPrograms(callback) {
-    const url = `${baseUrl_test}/qr/programs/disciplines`;
+// async function getDisciplinesForPrograms(callback) {
+//     const url = `${baseUrl_test}/qr/programs/disciplines`;
 
-    await axios.get(url, {
-        params: {
-            extended: true
-        }
-    }).then((res) => {
-        callback(res.data);
-    }).catch((error) => {
-        console.log(error)
-    })
-}
+//     await axios.get(url, {
+//         params: {
+//             extended: true
+//         }
+//     }).then((res) => {
+//         callback(res.data);
+//     }).catch((error) => {
+//         console.log(error)
+//     })
+// }
 
-async function getGroups(callback) {
-    const url = `${baseUrl_test}/qr/groups`;
+// async function getGroups(callback) {
+//     const url = `${baseUrl_test}/qr/groups`;
 
-    await axios.get(url).then((res) => {
-        callback(res.data);
-    }).catch((error) => {
-        console.log(error)
-    })
-}
+//     await axios.get(url).then((res) => {
+//         callback(res.data);
+//     }).catch((error) => {
+//         console.log(error)
+//     })
+// }
 
-async function getStudents(groupId, callback) {
-    const url = `${baseUrl_test}/qr/groups/${groupId}/students`;
+// async function getStudents(groupId, callback) {
+//     const url = `${baseUrl_test}/qr/groups/${groupId}/students`;
 
-    await axios.get(url).then((res) => {
-        callback(res.data);
-    }).catch((error) => {
-        console.log(error)
-    })
-}
+//     await axios.get(url).then((res) => {
+//         callback(res.data);
+//     }).catch((error) => {
+//         console.log(error)
+//     })
+// }
 
 async function getAllDisciplines(callback) {
     const url = `${baseUrl_test}/disciplines`;
@@ -579,8 +579,11 @@ function getTextError(data) {
 
 export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
-    getAllStudents, getTextError, getDataForQR, getDisciplinesForPrograms, getGroups, getStudents, getAllDisciplines,
-    getAllWorkTypes, getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
+    getAllStudents, getTextError, getDataForQR, 
+    // getDisciplinesForPrograms, getGroups, getStudents, 
+    getAllDisciplines,
+    getAllWorkTypes, 
+    getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
     searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines, deleteWork
 }

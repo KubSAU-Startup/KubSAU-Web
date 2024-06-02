@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { addNewDepartment, deleteDepartment, editDepartment, getAllDepartments, getTextError } from '../../network';
 import Empty_modal from '../Modal/Empty_modal';
-
+import MaskInput from 'react-maskinput';
 
 function Admin_department() {
     const [modalActive, setModalActive] = useState(false);
@@ -23,19 +23,19 @@ function Admin_department() {
     const [textError, setTextError] = useState('');
     // const [getProgId, setGetProgId] = useState(null);
     const [cartStates, setCartStates] = useState({});
-    const [titleDepartment, setTitleDepartment] = useState(null);
-    const [phoneDepartment, setPhoneDepartment] = useState(null);
+    const [titleDepartment, setTitleDepartment] = useState('');
+    const [phoneDepartment, setPhoneDepartment] = useState('');
+    const [errorPhone, setErrorPhone] = useState('');
+    const [errorTitle, setErrorTitle] = useState('');
 
-    const [newTitle, setNewTitle] = useState(null);
-    const [newPhone, setNewPhone] = useState(null);
+    const [newTitle, setNewTitle] = useState('');
+    const [newPhone, setNewPhone] = useState('');
 
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
 
     const [visibleItems, setVisibleItems] = useState(30);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
-
-    const [newDepartment, setNewDepartment] = useState({});
 
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
@@ -109,15 +109,35 @@ function Admin_department() {
         }));
     };
     async function addDepartment() {
-        await addNewDepartment(titleDepartment, phoneDepartment, (res) => {
-            if (res.success) {
-                // console.log('rfquhjweoruiqew', res.response);
-                // console.log('rfquhjweoruiqew', allDepartments);
-                setAllDepartments(prevData => [res.response, ...prevData]);
-            } else {
-                console.log(res);
+        setErrorTitle('');
+        setErrorPhone('');
+        if (titleDepartment === '' || phoneDepartment === '' || phoneDepartment === '+7 (___) ___-__-__') {
+
+            if (titleDepartment === '') {
+                setErrorTitle('Заполните название кафедры');
             }
-        });
+            if (phoneDepartment === '' || phoneDepartment === '+7 (___) ___-__-__') {
+                setErrorPhone('Заполните телефон кафедры');
+            }
+
+        } else {
+            await addNewDepartment(titleDepartment, phoneDepartment, (res) => {
+                if (res.success) {
+                    // console.log('rfquhjweoruiqew', res.response);
+                    // console.log('rfquhjweoruiqew', allDepartments);
+                    setAllDepartments(prevData => [res.response, ...prevData]);
+                } else {
+                    console.log(res);
+                }
+            });
+            setModalActive(false);
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+            setTitleDepartment('');
+            setPhoneDepartment('');
+            setErrorPhone('');
+            setErrorTitle('');
+        }
     }
 
     useEffect(() => {
@@ -139,27 +159,47 @@ function Admin_department() {
     }, [allDepartments])
 
     async function editData(index, title, phone) {
-        await editDepartment(index, title, phone, (res) => {
-            if (res.success) {
+        setErrorTitle('');
+        setErrorPhone('');
+        if (newTitle === '' || newPhone === '' || newPhone === '+7 (___) ___-__-__') {
 
-                const editDepartments = allDepartments.map(elem => {
-                    if (elem.id === index) {
-                        return {
-                            ...elem, // копируем все свойства из исходного объекта
-                            title: title, // обновляем поле title
-                            phone: phone // обновляем поле phone
-                        };
-                    } else {
-                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-                    }
-                });
-
-                setAllDepartments(editDepartments);
-
-            } else {
-                console.log(res.response);
+            if (newTitle === '') {
+                setErrorTitle('Заполните название кафедры');
             }
-        });
+            if (newPhone === '' || newPhone === '+7 (___) ___-__-__') {
+                setErrorPhone('Заполните телефон кафедры');
+            }
+
+        } else {
+            await editDepartment(index, title, phone, (res) => {
+                if (res.success) {
+
+                    const editDepartments = allDepartments.map(elem => {
+                        if (elem.id === index) {
+                            return {
+                                ...elem, // копируем все свойства из исходного объекта
+                                title: title, // обновляем поле title
+                                phone: phone // обновляем поле phone
+                            };
+                        } else {
+                            return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                        }
+                    });
+
+                    setAllDepartments(editDepartments);
+
+                } else {
+                    console.log(res.response);
+                }
+            });
+            setModalEditActive(false);
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+            setNewTitle('');
+            setNewPhone('');
+            setErrorPhone('');
+            setErrorTitle('');
+        }
 
     }
 
@@ -286,21 +326,27 @@ function Admin_department() {
             )}
             <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-department'>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-dapartment' placeholder=' ' value={titleDepartment} onChange={e => setTitleDepartment(e.target.value)} />
-                        <label className='label-name'>Название кафедры</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-dapartment' placeholder=' ' value={titleDepartment} onChange={e => setTitleDepartment(e.target.value)} />
+                            <label className='label-name'>Название кафедры</label>
+                        </div>
+                        {(errorTitle !== '') && <p className='inputModalError' >{errorTitle}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='phone-dapartment' placeholder=' ' value={phoneDepartment} onChange={e => setPhoneDepartment(e.target.value)} />
-                        <label className='label-name'>Номер телефона</label>
+                    <div>
+
+                        <div className='input-conteiner'>
+                            <MaskInput alwaysShowMask mask={'+7 (000) 000-00-00'} size={20} showMask maskChar="_" className='phone-dapartment' placeholder=' ' value={phoneDepartment} onChange={e => setPhoneDepartment(e.target.value)} />
+                            <label className='label-name'>Номер телефона</label>
+                        </div>
+                        {(errorPhone !== '') && <p className='inputModalError' >{errorPhone}</p>}
+
                     </div>
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
-                        addDepartment(); setModalActive(false); document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
-
-                        setTitleDepartment(''); setPhoneDepartment('');
+                        addDepartment();
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
@@ -309,22 +355,37 @@ function Admin_department() {
             </Empty_modal>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
                 <div className='modal-department'>
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-dapartment' placeholder=' ' value={newTitle} onChange={e => setNewTitle(e.target.value)} />
-                        <label className='label-name'>Название кафедры</label>
+                    <div>
+                        <div className='input-conteiner'>
+                            <input type='text' className='name-dapartment' placeholder=' ' value={newTitle} onChange={e => setNewTitle(e.target.value)} />
+                            <label className='label-name'>Название кафедры</label>
+                        </div>
+                        {(errorTitle !== '') && <p className='inputModalError' >{errorTitle}</p>}
+
                     </div>
-                    <div className='input-conteiner'>
-                        <input type='text' className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} />
-                        <label className='label-name'>Номер телефона</label>
+                    <div>
+                        <div className='input-conteiner'>
+                        <MaskInput alwaysShowMask mask={'+7 (000) 000-00-00'} size={20} showMask maskChar="_" className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} />
+
+                            {/* <input type='text' className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} /> */}
+                            <label className='label-name'>Номер телефона</label>
+                        </div>
+                        {(errorPhone !== '') && <p className='inputModalError' >{errorPhone}</p>}
+
                     </div>
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
-                        editData(editId, newTitle, newPhone); setModalEditActive(false);
-                        document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                        editData(editId, newTitle, newPhone);
                     }}>Сохранить</button>
                     <button onClick={() => {
-                        setModalEditActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                        setModalEditActive(false);
+                        document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
+                        setErrorPhone('');
+                        setErrorTitle('');
+                        setTitleDepartment('');
+                        setPhoneDepartment('');
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
@@ -333,10 +394,18 @@ function Admin_department() {
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
                         <button onClick={() => {
-                            deleteData(deleteId); setModalDeleteActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                            deleteData(deleteId);
+                            setModalDeleteActive(false);
+
                         }}>Удалить</button>
                         <button onClick={() => {
-                            setModalDeleteActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                            setModalDeleteActive(false);
+                            document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
+                            setErrorPhone('');
+                            setErrorTitle('');
+                            setNewPhone('');
+                            setNewTitle('');
                         }}>Отмена</button>
                     </div>
                 </div>

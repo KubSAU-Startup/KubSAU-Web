@@ -35,6 +35,7 @@ function Admin_main() {
     const [workTypeEdit, setWorkTypeEdit] = useState(null);
     const [departmentEdit, setDepartmentEdit] = useState(null);
     const [titleEdit, setTitleEdit] = useState(null);
+    const [errorTitle, setErrorTitle] = useState('');
 
     // переменная для получения данных карточек из бэка
     const [mainData, setMainData] = useState([]);
@@ -212,40 +213,48 @@ function Admin_main() {
     }, [offset, limit, journalParam, debouncedInputValue]);
 
     async function editData() {
-
-        console.log(dateTime);
-
-        // console.log(timestamp);
-
         if (workTypeEdit !== 'Курсовая')
-            setTitleEdit(null);
+            setTitleEdit('');
 
-        await editWork(editId, dateTime, titleEdit, (res) => {
-            if (res.success) {
-                console.log(res.response);
+        setErrorTitle('');
 
-                const editWork = mainData.map(elem => {
-                    if (elem.work.id === editId) {
-                        return {
-                            ...elem, // копируем все свойства из исходного объекта
-                            work: {
-                                ...elem.work,
-                                registrationDate: dateTime,
-                                title: titleEdit
-                            }
+        if (titleEdit === '') {
+            setErrorTitle('Введите название работы');
+        } else {
 
-                        };
-                    } else {
-                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-                    }
-                });
+            await editWork(editId, dateTime, titleEdit, (res) => {
+                if (res.success) {
+                    console.log(res.response);
 
-                setMainData(editWork);
+                    const editWork = mainData.map(elem => {
+                        if (elem.work.id === editId) {
+                            return {
+                                ...elem, // копируем все свойства из исходного объекта
+                                work: {
+                                    ...elem.work,
+                                    registrationDate: dateTime,
+                                    title: titleEdit
+                                }
 
-            } else {
-                console.log(res.response);
-            }
-        });
+                            };
+                        } else {
+                            return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                        }
+                    });
+
+                    setMainData(editWork);
+
+                } else {
+                    console.log(res.response);
+                }
+            });
+
+            setModalEditActive(false);
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+            setErrorTitle('');
+            setTitleEdit('');
+        }
     }
 
     async function deleteData() {
@@ -574,24 +583,27 @@ function Admin_main() {
                         </div>
 
                     </div>
-                    {workTypeEdit === 'Курсовая' && <div className='input-conteiner'>
-                        <input type='text' className='name-dapartment' placeholder=' ' value={titleEdit} onChange={e => setTitleEdit(e.target.value)} />
-                        <label className='label-name'>Название работы</label>
-                    </div>}
+                    <div>
+                        {workTypeEdit === 'Курсовая' && <div className='input-conteiner'>
+                            <input type='text' className='name-dapartment' placeholder=' ' value={titleEdit} onChange={e => setTitleEdit(e.target.value)} />
+                            <label className='label-name'>Название работы</label>
+                        </div>}
+                        {(errorTitle !== '') && <p className='inputModalError' >{errorTitle}</p>}
+
+                    </div>
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
                         editData();
-                        setModalEditActive(false);
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
+
 
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
                         document.body.style.paddingRight = `0px`;
-
+                        setTitleEdit('');
+                        setErrorTitle('');
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
