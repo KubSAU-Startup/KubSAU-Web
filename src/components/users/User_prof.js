@@ -190,7 +190,7 @@ function User_prof() {
                 setErrorLastN('Заполните фамилию');
             }
             if (middleNEdit === '') {
-                setErrorMiddleN('Заполните отчетсво');
+                setErrorMiddleN('Заполните отчество');
             }
             if (modalStaffEdit === null) {
                 setErrorStaff('Выберите должность');
