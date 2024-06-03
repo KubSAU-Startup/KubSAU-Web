@@ -27,7 +27,11 @@ function Admin_groups() {
     const [textError, setTextError] = useState('');
     const [cartStates, setCartStates] = useState({});
     const [numberGroup, setNumberGroup] = useState('');
-    const [newNumberGroup, setNewNumberGroup] = useState(null);
+    const [newNumberGroup, setNewNumberGroup] = useState('');
+
+    const [errorHead, setErrorHead] = useState(null);
+    const [errorDir, setErrorDir] = useState(null);
+    const [errorGroup, setErrorGroup] = useState(null);
 
 
     const [newDirectivity, setNewDirectivity] = useState(null);
@@ -137,17 +141,40 @@ function Admin_groups() {
         }));
     };
     async function addData() {
-        const group = abbGroup + numberGroup;
-        const dir = directivity.value;
-        await addNewGroup(group, dir, (res) => {
-            if (res.success) {
-                console.log('rfquhjweoruiqew', res.response);
-                // console.log('rfquhjweoruiqew', allGroups);
-                setAllGroups(prevData => [res.response, ...prevData]);
-            } else {
-                console.log(res);
+        setErrorHead('');
+        setErrorDir('');
+        setErrorGroup('');
+        if (head === null || directivity === null || numberGroup === '') {
+            if (head === null) {
+                setErrorHead('Выберите направление');
             }
-        });
+            if (directivity === null && head !== null) {
+                setErrorDir('Выберите направленность');
+            }
+            if (numberGroup === '') {
+                setErrorGroup('Заполните номер группы');
+            }
+        } else {
+            const group = abbGroup + numberGroup;
+            const dir = directivity.value;
+            await addNewGroup(group, dir, (res) => {
+                if (res.success) {
+                    console.log('rfquhjweoruiqew', res.response);
+                    // console.log('rfquhjweoruiqew', allGroups);
+                    setAllGroups(prevData => [res.response, ...prevData]);
+                } else {
+                    console.log(res);
+                }
+            });
+            setModalActive(false);
+            setHead(null);
+            setDirectivity(null);
+            setAbbGroup('');
+            setNumberGroup('');
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+        }
+
     }
 
     useEffect(() => {
@@ -168,30 +195,57 @@ function Admin_groups() {
         }
     }, [allGroups])
 
-    async function editData(index, abb, num, dir) {
-        await editGroup(index, abb, num, dir, (res) => {
-            if (res.success) {
-                console.log(res.response);
+    async function editData() {
 
-                const editGroup = allGroups.map(elem => {
-                    if (elem.id === index) {
-                        return {
-                            ...elem, // копируем все свойства из исходного объекта
-                            title: abb + num, // обновляем поле title
-                            directivityId: dir // обновляем поле phone
-                        };
-                    } else {
-                        return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-                    }
-                });
-
-                setAllGroups(editGroup);
-
-            } else {
-                console.log(res.response);
+        setErrorHead(null);
+        setErrorDir(null);
+        setErrorGroup('');
+        if (newHead === null || newDirectivity === null || newNumberGroup === '') {
+            if (newHead === null) {
+                setErrorHead('Выберите направление');
             }
-        });
+            if (newDirectivity === null && newHead !== null) {
+                setErrorDir('Выберите направленность');
+            }
+            if (newNumberGroup === '') {
+                setErrorGroup('Заполните номер группы');
+            }
+        } else {
+            await editGroup(editId, newAbbGroup, newNumberGroup, newDirectivity.value, (res) => {
+                if (res.success) {
+                    console.log(res.response);
 
+                    const editGroup = allGroups.map(elem => {
+                        if (elem.id === editId) {
+                            return {
+                                ...elem, // копируем все свойства из исходного объекта
+                                title: `${newAbbGroup}${newNumberGroup}`, // обновляем поле title
+                                directivityId: newDirectivity.value // обновляем поле phone
+                            };
+                        } else {
+                            return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+                        }
+                    });
+
+                    setAllGroups(editGroup);
+
+                } else {
+                    console.log(res.response);
+                }
+            });
+
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = `0px`;
+
+            setModalEditActive(false);
+            setNewDirectivity(null);
+            setNewAbbGroup('');
+            setNewHead('');
+            setNewNumberGroup(null);
+            setErrorHead(null);
+            setErrorDir(null);
+            setErrorGroup('');
+        }
     }
 
     async function deleteData(index) {
@@ -264,6 +318,9 @@ function Admin_groups() {
                     />
                 </div>
                 <button className='add-student' onClick={() => {
+                    setErrorHead(null);
+                    setErrorDir(null);
+                    setErrorGroup('');
                     setModalActive(true);
                     document.body.style.overflow = 'hidden';
                     document.body.style.paddingRight = `${scrollBarWidth}px`;
@@ -311,7 +368,9 @@ function Admin_groups() {
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
                                 document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                                setErrorHead(null);
+                                setErrorDir(null);
+                                setErrorGroup('');
                                 setModalEditActive(true);
                                 setEditId(res.id);
                                 allGroups.filter(el => el.id === res.id).map(r => {
@@ -348,11 +407,82 @@ function Admin_groups() {
             )}
             <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-group'>
+                    <div style={{ marginBottom: '30px' }}>
+
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Направление"
+                            value={head}
+                            onChange={handleHeadChange}
+                            isSearchable={true}
+                            isClearable={true}
+                            options={allHeads.map(res => ({
+                                value: res.id,
+                                label: res.title
+                            }
+                            ))}
+                        />
+                        {(errorHead !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorHead}</p>}
+
+                    </div>
+                    <div style={{ marginBottom: '30px' }}>
+
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Направленность"
+                            value={directivity}
+                            onChange={handledirectivityChange}
+                            isSearchable={true}
+                            isClearable={true}
+                            isDisabled={head ? false : true}
+                            options={head && allDirectivities.filter((el) => el.headId === head.value).map(res => ({
+                                value: res.id,
+                                label: res.title
+                            }))}
+
+                        />
+                        {(errorDir !== '' && head !== null) && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDir}</p>}
+
+                    </div>
+                    <div>
+                        <div className='value-input group'>
+                            {head !== null && <p>{abbGroup}</p>}
+                            <div className='input-conteiner'>
+                                <input type='text' className='name-group' placeholder=' ' value={numberGroup} onChange={e => setNumberGroup(e.target.value)} />
+                                <label className='label-name'>Номер группы</label>
+                            </div>
+                        </div>
+                        {(errorGroup !== '') && <p className='inputModalError' >{errorGroup}</p>}
+
+                    </div>
+                </div>
+                <div className='modal-button'>
+                    <button onClick={() => {
+                        addData();
+
+
+                    }}>Сохранить</button>
+
+                    <button onClick={() => {
+                        setModalActive(false);
+                        document.body.style.overflow = 'auto';
+                        document.body.style.paddingRight = `0px`;
+                        setErrorHead('');
+                        setErrorDir('');
+                        setErrorGroup('');
+                        setHead(null);
+                        setDirectivity(null);
+                        setNumberGroup('');
+                    }}>Отмена</button>
+                </div>
+            </Empty_modal>
+            <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
+                <div style={{ marginBottom: '30px' }}>
                     <Select
                         styles={customStylesModal}
                         placeholder="Направление"
-                        value={head}
-                        onChange={handleHeadChange}
+                        value={newHead}
+                        onChange={handleNewHeadChange}
                         isSearchable={true}
                         isClearable={true}
                         options={allHeads.map(res => ({
@@ -361,90 +491,54 @@ function Admin_groups() {
                         }
                         ))}
                     />
+                    {(errorHead !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorHead}</p>}
+
+                </div>
+                <div style={{ marginBottom: '30px' }}>
                     <Select
                         styles={customStylesModal}
                         placeholder="Направленность"
-                        value={directivity}
-                        onChange={handledirectivityChange}
+                        value={newDirectivity}
+                        onChange={handleNewDirectivityChange}
                         isSearchable={true}
                         isClearable={true}
-                        isDisabled={head ? false : true}
-                        options={head && allDirectivities.filter((el) => el.headId === head.value).map(res => ({
+                        isDisabled={newHead ? false : true}
+                        options={newHead && allDirectivities.filter((el) => el.headId === newHead.value).map(res => ({
                             value: res.id,
                             label: res.title
                         }))}
 
                     />
+                    {(errorDir !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDir}</p>}
+
+                </div>
+                <div>
                     <div className='value-input'>
-                        {head !== null && <p>{abbGroup}</p>}
+                        {newHead !== null && <p>{newAbbGroup}</p>}
                         <div className='input-conteiner'>
-                            <input type='text' className='name-group' placeholder=' ' value={numberGroup} onChange={e => setNumberGroup(e.target.value)} />
+                            <input type='text' className='name-group' placeholder=' ' value={newNumberGroup} onChange={e => setNewNumberGroup(e.target.value)} />
                             <label className='label-name'>Номер группы</label>
                         </div>
                     </div>
+                    {(errorGroup !== '') && <p className='inputModalError' >{errorGroup}</p>}
 
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
-                        addData(); setModalActive(false); setHead(null);
-                        setDirectivity(null); setAbbGroup(''); setNumberGroup('');
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
+                        editData();
 
-                    }}>Сохранить</button>
-
-                    <button onClick={() => {
-                        setModalActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
-                    }}>Отмена</button>
-                </div>
-            </Empty_modal>
-            <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
-                <Select
-                    styles={customStylesModal}
-                    placeholder="Направление"
-                    value={newHead}
-                    onChange={handleNewHeadChange}
-                    isSearchable={true}
-                    isClearable={true}
-                    options={allHeads.map(res => ({
-                        value: res.id,
-                        label: res.title
-                    }
-                    ))}
-                />
-                <Select
-                    styles={customStylesModal}
-                    placeholder="Направленность"
-                    value={newDirectivity}
-                    onChange={handleNewDirectivityChange}
-                    isSearchable={true}
-                    isClearable={true}
-                    isDisabled={newHead ? false : true}
-                    options={newHead && allDirectivities.filter((el) => el.headId === newHead.value).map(res => ({
-                        value: res.id,
-                        label: res.title
-                    }))}
-
-                />
-                <div className='value-input'>
-                    {newHead !== null && <p>{newAbbGroup}</p>}
-                    <div className='input-conteiner'>
-                        <input type='text' className='name-group' placeholder=' ' value={newNumberGroup} onChange={e => setNewNumberGroup(e.target.value)} />
-                        <label className='label-name'>Номер группы</label>
-                    </div>
-                </div>
-                <div className='modal-button'>
-                    <button onClick={() => {
-                        editData(editId, newAbbGroup, newNumberGroup, newDirectivity.value);
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
-
-                        setModalEditActive(false); setNewDirectivity(null); setNewAbbGroup(null); setNewHead(null); setNewNumberGroup(null)
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
                         document.body.style.paddingRight = `0px`;
+                        setErrorDir('');
+                        setErrorHead('');
+                        setErrorGroup('');
+                        setNewHead(null);
+                        setNewDirectivity(null);
+                        setNewAbbGroup('');
+                        setNewNumberGroup('');
 
                     }}>Отмена</button>
                 </div>

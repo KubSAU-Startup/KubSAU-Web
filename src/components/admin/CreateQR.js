@@ -22,6 +22,9 @@ function CreateQR() {
   const [emptyModalActive, setEmptyModalActive] = useState(false);
   const [editModalActive, setEditModalActive] = useState(false);
   const [userStates, setUserStates] = useState({});
+  const [errorGroup, setErrorGroup] = useState('');
+  const [errorDis, setErrorDis] = useState('');
+  const [errorType, setErrorType] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -388,6 +391,7 @@ function CreateQR() {
     setEditModalActive(false);
     document.body.style.overflow = 'auto';
     document.body.style.paddingRight = `0px`;
+  
 
   };
 
@@ -409,21 +413,37 @@ function CreateQR() {
   }
 
   const getQR = () => {
-    console.log(groupQR);
-    for (const group of groupQR) {
-      selectGroups = selectGroups + group.value + ',';
-    }
-    if (selectGroups !== '') {
-      getStudentsByGroups(selectGroups, (res) => {
-        if (res.error) {
-          setTextError(getTextError(res.error));
-          setErrorActive(true);
-          setIsLoading(false);
-        } else {
-          setStudQR(res.response);
-          console.log(res.response)
-        }
-      });
+
+    setErrorGroup('');
+
+    if (groupQR.length === 0) {
+
+
+      setErrorGroup('Выберите группу(ы)');
+
+
+    } else {
+      console.log(groupQR);
+      for (const group of groupQR) {
+        selectGroups = selectGroups + group.value + ',';
+      }
+      if (selectGroups !== '') {
+        getStudentsByGroups(selectGroups, (res) => {
+          if (res.error) {
+            setTextError(getTextError(res.error));
+            setErrorActive(true);
+            setIsLoading(false);
+          } else {
+            setStudQR(res.response);
+            console.log(res.response)
+          }
+        });
+      }
+      setEmptyModalActive(false);
+      document.body.style.overflow = 'auto';
+      document.body.style.paddingRight = `0px`;
+      setErrorGroup('');
+
     }
   }
 
@@ -526,21 +546,36 @@ function CreateQR() {
   }
 
   const addDiscipline = () => {
-    if (newDisc && newTypes) {
-      setEditTypes(prevState => ({
-        ...prevState,
-        [newDisc.value]: newTypes
-      }));
-      setCopyData(prevState => {
-        const updatedProgram = prevState.find(res => res.program.id === idProgram);
-        if (updatedProgram) {
-          updatedProgram.disciplines = [{ id: newDisc.value, title: newDisc.label, workTypeId: newTypes.value, departmentId: allDisciplines.find(r => r.id === newDisc.value).departmentId }, ...updatedProgram.disciplines];
-        }
-        return [...prevState];
-      });
-      setNewDisc(null);
-      setNewType(null);
+    setErrorDis('');
+    setErrorType('');
+    if (newDisc === null || newTypes === null) {
+
+      if (newDisc === null) {
+        setErrorDis('Выберите дисциплину');
+      }
+      if (newTypes === null) {
+        setErrorType('Выберите тип работы');
+      }
+    } else {
+      if (newDisc && newTypes) {
+        setEditTypes(prevState => ({
+          ...prevState,
+          [newDisc.value]: newTypes
+        }));
+        setCopyData(prevState => {
+          const updatedProgram = prevState.find(res => res.program.id === idProgram);
+          if (updatedProgram) {
+            updatedProgram.disciplines = [{ id: newDisc.value, title: newDisc.label, workTypeId: newTypes.value, departmentId: allDisciplines.find(r => r.id === newDisc.value).departmentId }, ...updatedProgram.disciplines];
+          }
+          return [...prevState];
+        });
+        setNewDisc(null);
+        setNewType(null);
+        setErrorDis('');
+        setErrorType('');
+      }
     }
+
   };
 
   const deleteData = (disciplineId) => {
@@ -707,9 +742,9 @@ function CreateQR() {
             <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
               <button className='btn-create-qr' onClick={() => {
                 document.body.style.overflow = 'hidden';
-                    document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-
+                document.body.style.paddingRight = `${scrollBarWidth}px`;
+                setErrorGroup('');
+                setGroupQR([]);
                 setIdProgram(value.program.id);
                 setDirectivityId(value.directivity.id);
                 setEmptyModalActive(true)
@@ -719,7 +754,10 @@ function CreateQR() {
               <button onClick={() => {
                 document.body.style.overflow = 'hidden';
                 document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                setErrorDis('');
+                setErrorType('');
+                setNewDisc(null);
+                setNewType(null);
                 setIdProgram(value.program.id);
                 setTitleProgram(`${value.directivity.title}, ${value.grade.title.toLowerCase()}, ${value.program.semester} семестр`);
                 setEditModalActive(true);
@@ -759,14 +797,12 @@ function CreateQR() {
                 label: res.title
               })
               )} />
+            {(errorGroup !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorGroup}</p>}
+
           </div>
           <div className='modal-button'>
             <button onClick={() => {
               getQR();
-              setEmptyModalActive(false);
-              document.body.style.overflow = 'auto';
-              document.body.style.paddingRight = `0px`;
-
 
             }}>Сгенерировать</button>
 
@@ -785,26 +821,34 @@ function CreateQR() {
         <div className='modal-disciplines'>
           <p><b>{titleProgram}</b></p>
           <div className='add-content'>
-            <Select
-              styles={customStylesTypeOfWork}
-              placeholder="Дисциплина"
-              value={newDisc}
-              onChange={handleNewDisciplineChange}
-              isSearchable={true}
-              options={allDisciplines.map(res => ({
-                value: res.id,
-                label: res.title
-              }))} />
-            <Select
-              styles={customStylesTypeOfWork}
-              placeholder="Тип работы"
-              value={newTypes}
-              onChange={handleNewWorkTypeChange}
-              isSearchable={true}
-              options={allWorkTypes.map(res => ({
-                value: res.id,
-                label: res.title
-              }))} />
+            <div>
+              <Select
+                styles={customStylesTypeOfWork}
+                placeholder="Дисциплина"
+                value={newDisc}
+                onChange={handleNewDisciplineChange}
+                isSearchable={true}
+                options={allDisciplines.map(res => ({
+                  value: res.id,
+                  label: res.title
+                }))} />
+              {(errorDis !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDis}</p>}
+
+            </div>
+            <div>
+              <Select
+                styles={customStylesTypeOfWork}
+                placeholder="Тип работы"
+                value={newTypes}
+                onChange={handleNewWorkTypeChange}
+                isSearchable={true}
+                options={allWorkTypes.map(res => ({
+                  value: res.id,
+                  label: res.title
+                }))} />
+              {(errorType !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorType}</p>}
+
+            </div>
             <button onClick={addDiscipline}>
               <FontAwesomeIcon icon={faCheckCircle} />
             </button>
@@ -825,7 +869,7 @@ function CreateQR() {
                       label: res.title
                     }))} />
 
-                  <button onClick={() => {deleteData(val.id); console.log(programQR.find(res => res.program.id === idProgram))}}>
+                  <button onClick={() => { deleteData(val.id); console.log(programQR.find(res => res.program.id === idProgram)) }}>
                     <FontAwesomeIcon icon={faXmarkCircle} />
                   </button>
                 </div>

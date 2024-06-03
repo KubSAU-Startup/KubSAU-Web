@@ -21,7 +21,7 @@
 }
 
 .name-group{
-    width: 400px;
+    width: 200px;
     border: none;
     border-bottom: 1px solid #919191;
     outline: 0;
@@ -44,3 +44,8 @@
     font-size: 12px;
     color: #4a4a4a;
 }
+
+.value-input.group p{
+    margin-right: 15px
+}
+

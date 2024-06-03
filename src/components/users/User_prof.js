@@ -164,7 +164,6 @@ function User_prof() {
             setEmail('');
             setModalStaff(null);
             setModalActive(false);
-            setErrorEmail('');
             setErrorLastN('');
             setErrorFirstN('');
             setErrorMiddleN('');
@@ -232,7 +231,6 @@ function User_prof() {
             setEmailEdit('');
             setModalStaffEdit(null);
             setModalEditActive(false);
-            setErrorEmail('');
             setErrorLastN('');
             setErrorFirstN('');
             setErrorMiddleN('');
@@ -382,7 +380,11 @@ function User_prof() {
                 setModalActive(true);
                 document.body.style.overflow = 'hidden';
                 document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                setErrorLastN('');
+                setErrorFirstN('');
+                setErrorMiddleN('');
+                setErrorStaff('');
+                setErrorEmail('');
             }}>
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button>
@@ -419,7 +421,11 @@ function User_prof() {
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
                                 document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                                setErrorLastN('');
+                                setErrorFirstN('');
+                                setErrorMiddleN('');
+                                setErrorStaff('');
+                                setErrorEmail('');
                                 setModalEditActive(true);
                                 setFirstNEdit(res.firstName);
                                 setLastNEdit(res.lastName);
@@ -584,7 +590,6 @@ function User_prof() {
                             setEmailEdit('');
                             setModalStaffEdit(null);
                             setModalEditActive(false);
-                            setErrorEmail('');
                             setErrorLastN('');
                             setErrorFirstN('');
                             setErrorMiddleN('');

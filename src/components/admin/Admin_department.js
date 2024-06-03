@@ -254,7 +254,8 @@ function Admin_department() {
                     setModalActive(true);
                     document.body.style.overflow = 'hidden';
                     document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                    setErrorPhone('');
+                    setErrorTitle('');
                 }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
@@ -298,7 +299,8 @@ function Admin_department() {
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
                                 document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                                setErrorPhone('');
+                                setErrorTitle('');
                                 setModalEditActive(true);
                                 setEditId(res.id);
                                 allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
@@ -349,7 +351,13 @@ function Admin_department() {
                         addDepartment();
                     }}>Сохранить</button>
                     <button onClick={() => {
-                        setModalActive(false); document.body.style.overflow = 'auto'; document.body.style.paddingRight = `0px`;
+                        setModalActive(false); 
+                        document.body.style.overflow = 'auto'; 
+                        document.body.style.paddingRight = `0px`;
+                        setErrorPhone('');
+                        setErrorTitle('');
+                        setTitleDepartment('');
+                        setPhoneDepartment('');
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
@@ -365,7 +373,7 @@ function Admin_department() {
                     </div>
                     <div>
                         <div className='input-conteiner'>
-                        <MaskInput alwaysShowMask mask={'+7 (000) 000-00-00'} size={20} showMask maskChar="_" className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} />
+                            <MaskInput alwaysShowMask mask={'+7 (000) 000-00-00'} size={20} showMask maskChar="_" className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} />
 
                             {/* <input type='text' className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} /> */}
                             <label className='label-name'>Номер телефона</label>
@@ -382,10 +390,12 @@ function Admin_department() {
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
                         document.body.style.paddingRight = `0px`;
+
+
                         setErrorPhone('');
                         setErrorTitle('');
-                        setTitleDepartment('');
-                        setPhoneDepartment('');
+                        setNewPhone('');
+                        setNewTitle('');
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
@@ -402,10 +412,7 @@ function Admin_department() {
                             setModalDeleteActive(false);
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
-                            setErrorPhone('');
-                            setErrorTitle('');
-                            setNewPhone('');
-                            setNewTitle('');
+
                         }}>Отмена</button>
                     </div>
                 </div>

@@ -447,6 +447,8 @@ function Admin_main() {
 
                                 setEditId(entries.work.id);
                                 setDateTime(entries.work.registrationDate);
+                                setErrorTitle('');
+
                                 // setStudentEdit({ value: entries.student.id, label: entries.student.title });
                                 // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
                                 // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });

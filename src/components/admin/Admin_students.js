@@ -433,7 +433,11 @@ function Admin_students() {
             <button className='add-student' onClick={() => {
                 document.body.style.overflow = 'hidden';
                 document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                setErrorLastN('');
+                setErrorFirstN('');
+                setErrorMiddleN('');
+                setErrorGroup('');
+                setErrorStatus('');
                 setModalActive(true)
             }}>
                 <FontAwesomeIcon icon={faPlusCircle} />
@@ -510,7 +514,11 @@ function Admin_students() {
                             <button onClick={() => {
                                 document.body.style.overflow = 'hidden';
                                 document.body.style.paddingRight = `${scrollBarWidth}px`;
-
+                                setErrorLastN('');
+                                setErrorFirstN('');
+                                setErrorMiddleN('');
+                                setErrorGroup('');
+                                setErrorStatus('');
                                 setEditId(res.id);
                                 setLastNEdit(res.lastName);
                                 setFirstNEdit(res.firstName);
@@ -615,9 +623,11 @@ function Admin_students() {
                         <button onClick={() => {
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
-                            setErrorFirstN('');
                             setErrorLastN('');
+                            setErrorFirstN('');
                             setErrorMiddleN('');
+                            setErrorGroup('');
+                            setErrorStatus('');
 
                             setLastN('');
                             setFirstN('');
@@ -705,9 +715,11 @@ function Admin_students() {
                             setModalEditActive(false);
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
-                            setErrorFirstN('');
                             setErrorLastN('');
+                            setErrorFirstN('');
                             setErrorMiddleN('');
+                            setErrorGroup('');
+                            setErrorStatus('');
 
                             setLastNEdit('');
                             setFirstNEdit('');
