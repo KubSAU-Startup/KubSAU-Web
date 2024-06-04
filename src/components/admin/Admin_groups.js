@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { addNewGroup, editGroup, deleteGroup, getAllDirectivities, getAllGroups, getAllHeads, getTextError } from '../../network';
 import Empty_modal from '../Modal/Empty_modal';
+import Error_empty from '../Modal/Error_empty';
+import Error_ok from '../Modal/Error_ok';
 import { customStylesModal, customStylesTypeOfWork } from '../Select_style/Select_style';
 
 function Admin_groups() {
@@ -43,7 +45,9 @@ function Admin_groups() {
 
     const [abbGroup, setAbbGroup] = useState('');
     const [newAbbGroup, setNewAbbGroup] = useState('');
-
+    const [codeText, setCodeText] = useState('');
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+    const [errorOkActive, setErrorOkActive] = useState(false);
 
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
@@ -82,6 +86,7 @@ function Admin_groups() {
 
     useEffect(() => {
         setVisibleItems(30);
+        setIsLoading(true);
         getAllGroups((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -90,6 +95,11 @@ function Admin_groups() {
                 setAllGroups(res.response);
                 setSearchResults(res.response.reverse());
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         });
 
@@ -101,6 +111,11 @@ function Admin_groups() {
                 setAllDirectivities(res.response.directivities);
             }
             setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         });
 
         getAllHeads((res) => {
@@ -110,6 +125,11 @@ function Admin_groups() {
             } else {
                 setAllHeads(res.response.heads);
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         });
 
@@ -141,6 +161,8 @@ function Admin_groups() {
         }));
     };
     async function addData() {
+        setIsLoading(true);
+
         setErrorHead('');
         setErrorDir('');
         setErrorGroup('');
@@ -154,23 +176,28 @@ function Admin_groups() {
             if (numberGroup === '') {
                 setErrorGroup('Заполните номер группы');
             }
+            setIsLoading(false);
+
         } else {
             const group = abbGroup + numberGroup;
             const dir = directivity.value;
             await addNewGroup(group, dir, (res) => {
                 if (res.success) {
-                    console.log('rfquhjweoruiqew', res.response);
-                    // console.log('rfquhjweoruiqew', allGroups);
                     setAllGroups(prevData => [res.response, ...prevData]);
                 } else {
-                    console.log(res);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorEmptyActive(true);
                 }
+                setIsLoading(false);
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
             setModalActive(false);
-            setHead(null);
-            setDirectivity(null);
-            setAbbGroup('');
-            setNumberGroup('');
+
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
         }
@@ -196,6 +223,7 @@ function Admin_groups() {
     }, [allGroups])
 
     async function editData() {
+        setIsLoading(true);
 
         setErrorHead(null);
         setErrorDir(null);
@@ -210,11 +238,11 @@ function Admin_groups() {
             if (newNumberGroup === '') {
                 setErrorGroup('Заполните номер группы');
             }
+            setIsLoading(false);
+
         } else {
             await editGroup(editId, newAbbGroup, newNumberGroup, newDirectivity.value, (res) => {
                 if (res.success) {
-                    console.log(res.response);
-
                     const editGroup = allGroups.map(elem => {
                         if (elem.id === editId) {
                             return {
@@ -230,33 +258,45 @@ function Admin_groups() {
                     setAllGroups(editGroup);
 
                 } else {
-                    console.log(res.response);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorEmptyActive(true);
                 }
+                setIsLoading(false);
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
 
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
 
             setModalEditActive(false);
-            setNewDirectivity(null);
-            setNewAbbGroup('');
-            setNewHead('');
-            setNewNumberGroup(null);
-            setErrorHead(null);
-            setErrorDir(null);
-            setErrorGroup('');
+            
         }
     }
 
     async function deleteData(index) {
+        setIsLoading(true);
+
         await deleteGroup(index, (res) => {
             if (res.success) {
-                console.log(res.response);
                 setAllGroups(allGroups.filter((a) => a.id !== index));
 
             } else {
-                console.log(res.response);
+                setTextError(res.message);
+                setCodeText(res.code);
+                setErrorEmptyActive(true);
             }
+        setIsLoading(false);
+
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorOkActive(true);
+            setIsLoading(false);
         });
 
     }
@@ -318,10 +358,16 @@ function Admin_groups() {
                     />
                 </div>
                 <button className='add-student' onClick={() => {
-                    setErrorHead(null);
-                    setErrorDir(null);
-                    setErrorGroup('');
+                     setErrorHead('');
+                     setErrorDir('');
+                     setErrorGroup('');
+                     setHead(null);
+                     setDirectivity(null);
+                     setNumberGroup('');
+                     setAbbGroup('');
+                    
                     setModalActive(true);
+                    
                     document.body.style.overflow = 'hidden';
                     document.body.style.paddingRight = `${scrollBarWidth}px`;
 
@@ -459,20 +505,13 @@ function Admin_groups() {
                 <div className='modal-button'>
                     <button onClick={() => {
                         addData();
-
-
                     }}>Сохранить</button>
 
                     <button onClick={() => {
                         setModalActive(false);
                         document.body.style.overflow = 'auto';
                         document.body.style.paddingRight = `0px`;
-                        setErrorHead('');
-                        setErrorDir('');
-                        setErrorGroup('');
-                        setHead(null);
-                        setDirectivity(null);
-                        setNumberGroup('');
+                       
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
@@ -532,13 +571,6 @@ function Admin_groups() {
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
                         document.body.style.paddingRight = `0px`;
-                        setErrorDir('');
-                        setErrorHead('');
-                        setErrorGroup('');
-                        setNewHead(null);
-                        setNewDirectivity(null);
-                        setNewAbbGroup('');
-                        setNewNumberGroup('');
 
                     }}>Отмена</button>
                 </div>
@@ -562,6 +594,9 @@ function Admin_groups() {
                     </div>
                 </div>
             </Empty_modal>
+            <Error_modal active={errorActive} text={textError} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
         </>
     )
 }

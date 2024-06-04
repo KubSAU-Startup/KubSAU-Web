@@ -6,11 +6,12 @@ import { customStyles } from '../Select_style/Select_style';
 import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import Empty_modal from '../Modal/Empty_modal'
+import Empty_modal from '../Modal/Empty_modal';
+import Error_modal from '../Modal/Error_modal';
+import Error_empty from '../Modal/Error_empty';
+import Error_ok from '../Modal/Error_ok';
+import Loading from '../Modal/Loading';
 import { getAllDirectivities, getAllGroups, getAllStudents, getTextError, addNewStudent, editStudent, deleteStudent, searchOfStudents } from '../../network';
-
-
-const endpoint = 'https://jsonplaceholder.typicode.com/users';
 
 function Admin_students() {
     const [modalActive, setModalActive] = useState(false);
@@ -61,7 +62,9 @@ function Admin_students() {
     const [cartStates, setCartStates] = useState({});
     const [numberGroup, setNumberGroup] = useState('');
     const [newNumberGroup, setNewNumberGroup] = useState(null);
-
+    const [codeText, setCodeText] = useState('');
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+    const [errorOkActive, setErrorOkActive] = useState(false);
 
     const [newDirectivity, setNewDirectivity] = useState(null);
     const [newHead, setNewHead] = useState(null);
@@ -149,6 +152,11 @@ function Admin_students() {
                 }
             }
             setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         })
 
     }, [offset, limit, studentsParam, debouncedInputValue])
@@ -163,6 +171,11 @@ function Admin_students() {
                 setAllDirectivities(res.response);
             }
             setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         })
 
         getAllGroups((res) => {
@@ -173,6 +186,11 @@ function Admin_students() {
             } else {
                 setAllGroups(res.response);
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         })
     }, []);
@@ -197,6 +215,8 @@ function Admin_students() {
     }, [inputValue, 1000]);
 
     async function addData() {
+        setIsLoading(true);
+
         setErrorLastN('');
         setErrorFirstN('');
         setErrorMiddleN('');
@@ -219,29 +239,31 @@ function Admin_students() {
             if (modalStatus === null) {
                 setErrorStatus('Выберите статус студента');
             }
+            setIsLoading(false);
+
         } else {
             await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
                 if (res.success) {
                     setAllStudents(prevData => [res.response, ...prevData]);
                 } else {
-                    console.log(res);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorEmptyActive(true);
                 }
+                setIsLoading(false);
+
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
 
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
-
-            setLastN('');
-            setFirstN('');
-            setMiddleN('');
-            setModalGroup(null);
-            setModalStatus(null);
             setModalActive(false);
-            setErrorLastN('');
-            setErrorFirstN('');
-            setErrorMiddleN('');
-            setErrorGroup('');
-            setErrorStatus('');
+
+
         }
     }
     // console.log(searchResults)
@@ -252,6 +274,7 @@ function Admin_students() {
         setErrorMiddleN('');
         setErrorGroup('');
         setErrorStatus('');
+        setIsLoading(true);
 
         if (firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || modalEditGroup === null || modalEditStatus === null) {
 
@@ -270,10 +293,11 @@ function Admin_students() {
             if (modalEditStatus === null) {
                 setErrorStatus('Выберите статус студента');
             }
+            setIsLoading(false);
+
         } else {
             await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
                 if (res.success) {
-                    console.log(res.response);
 
                     const editStudent = allStudents.map(elem => {
                         if (elem.id === editId) {
@@ -293,33 +317,43 @@ function Admin_students() {
                     setAllStudents(editStudent);
 
                 } else {
-                    console.log(res.response);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorEmptyActive(true);
                 }
+                setIsLoading(false);
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
             setModalEditActive(false);
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
-            setLastNEdit('');
-            setFirstNEdit('');
-            setMiddleNEdit('');
-            setModalEditGroup(null);
-            setModalEditStatus(null);
-            setErrorLastN('');
-            setErrorFirstN('');
-            setErrorMiddleN('');
-            setErrorGroup('');
-            setErrorStatus('');
+
         }
     }
     async function deleteData() {
+        setIsLoading(true);
+
         await deleteStudent(deleteId, (res) => {
             if (res.success) {
                 console.log(res.response);
                 setAllStudents(allStudents.filter((a) => a.id !== deleteId));
 
             } else {
-                console.log(res.response);
+                setTextError(res.message);
+                setCodeText(res.code);
+                setErrorEmptyActive(true);
             }
+        setIsLoading(false);
+
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorOkActive(true);
+            setIsLoading(false);
         });
 
     }
@@ -385,6 +419,8 @@ function Admin_students() {
 
     return (
         <>
+         {/* окно загрузки */}
+         <Loading active={isLoading} setActive={setIsLoading} />
             <Admin_header />
             <div className='admin-main-search'>
                 <input
@@ -433,12 +469,17 @@ function Admin_students() {
             <button className='add-student' onClick={() => {
                 document.body.style.overflow = 'hidden';
                 document.body.style.paddingRight = `${scrollBarWidth}px`;
+                setLastN('');
+                setFirstN('');
+                setMiddleN('');
+                setModalGroup(null);
+                setModalStatus(null);
                 setErrorLastN('');
                 setErrorFirstN('');
                 setErrorMiddleN('');
                 setErrorGroup('');
                 setErrorStatus('');
-                setModalActive(true)
+                setModalActive(true);
             }}>
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button>
@@ -623,17 +664,7 @@ function Admin_students() {
                         <button onClick={() => {
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
-                            setErrorLastN('');
-                            setErrorFirstN('');
-                            setErrorMiddleN('');
-                            setErrorGroup('');
-                            setErrorStatus('');
-
-                            setLastN('');
-                            setFirstN('');
-                            setMiddleN('');
-                            setModalGroup(null);
-                            setModalStatus(null);
+                            
                             setModalActive(false);
                         }}>Отмена</button>
                     </div>
@@ -715,17 +746,7 @@ function Admin_students() {
                             setModalEditActive(false);
                             document.body.style.overflow = 'auto';
                             document.body.style.paddingRight = `0px`;
-                            setErrorLastN('');
-                            setErrorFirstN('');
-                            setErrorMiddleN('');
-                            setErrorGroup('');
-                            setErrorStatus('');
-
-                            setLastNEdit('');
-                            setFirstNEdit('');
-                            setMiddleNEdit('');
-                            setModalEditGroup(null);
-                            setModalEditStatus(null);
+                            
                         }}>Отмена</button>
                     </div>
 
@@ -750,6 +771,10 @@ function Admin_students() {
                     </div>
                 </div>
             </Empty_modal>
+            
+            <Error_modal active={errorActive} text={textError} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
         </>
 
     );

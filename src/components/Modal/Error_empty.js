@@ -4,22 +4,21 @@ import './Modal.css'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function Error_modal({ active, text }) {
+function Error_empty({ active, text, codeText }) {
     return (
         <div className={`modal ${active ? 'active' : ''}`}>
             <div className='modal-content'>
-                <div className='error-modal'>
-                    <div className='error-modal-header'>
+                <div className='error-modal-empty'>
+                    <div className='error-empty-header'>
                         <FontAwesomeIcon icon={faExclamationTriangle} className='error-icon' />
                         <p>Произошла ошибка:</p>
                     </div>
                     <p>{`${text}`}</p>
-                    <p>Попробуйте авторизоваться</p>
-                    <Link to='/' className='btn-to-log'>Авторизоваться</Link>
+                    <p><b>Код ошибки: </b>{`${codeText}`}</p>
                 </div>
             </div>
         </div>
     )
 }
 
-export default Error_modal
+export default Error_empty

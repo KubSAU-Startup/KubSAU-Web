@@ -6,7 +6,11 @@ import { customStyles } from '../Select_style/Select_style';
 import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import Empty_modal from '../Modal/Empty_modal'
+import Empty_modal from '../Modal/Empty_modal';
+import Error_empty from '../Modal/Error_empty';
+import Error_ok from '../Modal/Error_ok';
+import Loading from '../Modal/Loading';
+import Error_modal from '../Modal/Error_modal';
 import { addNewEmployee, editEmployee, deleteEmployee, getTextError, getAllEmployees } from '../../network';
 
 
@@ -14,7 +18,9 @@ function User_prof() {
 
     const [modalActive, setModalActive] = useState(false);
     const [filterType, setFilterType] = useState(null);
-
+    const [codeText, setCodeText] = useState('');
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+    const [errorOkActive, setErrorOkActive] = useState(false);
     const [modalStaff, setModalStaff] = useState(null);
     const [modalStaffEdit, setModalStaffEdit] = useState(null);
 
@@ -96,7 +102,11 @@ function User_prof() {
                 setSearchResults(res.response);
             }
             setIsLoading(false);
-
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         })
 
     }, []);
@@ -125,6 +135,8 @@ function User_prof() {
     };
 
     async function addData() {
+        setIsLoading(true);
+
         setErrorEmail('');
         setErrorLastN('');
         setErrorFirstN('');
@@ -146,34 +158,36 @@ function User_prof() {
             if (modalStaff === null) {
                 setErrorStaff('Выберите должность');
             }
+            setIsLoading(false);
+
         } else {
-            // console.log(firstN, lastN, middleN, email, modalStaff.value);
             await addNewEmployee(firstN, lastN, middleN, email, modalStaff.value, (res) => {
                 if (res.success) {
                     setAllEmployees(prevData => [res.response, ...prevData]);
                 } else {
-                    console.log(res);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorEmptyActive(true);
                 }
+                setIsLoading(false);
+
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
 
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
-            setLastN('');
-            setFirstN('');
-            setMiddleN('');
-            setEmail('');
-            setModalStaff(null);
+
             setModalActive(false);
-            setErrorLastN('');
-            setErrorFirstN('');
-            setErrorMiddleN('');
-            setErrorStaff('');
-            setErrorEmail('');
         }
 
     }
 
     async function editData() {
+        setIsLoading(true);
         setErrorEmail('');
         setErrorLastN('');
         setErrorFirstN('');
@@ -195,12 +209,12 @@ function User_prof() {
             if (modalStaffEdit === null) {
                 setErrorStaff('Выберите должность');
             }
+            setIsLoading(false);
+
         } else {
 
             await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit.value, (res) => {
                 if (res.success) {
-                    console.log(res.response);
-
                     const editData = allEmployees.map(elem => {
                         if (elem.id === editId) {
                             return {
@@ -215,38 +229,45 @@ function User_prof() {
                             return elem; // если элемент не подлежит изменению, возвращаем его без изменений
                         }
                     });
-
                     setAllEmployees(editData);
-
-
                 } else {
-                    console.log(res.response);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorEmptyActive(true);
                 }
+                setIsLoading(false);
+
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
-            setLastNEdit('');
-            setFirstNEdit('');
-            setMiddleNEdit('');
-            setEmailEdit('');
-            setModalStaffEdit(null);
             setModalEditActive(false);
-            setErrorLastN('');
-            setErrorFirstN('');
-            setErrorMiddleN('');
-            setErrorStaff('');
-            setErrorEmail('');
+
         }
     }
     async function deleteData() {
+        setIsLoading(true);
+
         await deleteEmployee(deleteId, (res) => {
             if (res.success) {
-                console.log(res.response);
                 setAllEmployees(allEmployees.filter((a) => a.id !== deleteId));
 
             } else {
-                console.log(res.response);
+                setTextError(res.message);
+                setCodeText(res.code);
+                setErrorEmptyActive(true);
             }
+            setIsLoading(false);
+
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorOkActive(true);
+            setIsLoading(false);
         });
 
     }
@@ -353,6 +374,8 @@ function User_prof() {
     ]
     return (
         <>
+            {/* окно загрузки */}
+            <Loading active={isLoading} setActive={setIsLoading} />
             <User_header />
             <div className='admin-main-search'>
                 <input
@@ -380,6 +403,11 @@ function User_prof() {
                 setModalActive(true);
                 document.body.style.overflow = 'hidden';
                 document.body.style.paddingRight = `${scrollBarWidth}px`;
+                setLastN('');
+                setFirstN('');
+                setMiddleN('');
+                setEmail('');
+                setModalStaff(null);
                 setErrorLastN('');
                 setErrorFirstN('');
                 setErrorMiddleN('');
@@ -620,6 +648,9 @@ function User_prof() {
                     </div>
                 </div>
             </Empty_modal>
+            <Error_modal active={errorActive} text={textError} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
         </>
 
     );

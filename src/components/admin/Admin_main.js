@@ -4,6 +4,8 @@ import Admin_header from './Admin_header';
 import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, editWork, deleteWork } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
+import Error_empty from '../Modal/Error_empty';
+
 import { customStyles, customStylesModal } from '../Select_style/Select_style';
 import Loading from '../Modal/Loading';
 import Empty_modal from '../Modal/Empty_modal';
@@ -12,6 +14,8 @@ import Flatpickr from "react-flatpickr";
 
 function Admin_main() {
     const [errorActive, setErrorActive] = useState(false);
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+
     const [textError, setTextError] = useState('');
     const [selectedWorkType, setSelectedWorkType] = useState(null);
     const [selectedDiscipline, setSelectedDiscipline] = useState(null);
@@ -36,7 +40,7 @@ function Admin_main() {
     const [departmentEdit, setDepartmentEdit] = useState(null);
     const [titleEdit, setTitleEdit] = useState(null);
     const [errorTitle, setErrorTitle] = useState('');
-
+    const [codeText, setCodeText] = useState('');
     // переменная для получения данных карточек из бэка
     const [mainData, setMainData] = useState([]);
 
@@ -98,6 +102,12 @@ function Admin_main() {
             } else {
                 setFilterWorkType(res.response);
             }
+
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         });
 
@@ -109,6 +119,11 @@ function Admin_main() {
                 setFilterDiscipline(res.response);
             }
             setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         });
 
         getFilterEmployees((res) => {
@@ -118,6 +133,11 @@ function Admin_main() {
             } else {
                 setFilterEmployees(res.response);
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         });
 
@@ -129,6 +149,11 @@ function Admin_main() {
                 setFilterGroup(res.response);
             }
             setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         });
         getFilterDepartments((res) => {
             if (res.error) {
@@ -137,6 +162,11 @@ function Admin_main() {
             } else {
                 setFilterDepartments(res.response);
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         });
     }, []);
@@ -209,10 +239,16 @@ function Admin_main() {
                 }
             }
             setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         })
     }, [offset, limit, journalParam, debouncedInputValue]);
 
     async function editData() {
+        setIsLoading(true);
         if (workTypeEdit !== 'Курсовая')
             setTitleEdit('');
 
@@ -220,11 +256,11 @@ function Admin_main() {
 
         if (titleEdit === '') {
             setErrorTitle('Введите название работы');
+            setIsLoading(false);
         } else {
 
             await editWork(editId, dateTime, titleEdit, (res) => {
                 if (res.success) {
-                    console.log(res.response);
 
                     const editWork = mainData.map(elem => {
                         if (elem.work.id === editId) {
@@ -245,27 +281,41 @@ function Admin_main() {
                     setMainData(editWork);
 
                 } else {
-                    console.log(res.response);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorEmptyActive(true);
                 }
-            });
+                setIsLoading(false);
 
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorEmptyActive(true);
+                setIsLoading(false);
+            });
             setModalEditActive(false);
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
-            setErrorTitle('');
-            setTitleEdit('');
         }
     }
 
     async function deleteData() {
+        setIsLoading(true);
         await deleteWork(deleteId, (res) => {
             if (res.success) {
-                console.log(res.response);
                 setMainData(mainData.filter((a) => a.work.id !== deleteId));
 
             } else {
-                console.log(res.response);
+                setTextError(res.message);
+                setCodeText(res.code);
+                setErrorEmptyActive(true);
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         });
 
     }
@@ -597,15 +647,12 @@ function Admin_main() {
                 <div className='modal-button'>
                     <button onClick={() => {
                         editData();
-
-
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
                         document.body.style.overflow = 'auto';
                         document.body.style.paddingRight = `0px`;
-                        setTitleEdit('');
-                        setErrorTitle('');
+                        
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
@@ -632,7 +679,9 @@ function Admin_main() {
             </Empty_modal>
 
             {/* модальное окно ошибки */}
-            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+            <Error_modal active={errorActive} text={textError} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+
         </>
     );
 }

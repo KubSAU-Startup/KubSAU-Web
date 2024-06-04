@@ -4,11 +4,13 @@ import './Admin_department.css'
 import Modal from '../Modal/Modal';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
+import Error_empty from '../Modal/Error_empty';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { addNewDepartment, deleteDepartment, editDepartment, getAllDepartments, getTextError } from '../../network';
 import Empty_modal from '../Modal/Empty_modal';
 import MaskInput from 'react-maskinput';
+import Error_ok from '../Modal/Error_ok';
 
 function Admin_department() {
     const [modalActive, setModalActive] = useState(false);
@@ -27,6 +29,9 @@ function Admin_department() {
     const [phoneDepartment, setPhoneDepartment] = useState('');
     const [errorPhone, setErrorPhone] = useState('');
     const [errorTitle, setErrorTitle] = useState('');
+    const [codeText, setCodeText] = useState('');
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+    const [errorOkActive, setErrorOkActive] = useState(false);
 
     const [newTitle, setNewTitle] = useState('');
     const [newPhone, setNewPhone] = useState('');
@@ -68,7 +73,7 @@ function Admin_department() {
 
     useEffect(() => {
         setVisibleItems(30);
-
+        setIsLoading(true);
 
         getAllDepartments((res) => {
             if (res.error) {
@@ -77,8 +82,12 @@ function Admin_department() {
             } else {
                 setAllDepartments(res.response);
                 setSearchResults(res.response.reverse());
-                console.log(searchResults);
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         });
 
@@ -109,34 +118,42 @@ function Admin_department() {
         }));
     };
     async function addDepartment() {
+        setIsLoading(true);
+
         setErrorTitle('');
         setErrorPhone('');
-        if (titleDepartment === '' || phoneDepartment === '' || phoneDepartment === '+7 (___) ___-__-__') {
-
+        if (titleDepartment === '' || phoneDepartment === '' || !isValidPhone(phoneDepartment)) {
+            if (!isValidPhone(phoneDepartment) && phoneDepartment !== '+7 (___) ___-__-__') {
+                setErrorPhone('Некорректный номер телефона');
+            }
             if (titleDepartment === '') {
                 setErrorTitle('Заполните название кафедры');
             }
             if (phoneDepartment === '' || phoneDepartment === '+7 (___) ___-__-__') {
                 setErrorPhone('Заполните телефон кафедры');
             }
-
+            setIsLoading(false);
         } else {
             await addNewDepartment(titleDepartment, phoneDepartment, (res) => {
                 if (res.success) {
-                    // console.log('rfquhjweoruiqew', res.response);
-                    // console.log('rfquhjweoruiqew', allDepartments);
                     setAllDepartments(prevData => [res.response, ...prevData]);
                 } else {
-                    console.log(res);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorOkActive(true);
                 }
+                setIsLoading(false);
+
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
             setModalActive(false);
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
-            setTitleDepartment('');
-            setPhoneDepartment('');
-            setErrorPhone('');
-            setErrorTitle('');
+
         }
     }
 
@@ -158,62 +175,81 @@ function Admin_department() {
         }
     }, [allDepartments])
 
-    async function editData(index, title, phone) {
+    async function editData() {
+        setIsLoading(true);
         setErrorTitle('');
         setErrorPhone('');
-        if (newTitle === '' || newPhone === '' || newPhone === '+7 (___) ___-__-__') {
-
+        if (newTitle === '' || newPhone === '' || !isValidPhone(newPhone)) {
+            if (!isValidPhone(newPhone) && newPhone !== '+7 (___) ___-__-__') {
+                setErrorPhone('Некорректный номер телефона');
+            }
             if (newTitle === '') {
                 setErrorTitle('Заполните название кафедры');
             }
             if (newPhone === '' || newPhone === '+7 (___) ___-__-__') {
                 setErrorPhone('Заполните телефон кафедры');
             }
+            setIsLoading(false);
 
         } else {
-            await editDepartment(index, title, phone, (res) => {
+            await editDepartment(editId, newTitle, newPhone, (res) => {
                 if (res.success) {
-
                     const editDepartments = allDepartments.map(elem => {
-                        if (elem.id === index) {
+                        if (elem.id === editId) {
                             return {
                                 ...elem, // копируем все свойства из исходного объекта
-                                title: title, // обновляем поле title
-                                phone: phone // обновляем поле phone
+                                title: newTitle, // обновляем поле title
+                                phone: newPhone // обновляем поле phone
                             };
                         } else {
                             return elem; // если элемент не подлежит изменению, возвращаем его без изменений
                         }
                     });
-
                     setAllDepartments(editDepartments);
-
                 } else {
-                    console.log(res.response);
+                    setTextError(res.message);
+                    setCodeText(res.code);
+                    setErrorOkActive(true);
                 }
+                setIsLoading(false);
+
+            }).catch((error) => {
+                setTextError(error.message);
+                setCodeText(error.code);
+                setErrorOkActive(true);
+                setIsLoading(false);
             });
             setModalEditActive(false);
             document.body.style.overflow = 'auto';
             document.body.style.paddingRight = `0px`;
-            setNewTitle('');
-            setNewPhone('');
-            setErrorPhone('');
-            setErrorTitle('');
         }
 
     }
 
     async function deleteData(index) {
+        setIsLoading(true);
+
         await deleteDepartment(index, (res) => {
             if (res.success) {
-                console.log(res.response);
                 setAllDepartments(allDepartments.filter((a) => a.id !== index));
 
             } else {
-                console.log(res.response);
+                setTextError(res.message);
+                setCodeText(res.code);
+                setErrorOkActive(true);
             }
+            setIsLoading(false);
+
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorOkActive(true);
+            setIsLoading(false);
         });
 
+    }
+    function isValidPhone(phone) {
+        return /\+7 \([0-9]{3}\) [0-9]{3}-[0-9]{2}-[0-9]{2}/.test(phone);
     }
 
     // функция пагинации
@@ -238,7 +274,9 @@ function Admin_department() {
             <Loading active={isLoading} setActive={setIsLoading} />
 
             {/* модальное окно ошибки */}
-            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+            <Error_modal active={errorActive} text={textError} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
 
             <Admin_header />
             <div className='search-add'>
@@ -256,6 +294,8 @@ function Admin_department() {
                     document.body.style.paddingRight = `${scrollBarWidth}px`;
                     setErrorPhone('');
                     setErrorTitle('');
+                    setTitleDepartment('');
+                    setPhoneDepartment('');
                 }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
@@ -351,8 +391,8 @@ function Admin_department() {
                         addDepartment();
                     }}>Сохранить</button>
                     <button onClick={() => {
-                        setModalActive(false); 
-                        document.body.style.overflow = 'auto'; 
+                        setModalActive(false);
+                        document.body.style.overflow = 'auto';
                         document.body.style.paddingRight = `0px`;
                         setErrorPhone('');
                         setErrorTitle('');
@@ -384,7 +424,7 @@ function Admin_department() {
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
-                        editData(editId, newTitle, newPhone);
+                        editData();
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
@@ -406,7 +446,8 @@ function Admin_department() {
                         <button onClick={() => {
                             deleteData(deleteId);
                             setModalDeleteActive(false);
-
+                            document.body.style.overflow = 'auto';
+                            document.body.style.paddingRight = `0px`;
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);

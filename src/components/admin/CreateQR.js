@@ -15,7 +15,8 @@ import Error_modal from '../Modal/Error_modal';
 import { saveAs } from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
 import Empty_modal from '../Modal/Empty_modal';
-import Admin_header from './Admin_header';
+import Error_empty from '../Modal/Error_empty';
+import Error_ok from '../Modal/Error_ok';
 
 function CreateQR() {
   const [isOpen, setOpen] = useState(false);
@@ -59,6 +60,7 @@ function CreateQR() {
 
   const [errorActive, setErrorActive] = useState(false);
   const [textError, setTextError] = useState('');
+  const [codeText, setCodeText] = useState('');
 
   const [semester, setSemester] = useState(null);
   const [program, setProgram] = useState(null);
@@ -96,6 +98,9 @@ function CreateQR() {
   const [titleProgram, setTitleProgram] = useState('');
   const [newTypes, setNewType] = useState(null);
   const [newDisc, setNewDisc] = useState(null);
+
+  const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+  const [errorOkActive, setErrorOkActive] = useState(false);
 
   const [disciplineAndType, setDisciplineAndType] = useState([]);
   const [arrayUInt8, setArrayUInt8] = useState([]);
@@ -176,6 +181,11 @@ function CreateQR() {
         }
       }
       setIsLoading(false);
+    }).catch((error) => {
+      setTextError(error.message);
+      setCodeText(error.code);
+      setErrorEmptyActive(true);
+      setIsLoading(false);
     })
 
   }, [offset, limit, qrParams, debouncedInputValue]);
@@ -212,7 +222,13 @@ function CreateQR() {
         setDirectivitiesPrograms(res.response.directivities);
       }
       setIsLoading(false);
+    }).catch((error) => {
+      setTextError(error.message);
+      setCodeText(error.code);
+      setErrorEmptyActive(true);
+      setIsLoading(false);
     });
+
     getAllGroups((res) => {
       if (res.error) {
         setTextError(getTextError(res.error));
@@ -221,7 +237,13 @@ function CreateQR() {
         setAllGroups(res.response);
       }
       setIsLoading(false);
+    }).catch((error) => {
+      setTextError(error.message);
+      setCodeText(error.code);
+      setErrorEmptyActive(true);
+      setIsLoading(false);
     });
+
     getAllWorkTypes((res) => {
       if (res.error) {
         setTextError(getTextError(res.error));
@@ -230,7 +252,13 @@ function CreateQR() {
         setAllWorkTypes(res.response);
       }
       setIsLoading(false);
+    }).catch((error) => {
+      setTextError(error.message);
+      setCodeText(error.code);
+      setErrorEmptyActive(true);
+      setIsLoading(false);
     });
+
     getAllDisciplines((res) => {
       if (res.error) {
         setTextError(getTextError(res.error));
@@ -239,15 +267,19 @@ function CreateQR() {
         setAllDisciplines(res.response);
       }
       setIsLoading(false);
+    }).catch((error) => {
+      setTextError(error.message);
+      setCodeText(error.code);
+      setErrorEmptyActive(true);
+      setIsLoading(false);
     });
+
   }, []);
 
   useEffect(() => {
-    // console.log(studQR)
     if (studQR !== null) {
       createZip();
     }
-
   }, [studQR])
 
   useEffect(() => {
@@ -368,16 +400,18 @@ function CreateQR() {
     setIsLoading(true);
     await editDisciplines(idProgram, discip, type, (res) => {
       if (res.success) {
-        console.log(res.response);
-
         setProgramQR(structuredClone(copyData));
-        setIsLoading(false);
-
       } else {
-        console.log(res.response);
-        setIsLoading(false);
-
+        setTextError(res.message);
+        setCodeText(res.code);
+        setErrorEmptyActive(true);
       }
+      setIsLoading(false);
+    }).catch((error) => {
+      setTextError(error.message);
+      setCodeText(error.code);
+      setErrorOkActive(true);
+      setIsLoading(false);
     });
   }
 
@@ -391,7 +425,7 @@ function CreateQR() {
     setEditModalActive(false);
     document.body.style.overflow = 'auto';
     document.body.style.paddingRight = `0px`;
-  
+
 
   };
 
@@ -888,6 +922,8 @@ function CreateQR() {
 
       {/* модальное окно ошибки */}
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+      <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+      <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
     </>
   )
 }

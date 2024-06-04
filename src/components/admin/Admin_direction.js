@@ -10,6 +10,8 @@ import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { getAllDirectivities, getTextError } from '../../network';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
+import Error_empty from '../Modal/Error_empty';
+import Error_ok from '../Modal/Error_ok';
 
 function Admin_direction() {
     const [modalActive, setModalActive] = useState(false);
@@ -32,6 +34,9 @@ function Admin_direction() {
     const [textError, setTextError] = useState('');
     const [filterData, setFilterData] = useState([]);
 
+    const [codeText, setCodeText] = useState('');
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+    const [errorOkActive, setErrorOkActive] = useState(false);
     const [searchDone, setSearchDone] = useState(false);
     const [filterDone, setFilterDone] = useState(false);
     const [visibleItems, setVisibleItems] = useState(30);
@@ -84,7 +89,11 @@ function Admin_direction() {
                 setSearchResults(res.response.directivities);
             }
             setIsLoading(false);
-        })
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);        })
 
     }, []);
 
@@ -218,6 +227,7 @@ function Admin_direction() {
         <>
             <Loading active={isLoading} setActive={setIsLoading} />
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
 
             <Admin_header />
             <div className='admin-main-search'>

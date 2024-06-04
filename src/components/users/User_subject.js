@@ -4,6 +4,7 @@ import '../admin/Admin_students.css'
 import { getAllDisciplines, getTextError } from '../../network';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
+import Error_empty from '../Modal/Error_empty';
 
 function User_subject() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -12,7 +13,8 @@ function User_subject() {
     const [searchResults, setSearchResults] = useState([]);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-
+    const [codeText, setCodeText] = useState('');
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
     const [visibleItems, setVisibleItems] = useState(30);
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
     const [allDisciplines, setAllDisciplines] = useState([]);
@@ -29,6 +31,11 @@ function User_subject() {
                 setAllDisciplines(res.response);
                 setSearchResults(res.response);
             }
+            setIsLoading(false);
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
             setIsLoading(false);
         })
 
@@ -69,6 +76,7 @@ function User_subject() {
         <>
             <Loading active={isLoading} setActive={setIsLoading} />
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
 
             <User_header />
             <div className='admin-main-search'>

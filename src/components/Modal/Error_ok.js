@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import './Modal.css'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function Error_modal({ active, text }) {
+function Error_ok({ active, text, codeText, setActive }) {
+    // const [active, setActive] = useState(true);
     return (
         <div className={`modal ${active ? 'active' : ''}`}>
             <div className='modal-content'>
@@ -14,12 +15,12 @@ function Error_modal({ active, text }) {
                         <p>Произошла ошибка:</p>
                     </div>
                     <p>{`${text}`}</p>
-                    <p>Попробуйте авторизоваться</p>
-                    <Link to='/' className='btn-to-log'>Авторизоваться</Link>
+                    <p><b>Код ошибки: </b>{`${codeText}`}</p>
+                    <button onClick={()=>{setActive(false)}} className='btn-to-log'>ОК</button>
                 </div>
             </div>
         </div>
     )
 }
 
-export default Error_modal
+export default Error_ok
