@@ -1,7 +1,7 @@
-FROM node:20-alpine
+FROM node:alpine AS development
+ENV NODE_ENV development
 WORKDIR /app
-COPY package.json .
-RUN npm install --legacy-peer-deps
+COPY ./package*.json /app
+RUN npm install
 COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["npm","start"]
