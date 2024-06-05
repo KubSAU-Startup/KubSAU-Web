@@ -93,7 +93,8 @@ function Admin_direction() {
             setTextError(error.message);
             setCodeText(error.code);
             setErrorEmptyActive(true);
-            setIsLoading(false);        })
+            setIsLoading(false);
+        })
 
     }, []);
 
@@ -230,71 +231,72 @@ function Admin_direction() {
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
 
             <Admin_header />
-            <div className='admin-main-search'>
-                <input
-                    type='text'
-                    value={searchTerm}
-                    onChange={handleChange}
-                    placeholder='Поиск...'
-                />
-            </div>
-            <div className='filters'>
-                <Select
-                    styles={customStyles}
-                    placeholder="Направление"
-                    value={filterDirection}
-                    onChange={handleFilterDirection}
-                    isSearchable={true}
-                    options={allDirectivities.heads.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                />
-                <Select
-                    styles={customStyles}
-                    placeholder="Направленность"
-                    value={filterDirectivity}
-                    onChange={handleFilterDirectivity}
-                    isSearchable={true}
-                    options={allDirectivities.directivities.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                />
-                <Select
-                    styles={customStyles}
-                    placeholder="Степень образованя"
-                    value={filterGrade}
-                    onChange={handleFilterGrade}
-                    isSearchable={true}
-                    options={allDirectivities.grades.map(res => ({
-                        value: res.id,
-                        label: res.title,
-                    }))}
-                />
+            <div id='body-content'>
+                <div className='admin-main-search'>
+                    <input
+                        type='text'
+                        value={searchTerm}
+                        onChange={handleChange}
+                        placeholder='Поиск...'
+                    />
+                </div>
+                <div className='filters'>
+                    <Select
+                        styles={customStyles}
+                        placeholder="Направление"
+                        value={filterDirection}
+                        onChange={handleFilterDirection}
+                        isSearchable={true}
+                        options={allDirectivities.heads.map(res => ({
+                            value: res.id,
+                            label: res.title,
+                        }))}
+                    />
+                    <Select
+                        styles={customStyles}
+                        placeholder="Направленность"
+                        value={filterDirectivity}
+                        onChange={handleFilterDirectivity}
+                        isSearchable={true}
+                        options={allDirectivities.directivities.map(res => ({
+                            value: res.id,
+                            label: res.title,
+                        }))}
+                    />
+                    <Select
+                        styles={customStyles}
+                        placeholder="Степень образованя"
+                        value={filterGrade}
+                        onChange={handleFilterGrade}
+                        isSearchable={true}
+                        options={allDirectivities.grades.map(res => ({
+                            value: res.id,
+                            label: res.title,
+                        }))}
+                    />
 
 
-                <button className='get-params' type='submit' onClick={getParams}>Применить</button>
-                <button className='delete-params' onClick={resetParams}>Сбросить</button>
+                    <button className='get-params' type='submit' onClick={getParams}>Применить</button>
+                    <button className='delete-params' onClick={resetParams}>Сбросить</button>
 
-            </div>
+                </div>
 
-            {/* <button className='add-student' onClick={() => setModalActive(true)}>
+                {/* <button className='add-student' onClick={() => setModalActive(true)}>
                 <FontAwesomeIcon icon={faPlusCircle} />
             </button> */}
-            {searchResults.slice(0, visibleItems).map(res => (
-                <div className='cart-stud' key={res.id}>
-                    <div className='content'>
-                        <div className='col1'>
-                            <p><span>Направление:</span> {res.headId && allDirectivities.heads.find(r => r.id === res.headId)?.title}</p>
-                            <p><span>Степень образования:</span> {res.gradeId && allDirectivities.grades.find(r => r.id === res.gradeId)?.title}</p>
-                        </div>
-                        <div className='col2'>
-                            <p><span>Направленность:</span> {res.title}</p>
+                {searchResults.slice(0, visibleItems).map(res => (
+                    <div className='cart-stud' key={res.id}>
+                        <div className='content'>
+                            <div className='col1'>
+                                <p><span>Направление:</span> {res.headId && allDirectivities.heads.find(r => r.id === res.headId)?.title}</p>
+                                <p><span>Степень образования:</span> {res.gradeId && allDirectivities.grades.find(r => r.id === res.gradeId)?.title}</p>
+                            </div>
+                            <div className='col2'>
+                                <p><span>Направленность:</span> {res.title}</p>
 
+                            </div>
                         </div>
-                    </div>
-                    {/* <button
+                        {/* <button
                         className='qr-setting'
                         onClick={() => {
                             if (isSetOpen === true && user.id !== selectedItemId) {
@@ -322,14 +324,14 @@ function Admin_direction() {
                             <img src={require('../../img/delete.png')} alt='delete' />
                         </button>
                     </div>)} */}
-                </div>
-            ))}
-            {/* кнопка пагинации */}
-            {isPaginationVisible && (
-                <button className='btn-loadMore' onClick={loadMore}>
-                    Загрузить ещё
-                </button>
-            )}
+                    </div>
+                ))}
+                {/* кнопка пагинации */}
+                {isPaginationVisible && (
+                    <button className='btn-loadMore' onClick={loadMore}>
+                        Загрузить ещё
+                    </button>
+                )}</div>
             {/* <Modal active={modalActive} setActive={setModalActive}>
                 <div className='input-conteiner'>
                     <input type='text' className='name-direction' placeholder=' ' />

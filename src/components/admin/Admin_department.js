@@ -151,8 +151,13 @@ function Admin_department() {
                 setIsLoading(false);
             });
             setModalActive(false);
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = `0px`;
+            document.body.style.overflow = '';
+            const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+            for (let i = 0; i < adminMainHeaders.length; i++) {
+                adminMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
+
 
         }
     }
@@ -220,8 +225,13 @@ function Admin_department() {
                 setIsLoading(false);
             });
             setModalEditActive(false);
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = `0px`;
+            document.body.style.overflow = '';
+            const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+            for (let i = 0; i < adminMainHeaders.length; i++) {
+                adminMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
+
         }
 
     }
@@ -279,93 +289,113 @@ function Admin_department() {
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
 
             <Admin_header />
-            <div className='search-add'>
-                <div className='admin-main-search'>
-                    <input
-                        type='text'
-                        value={searchTerm}
-                        onChange={handleChange}
-                        placeholder='Поиск...'
-                    />
-                </div>
-                <button className='add-student' onClick={() => {
-                    setModalActive(true);
-                    document.body.style.overflow = 'hidden';
-                    document.body.style.paddingRight = `${scrollBarWidth}px`;
-                    setErrorPhone('');
-                    setErrorTitle('');
-                    setTitleDepartment('');
-                    setPhoneDepartment('');
-                }}>
-                    <FontAwesomeIcon icon={faPlusCircle} />
-                </button>
-            </div>
+            <div id='body-content'>
 
-            {searchResults.slice(0, visibleItems).map(res => (
-                <div className='cart-stud' key={res.id}>
-                    <div className='content'>
-                        <div className='col1'>
-                            <p><span>Кафедра: </span>{res.title}</p>
-
-                        </div>
-                        <div className='col2'>
-                            <p><span>Номер телефона: </span>{res.phone}</p>
-
-                        </div>
-
+                <div className='search-add'>
+                    <div className='admin-main-search'>
+                        <input
+                            type='text'
+                            value={searchTerm}
+                            onChange={handleChange}
+                            placeholder='Поиск...'
+                        />
                     </div>
-                    <button
-                        className='qr-setting'
-                        onClick={() => {
-                            if (isSetOpen === true && res.id !== selectedItemId) {
-                                closeModal();
-                                openModal(res.id);
-                            }
-                            else if (isSetOpen === true) {
-                                closeModal();
-                            }
-                            else {
-                                openModal(res.id);
-                            }
-                        }}
-                    // className='department-setting'
-                    // onClick={() => handleSettingClick(res.id)}
-                    >
-                        <img src={require('../../img/setting.png')} alt='setting' />
-                    </button>
-                    {isSetOpen && selectedItemId === res.id && (
-                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
-                            {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
-                            <button onClick={() => {
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
-                                setErrorPhone('');
-                                setErrorTitle('');
-                                setModalEditActive(true);
-                                setEditId(res.id);
-                                allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
-                                allDepartments.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
-                            }}>
-                                <img src={require('../../img/edit.png')} alt='edit' />
-                            </button>
-                            <button onClick={() => {
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
+                    <button className='add-student' onClick={() => {
+                        setModalActive(true);
+                        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                        document.body.style.overflow = 'hidden';
+                        const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                        for (let i = 0; i < adminMainHeaders.length; i++) {
+                            adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
 
-                                setModalDeleteActive(true);
-                                setDeleteId(res.id);
-                            }}>
-                                <img src={require('../../img/delete.png')} alt='delete' />
-                            </button>
-                        </div>)}
+                        setErrorPhone('');
+                        setErrorTitle('');
+                        setTitleDepartment('');
+                        setPhoneDepartment('');
+                    }}>
+                        <FontAwesomeIcon icon={faPlusCircle} />
+                    </button>
                 </div>
-            ))}
-            {/* кнопка пагинации */}
-            {isPaginationVisible && (
-                <button className='btn-loadMore' onClick={loadMore}>
-                    Загрузить ещё
-                </button>
-            )}
+
+                {searchResults.slice(0, visibleItems).map(res => (
+                    <div className='cart-stud' key={res.id}>
+                        <div className='content'>
+                            <div className='col1'>
+                                <p><span>Кафедра: </span>{res.title}</p>
+
+                            </div>
+                            <div className='col2'>
+                                <p><span>Номер телефона: </span>{res.phone}</p>
+
+                            </div>
+
+                        </div>
+                        <button
+                            className='qr-setting'
+                            onClick={() => {
+                                if (isSetOpen === true && res.id !== selectedItemId) {
+                                    closeModal();
+                                    openModal(res.id);
+                                }
+                                else if (isSetOpen === true) {
+                                    closeModal();
+                                }
+                                else {
+                                    openModal(res.id);
+                                }
+                            }}
+                        // className='department-setting'
+                        // onClick={() => handleSettingClick(res.id)}
+                        >
+                            <img src={require('../../img/setting.png')} alt='setting' />
+                        </button>
+                        {isSetOpen && selectedItemId === res.id && (
+                            <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                                {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
+                                <button onClick={() => {
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                                    for (let i = 0; i < adminMainHeaders.length; i++) {
+                                        adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+                                    setErrorPhone('');
+                                    setErrorTitle('');
+                                    setModalEditActive(true);
+                                    setEditId(res.id);
+                                    allDepartments.filter(r => r.id === res.id).map(r => setNewTitle(r.title));
+                                    allDepartments.filter(r => r.id === res.id).map(r => setNewPhone(r.phone));
+                                }}>
+                                    <img src={require('../../img/edit.png')} alt='edit' />
+                                </button>
+                                <button onClick={() => {
+                                   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                   document.body.style.overflow = 'hidden';
+                                   const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                                   for (let i = 0; i < adminMainHeaders.length; i++) {
+                                       adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                   }
+                                   document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+
+                                    setModalDeleteActive(true);
+                                    setDeleteId(res.id);
+                                }}>
+                                    <img src={require('../../img/delete.png')} alt='delete' />
+                                </button>
+                            </div>)}
+                    </div>
+                ))}
+                {/* кнопка пагинации */}
+                {isPaginationVisible && (
+                    <button className='btn-loadMore' onClick={loadMore}>
+                        Загрузить ещё
+                    </button>
+                )}</div>
             <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-department'>
                     <div>
@@ -392,8 +422,13 @@ function Admin_department() {
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalActive(false);
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
+                        document.body.style.overflow = '';
+                        const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                        for (let i = 0; i < adminMainHeaders.length; i++) {
+                            adminMainHeaders[i].style.paddingRight = `10px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = ``;
+
                         setErrorPhone('');
                         setErrorTitle('');
                         setTitleDepartment('');
@@ -428,8 +463,13 @@ function Admin_department() {
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
+                        document.body.style.overflow = '';
+                        const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                        for (let i = 0; i < adminMainHeaders.length; i++) {
+                            adminMainHeaders[i].style.paddingRight = `10px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = ``;
+
 
 
                         setErrorPhone('');
@@ -446,13 +486,23 @@ function Admin_department() {
                         <button onClick={() => {
                             deleteData(deleteId);
                             setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                            for (let i = 0; i < adminMainHeaders.length; i++) {
+                                adminMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
+    
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                            for (let i = 0; i < adminMainHeaders.length; i++) {
+                                adminMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
+    
 
                         }}>Отмена</button>
                     </div>

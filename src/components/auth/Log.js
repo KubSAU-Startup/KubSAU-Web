@@ -9,6 +9,7 @@ import { faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Link, Navigate, Route, Redirect, useHistory, useNavigate } from 'react-router-dom';
 import Forgot_pass from '../Modal/Forgot_pass';
 import Loading from '../Modal/Loading';
+import Error_empty from '../Modal/Error_empty';
 const eye = <FontAwesomeIcon icon={faEye} />;
 const eyeSlah = <FontAwesomeIcon icon={faEyeSlash} />;
 
@@ -18,7 +19,10 @@ function Log() {
     const [errorActive, setErrorActive] = useState(false);
     const [forgotPass, setForgotPass] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isTypeUser, setIsTypeUser] = useState(null);
+    const [errorEmptyActive, setErrorEmptyActive] = useState(false);
+    const [codeText, setCodeText] = useState('');
+    const [textError, setTextError] = useState('');
+
     const navigate = useNavigate();
 
     const { register, handleSubmit, formState: { errors }, reset, watch, getValues } = useForm();
@@ -30,13 +34,18 @@ function Log() {
             if (res.success) {
                 const token = res.response.accessToken
                 localStorage.setItem('token', token)
-                setIsLoading(false);
                 setIsAuthenticated(true);
             } else {
                 setErrorActive(true);
-                setIsLoading(false);
                 setIsAuthenticated(false);
             }
+            setIsLoading(false);
+
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
         });
     }
     useEffect(() => {
@@ -47,15 +56,12 @@ function Log() {
             setIsAuthenticated(false)
         }
     }, []);
-    console.log(isAuthenticated)
 
     useEffect(() => {
 
         checkAccount((res) => {
             if (res.success) {
-                // setIsTypeUser(res.response.type);
-                console.log(res.response.type)
-                // setIsAuthenticated(true);
+               
                 if (isAuthenticated) {
                     if (res.response.type === 1) {
                         navigate('/Choice');
@@ -68,7 +74,12 @@ function Log() {
                 localStorage.removeItem('token');
                 setIsAuthenticated(false);
             }
-        })
+        }).catch((error) => {
+            setTextError(error.message);
+            setCodeText(error.code);
+            setErrorEmptyActive(true);
+            setIsLoading(false);
+        });
     }, [isAuthenticated, navigate]);
 
     const [passwordShown, setPasswordShown] = useState(false);
@@ -97,7 +108,9 @@ function Log() {
                 </form>
             </div>
             <Error_auth_data active={errorActive} setActive={setErrorActive} />
-            <Forgot_pass active={forgotPass} setActive={setForgotPass} /></>
+            <Forgot_pass active={forgotPass} setActive={setForgotPass} />
+            <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            </>
     );
 }
 

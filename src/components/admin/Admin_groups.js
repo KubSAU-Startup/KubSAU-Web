@@ -198,8 +198,12 @@ function Admin_groups() {
             });
             setModalActive(false);
 
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = `0px`;
+            document.body.style.overflow = '';
+            const adMainHeaders = document.getElementsByClassName('ad_main_header');
+            for (let i = 0; i < adMainHeaders.length; i++) {
+                adMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
         }
 
     }
@@ -270,11 +274,15 @@ function Admin_groups() {
                 setIsLoading(false);
             });
 
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = `0px`;
+            document.body.style.overflow = '';
+            const adMainHeaders = document.getElementsByClassName('ad_main_header');
+            for (let i = 0; i < adMainHeaders.length; i++) {
+                adMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
 
             setModalEditActive(false);
-            
+
         }
     }
 
@@ -290,7 +298,7 @@ function Admin_groups() {
                 setCodeText(res.code);
                 setErrorEmptyActive(true);
             }
-        setIsLoading(false);
+            setIsLoading(false);
 
         }).catch((error) => {
             setTextError(error.message);
@@ -348,109 +356,125 @@ function Admin_groups() {
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
 
             <Admin_header />
-            <div className='search-add'>
-                <div className='admin-main-search'>
-                    <input
-                        type='text'
-                        value={searchTerm}
-                        onChange={handleChange}
-                        placeholder='Поиск...'
-                    />
-                </div>
-                <button className='add-student' onClick={() => {
-                     setErrorHead('');
-                     setErrorDir('');
-                     setErrorGroup('');
-                     setHead(null);
-                     setDirectivity(null);
-                     setNumberGroup('');
-                     setAbbGroup('');
-                    
-                    setModalActive(true);
-                    
-                    document.body.style.overflow = 'hidden';
-                    document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-                }}>
-                    <FontAwesomeIcon icon={faPlusCircle} />
-                </button>
-            </div>
-
-            {searchResults.slice(0, visibleItems).map(res => (
-                <div className='cart-stud' key={res.id}>
-                    <div className='content'>
-                        <div className='col1'>
-                            <p><span>Группа: </span>{res.title}</p>
-                            <p><span>Направление: </span>{allDirectivities.find((el) => el.id === res.directivityId)
-                                && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId)
-                                && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).title}</p>
-                        </div>
-                        <div className='col2'>
-                            <p><span>Направленность: </span>{allDirectivities.find((el) => el.id === res.directivityId) && allDirectivities.find((el) => el.id === res.directivityId).title}</p>
-                        </div>
+            <div id='body-content'>
+                <div className='search-add'>
+                    <div className='admin-main-search'>
+                        <input
+                            type='text'
+                            value={searchTerm}
+                            onChange={handleChange}
+                            placeholder='Поиск...'
+                        />
                     </div>
-                    <button
-                        className='qr-setting'
-                        onClick={() => {
-                            if (isSetOpen === true && res.id !== selectedItemId) {
-                                closeModal();
-                                openModal(res.id);
-                            }
-                            else if (isSetOpen === true) {
-                                closeModal();
-                            }
-                            else {
-                                openModal(res.id);
-                            }
-                        }}
-                    // className='student-setting'
-                    // onClick={() => handleSettingClick(res.id)}
-                    >
-                        <img src={require('../../img/setting.png')} alt='setting' />
-                    </button>
-                    {isSetOpen && selectedItemId === res.id && (
-                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
-                            {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
-                            <button onClick={() => {
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
-                                setErrorHead(null);
-                                setErrorDir(null);
-                                setErrorGroup('');
-                                setModalEditActive(true);
-                                setEditId(res.id);
-                                allGroups.filter(el => el.id === res.id).map(r => {
-                                    setNewAbbGroup(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation);
-                                    setNewNumberGroup(r.title.replace(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation, ''));
-                                });
-                                allHeads.filter((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).map(r => setNewHead({
-                                    value: r.id,
-                                    label: r.title
-                                }))
-                                allDirectivities.filter((el) => el.id === res.directivityId).map(r => setNewDirectivity({
-                                    value: r.id,
-                                    label: r.title
-                                }));
-                            }}>
-                                <img src={require('../../img/edit.png')} alt='edit' />
-                            </button>
-                            <button onClick={() => {
-                                setModalDeleteActive(true); setDeleteId(res.id);
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
+                    <button className='add-student' onClick={() => {
+                        setErrorHead('');
+                        setErrorDir('');
+                        setErrorGroup('');
+                        setHead(null);
+                        setDirectivity(null);
+                        setNumberGroup('');
+                        setAbbGroup('');
 
-                            }}>
-                                <img src={require('../../img/delete.png')} alt='delete' />
-                            </button>
-                        </div>)}
+                        setModalActive(true);
+
+                        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                        document.body.style.overflow = 'hidden';
+                        const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                        for (let i = 0; i < adMainHeaders.length; i++) {
+                            adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+                    }}>
+                        <FontAwesomeIcon icon={faPlusCircle} />
+                    </button>
                 </div>
-            ))}
-            {/* кнопка пагинации */}
-            {isPaginationVisible && (
-                <button className='btn-loadMore' onClick={loadMore}>
-                    Загрузить ещё
-                </button>
-            )}
+
+                {searchResults.slice(0, visibleItems).map(res => (
+                    <div className='cart-stud' key={res.id}>
+                        <div className='content'>
+                            <div className='col1'>
+                                <p><span>Группа: </span>{res.title}</p>
+                                <p><span>Направление: </span>{allDirectivities.find((el) => el.id === res.directivityId)
+                                    && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId)
+                                    && allHeads.find((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).title}</p>
+                            </div>
+                            <div className='col2'>
+                                <p><span>Направленность: </span>{allDirectivities.find((el) => el.id === res.directivityId) && allDirectivities.find((el) => el.id === res.directivityId).title}</p>
+                            </div>
+                        </div>
+                        <button
+                            className='qr-setting'
+                            onClick={() => {
+                                if (isSetOpen === true && res.id !== selectedItemId) {
+                                    closeModal();
+                                    openModal(res.id);
+                                }
+                                else if (isSetOpen === true) {
+                                    closeModal();
+                                }
+                                else {
+                                    openModal(res.id);
+                                }
+                            }}
+                        // className='student-setting'
+                        // onClick={() => handleSettingClick(res.id)}
+                        >
+                            <img src={require('../../img/setting.png')} alt='setting' />
+                        </button>
+                        {isSetOpen && selectedItemId === res.id && (
+                            <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                                {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
+                                <button onClick={() => {
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                                    for (let i = 0; i < adMainHeaders.length; i++) {
+                                        adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+                                    setErrorHead(null);
+                                    setErrorDir(null);
+                                    setErrorGroup('');
+                                    setModalEditActive(true);
+                                    setEditId(res.id);
+                                    allGroups.filter(el => el.id === res.id).map(r => {
+                                        setNewAbbGroup(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation);
+                                        setNewNumberGroup(r.title.replace(allHeads.find(el => el.id === allDirectivities.find(r => r.id === res.directivityId).headId).abbreviation, ''));
+                                    });
+                                    allHeads.filter((head) => head.id === allDirectivities.find((el) => el.id === res.directivityId).headId).map(r => setNewHead({
+                                        value: r.id,
+                                        label: r.title
+                                    }))
+                                    allDirectivities.filter((el) => el.id === res.directivityId).map(r => setNewDirectivity({
+                                        value: r.id,
+                                        label: r.title
+                                    }));
+                                }}>
+                                    <img src={require('../../img/edit.png')} alt='edit' />
+                                </button>
+                                <button onClick={() => {
+                                    setModalDeleteActive(true); setDeleteId(res.id);
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                                    for (let i = 0; i < adMainHeaders.length; i++) {
+                                        adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+                                }}>
+                                    <img src={require('../../img/delete.png')} alt='delete' />
+                                </button>
+                            </div>)}
+                    </div>
+                ))}
+                {/* кнопка пагинации */}
+                {isPaginationVisible && (
+                    <button className='btn-loadMore' onClick={loadMore}>
+                        Загрузить ещё
+                    </button>
+                )}</div>
             <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-group'>
                     <div style={{ marginBottom: '30px' }}>
@@ -509,9 +533,13 @@ function Admin_groups() {
 
                     <button onClick={() => {
                         setModalActive(false);
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
-                       
+                        document.body.style.overflow = '';
+                        const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                        for (let i = 0; i < adMainHeaders.length; i++) {
+                            adMainHeaders[i].style.paddingRight = `10px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = ``;
+
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
@@ -569,8 +597,12 @@ function Admin_groups() {
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
+                        document.body.style.overflow = '';
+                        const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                        for (let i = 0; i < adMainHeaders.length; i++) {
+                            adMainHeaders[i].style.paddingRight = `10px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = ``;
 
                     }}>Отмена</button>
                 </div>
@@ -581,14 +613,22 @@ function Admin_groups() {
                     <div className='modal-button'>
                         <button onClick={() => {
                             deleteData(deleteId); setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                            for (let i = 0; i < adMainHeaders.length; i++) {
+                                adMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
 
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                            for (let i = 0; i < adMainHeaders.length; i++) {
+                                adMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
 
                         }}>Отмена</button>
                     </div>

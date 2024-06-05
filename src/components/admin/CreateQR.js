@@ -423,8 +423,12 @@ function CreateQR() {
     console.log(`Сохраненные данные: дисциплины - ${disciplineIds}, типы работ - ${workTypeIds}`);
     editData(disciplineIds, workTypeIds);
     setEditModalActive(false);
-    document.body.style.overflow = 'auto';
-    document.body.style.paddingRight = `0px`;
+    document.body.style.overflow = '';
+    const adMainHeaders = document.getElementsByClassName('ad_main_header');
+    for (let i = 0; i < adMainHeaders.length; i++) {
+      adMainHeaders[i].style.paddingRight = `10px`;
+    }
+    document.getElementById('body-content').style.paddingRight = ``;
 
 
   };
@@ -433,8 +437,12 @@ function CreateQR() {
     setSearchResults(programQR);
     setCopyData(structuredClone(programQR));
     setEditModalActive(false);
-    document.body.style.overflow = 'auto';
-    document.body.style.paddingRight = `0px`;
+    document.body.style.overflow = '';
+    const adMainHeaders = document.getElementsByClassName('ad_main_header');
+    for (let i = 0; i < adMainHeaders.length; i++) {
+      adMainHeaders[i].style.paddingRight = `10px`;
+    }
+    document.getElementById('body-content').style.paddingRight = ``;
 
   };
 
@@ -474,8 +482,12 @@ function CreateQR() {
         });
       }
       setEmptyModalActive(false);
-      document.body.style.overflow = 'auto';
-      document.body.style.paddingRight = `0px`;
+      document.body.style.overflow = '';
+      const adMainHeaders = document.getElementsByClassName('ad_main_header');
+      for (let i = 0; i < adMainHeaders.length; i++) {
+        adMainHeaders[i].style.paddingRight = `10px`;
+      }
+      document.getElementById('body-content').style.paddingRight = ``;
       setErrorGroup('');
 
     }
@@ -642,7 +654,6 @@ function CreateQR() {
   { value: 12, label: 12 }];
 
   const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-  document.body.style.overflowX = 'hidden';
 
   return (
     <>
@@ -651,29 +662,31 @@ function CreateQR() {
 
       {/* шапка страницы */}
       <div className='ad_main_header'>
-        <img className='ad_main_logo' src={require('../../img/logo1.png')} />
-        <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
-          <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
-        </button>
-        <nav className={`menu ${isOpen ? "active" : ""}`}>
-          <ul className='menu_list'>
-            <Link to="/AdminMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
-            <Link to="/AdminDepartment" className='link-to'><li className='menu_item'>Кафедры</li></Link>
-            <Link to="/AdminStud" className='link-to'><li className='menu_item'>Студенты</li></Link>
-            <Link to="/AdminGroup" className='link-to'><li className='menu_item'>Группы</li></Link>
-            <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
-          </ul>
-        </nav>
+        <div className='ad_main_header-content'>
+          <img className='ad_main_logo' src={require('../../img/logo1.png')} />
+          <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
+            <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
+          </button>
+          <nav className={`menu ${isOpen ? "active" : ""}`}>
+            <ul className='menu_list'>
+              <Link to="/AdminMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
+              <Link to="/AdminDepartment" className='link-to'><li className='menu_item'>Кафедры</li></Link>
+              <Link to="/AdminStud" className='link-to'><li className='menu_item'>Студенты</li></Link>
+              <Link to="/AdminGroup" className='link-to'><li className='menu_item'>Группы</li></Link>
+              <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
+            </ul>
+          </nav>
 
-        {/* <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link> */}
+          {/* <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link> */}
 
-        <Link style={{ visibility: 'hidden' }} className='admin-to-qr' to="/CreateQR">
-          <p>Создать QR-код</p>
-          <img className='qr-arrow' src={require('../../img/arrow.png')} />
-        </Link>
+          <Link style={{ visibility: 'hidden' }} className='admin-to-qr' to="/CreateQR">
+            <p>Создать QR-код</p>
+            <img className='qr-arrow' src={require('../../img/arrow.png')} />
+          </Link>
 
-        <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
-        <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
+          <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
+          <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
+        </div>
       </div>
 
       <QRCode
@@ -686,22 +699,22 @@ function CreateQR() {
       />
 
 
-      {/* блок фильтров и поиска */}
-      <div className='qr-options'>
+      {/* поиск */}
+      <div id='body-content'>
+        <div className='admin-main-search'>
+          <input
+            type='text'
+            value={inputValue}
+            onChange={handleInputValue}
+            placeholder='Поиск...'
+          />
+        </div>
 
-        {/* поиск */}
-        <div className='data-option'>
-          <div className='search'>
-            <input type='text'
-              value={inputValue}
-              onChange={handleInputValue}
-              placeholder='Поиск...' />
-          </div>
-
-          {/* фильтры */}
-          <div className='filter-data-qr'>
+        {/* фильтры */}
+        <div className='filters'>
+          <div>
             <Select
-              styles={customStylesQR}
+              styles={customStyles}
               placeholder="Семестр"
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
@@ -709,6 +722,7 @@ function CreateQR() {
               // isDisabled={semesterFilter === -1 && directivityFilter !== null ? true : false}
               options={dataSemester}
             />
+          </div><div>
             <Select
               styles={customStyles}
               placeholder="Направленность"
@@ -721,99 +735,109 @@ function CreateQR() {
                 label: res.title
               })
               )}
-            />
-            {/* задать заначения фильтрам */}
-            <button className='get-params-qr' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
-            {/* очистить фильтры */}
-            <button className='delete-params-qr' onClick={deleteParams}><FontAwesomeIcon icon={faUndo} /></button>
-          </div>
+            /></div>
+          {/* задать заначения фильтрам */}
+          <button className='get-params' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
+          {/* очистить фильтры */}
+          <button className='delete-params' onClick={deleteParams}><FontAwesomeIcon icon={faUndo} /></button>
         </div>
-      </div>
+        {/* </div> */}
 
-      {/* кнопка вызова модального окна для создания программы */}
-      {/* <button className='add-qr-group' onClick={() => { setEmptyModalActive(true); setAddActive(true); }}>
+
+        {/* кнопка вызова модального окна для создания программы */}
+        {/* <button className='add-qr-group' onClick={() => { setEmptyModalActive(true); setAddActive(true); }}>
         <FontAwesomeIcon icon={faPlusCircle} />
       </button> */}
 
-      {/* все созданные программы */}
-      {searchResults.map(value => (
-        <div className='cart-qr-group' key={value.id}>
-          <div className='data-qr'>
-            <div className='qr1'>
-              <p><span>Семестр: </span>{value.program.semester}</p>
-              <p><span>Степень образования: </span>{value.grade.title}</p>
-              <p><span>Направленность: </span>{value.directivity.title}</p>
-            </div>
-            <div className='qr2'>
-              <span>Дисциплины: </span>
-              <div className='dicip'>
-                {value.disciplines.map((res) => (
-                  <p>{res.title}</p>
-                ))}
+        {/* все созданные программы */}
+        {searchResults.map(value => (
+          <div className='cart-qr-group' key={value.id}>
+            <div className='data-qr'>
+              <div className='qr1'>
+                <p><span>Семестр: </span>{value.program.semester}</p>
+                <p><span>Степень образования: </span>{value.grade.title}</p>
+                <p><span>Направленность: </span>{value.directivity.title}</p>
+              </div>
+              <div className='qr2'>
+                <span>Дисциплины: </span>
+                <div className='dicip'>
+                  {value.disciplines.map((res) => (
+                    <p>{res.title}</p>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          <button
-            className='qr-setting'
-            onClick={() => {
-              if (isSetOpen === true && value.program.id !== selectedItemId) {
-                closeModal();
-                openModal(value.program.id);
-              }
-              else if (isSetOpen === true) {
-                closeModal();
-              }
-              else {
-                openModal(value.program.id);
-              }
-            }}
-          >
-            <img src={require('../../img/setting.png')} alt='setting' />
-          </button>
+            <button
+              className='qr-setting'
+              onClick={() => {
+                if (isSetOpen === true && value.program.id !== selectedItemId) {
+                  closeModal();
+                  openModal(value.program.id);
+                }
+                else if (isSetOpen === true) {
+                  closeModal();
+                }
+                else {
+                  openModal(value.program.id);
+                }
+              }}
+            >
+              <img src={require('../../img/setting.png')} alt='setting' />
+            </button>
 
-          {isSetOpen && selectedItemId === value.program.id && (
-            <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
-              <button className='btn-create-qr' onClick={() => {
-                document.body.style.overflow = 'hidden';
-                document.body.style.paddingRight = `${scrollBarWidth}px`;
-                setErrorGroup('');
-                setGroupQR([]);
-                setIdProgram(value.program.id);
-                setDirectivityId(value.directivity.id);
-                setEmptyModalActive(true)
-              }}>
-                <img src={require('../../img/qr_white.png')} />
-              </button>
-              <button onClick={() => {
-                document.body.style.overflow = 'hidden';
-                document.body.style.paddingRight = `${scrollBarWidth}px`;
-                setErrorDis('');
-                setErrorType('');
-                setNewDisc(null);
-                setNewType(null);
-                setIdProgram(value.program.id);
-                setTitleProgram(`${value.directivity.title}, ${value.grade.title.toLowerCase()}, ${value.program.semester} семестр`);
-                setEditModalActive(true);
-              }}>
-                <img src={require('../../img/edit.png')} alt='edit' />
-              </button>
-              {/* <button>
+            {isSetOpen && selectedItemId === value.program.id && (
+              <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
+                <button className='btn-create-qr' onClick={() => {
+                  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                  document.body.style.overflow = 'hidden';
+                  const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                  for (let i = 0; i < adMainHeaders.length; i++) {
+                    adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                  }
+                  document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+                  setErrorGroup('');
+                  setGroupQR([]);
+                  setIdProgram(value.program.id);
+                  setDirectivityId(value.directivity.id);
+                  setEmptyModalActive(true)
+                }}>
+                  <img src={require('../../img/qr_white.png')} />
+                </button>
+                <button onClick={() => {
+                  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                  document.body.style.overflow = 'hidden';
+                  const adMainHeaders = document.getElementsByClassName('ad_main_header');
+                  for (let i = 0; i < adMainHeaders.length; i++) {
+                    adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                  }
+                  document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+                  setErrorDis('');
+                  setErrorType('');
+                  setNewDisc(null);
+                  setNewType(null);
+                  setIdProgram(value.program.id);
+                  setTitleProgram(`${value.directivity.title}, ${value.grade.title.toLowerCase()}, ${value.program.semester} семестр`);
+                  setEditModalActive(true);
+                }}>
+                  <img src={require('../../img/edit.png')} alt='edit' />
+                </button>
+                {/* <button>
                 <img src={require('../../img/delete.png')} alt='delete' />
               </button> */}
 
 
-            </div>
-          )}
-        </div>
-      ))}
+              </div>
+            )}
+          </div>
+        ))}
 
-      {hasMoreData && (
-        <button className='btn-loadMore' onClick={loadMore}>
-          Загрузить ещё
-        </button>
-      )}
-
+        {hasMoreData && (
+          <button className='btn-loadMore' onClick={loadMore}>
+            Загрузить ещё
+          </button>
+        )}
+      </div>
       <Empty_modal active={emptyModalActive} setActive={setEmptyModalActive}>
         <div className='modal-groups'>
           <div><p><b>Выберите группы: </b></p></div>
@@ -842,8 +866,12 @@ function CreateQR() {
 
             <button onClick={() => {
               setEmptyModalActive(false);
-              document.body.style.overflow = 'auto';
-              document.body.style.paddingRight = `0px`;
+              document.body.style.overflow = '';
+              const adMainHeaders = document.getElementsByClassName('ad_main_header');
+              for (let i = 0; i < adMainHeaders.length; i++) {
+                adMainHeaders[i].style.paddingRight = `10px`;
+              }
+              document.getElementById('body-content').style.paddingRight = ``;
 
             }}>Отмена</button>
           </div>
