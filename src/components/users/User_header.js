@@ -10,7 +10,7 @@ function User_header() {
     const menuRef = useRef(null);
 
     useEffect(() => {
-        
+
 
         // Функция, которая будет вызываться при клике вне меню
         const handleClickOutside = (event) => {
@@ -30,9 +30,9 @@ function User_header() {
         };
     }, []);
 
-    document.body.style.overflowX = 'hidden';
 
-       
+
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         setIsAuthenticated(false);
@@ -43,26 +43,27 @@ function User_header() {
         return <Navigate to='/' />
     }
     return (
-        <div className='ad_main_header'>
-            <img className='ad_main_logo' src={require('../../img/logo1.png')} />
-            <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
-                <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
-            </button>
-            <nav className={`menu ${isOpen ? "active" : ""}`}>
-                <ul className='menu_list'>
-                    <Link to="/UserMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
-                    <Link to="/UserSubject" className='link-to'><li className='menu_item'>Дисциплины</li></Link>
-                    <Link to="/UserProf" className='link-to'><li className='menu_item'>Сотрудники</li></Link>
-                </ul>
-            </nav>
+        <div className='us_main_header'>
+            <div className='us_main_header-content'>
+                <img className='us_main_logo' src={require('../../img/logo1.png')} />
+                <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
+                    <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
+                </button>
+                <nav className={`menu ${isOpen ? "active" : ""}`}>
+                    <ul className='menu_list'>
+                        <Link to="/UserMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
+                        <Link to="/UserSubject" className='link-to'><li className='menu_item'>Дисциплины</li></Link>
+                        <Link to="/UserProf" className='link-to'><li className='menu_item'>Сотрудники</li></Link>
+                    </ul>
+                </nav>
 
 
-            <Link to='/UserAccount' className='user-to-account'>Мой аккаунт</Link>
-            {/* <div className='user-to-exit'>Выход</div> */}
+                <Link to='/UserAccount' className='user-to-account'>Мой аккаунт</Link>
+                {/* <div className='user-to-exit'>Выход</div> */}
 
-            <div className='user-to-exit' onClick={handleLogout}>Выход</div>
+                <div className='user-to-exit' onClick={handleLogout}>Выход</div>
+            </div>
         </div>
-
     );
 }
 

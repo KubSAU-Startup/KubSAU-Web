@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import '../admin/Admin_main.css';
 import User_header from './User_header';
+import '../admin/Admin_students.css'
 import { getDataAdminJournal, getTextError, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, editWork, deleteWork } from '../../network';
 import Select from 'react-select';
 import Error_modal from '../Modal/Error_modal';
 import Error_empty from '../Modal/Error_empty';
-
+import { faFilter, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { customStyles, customStylesModal } from '../Select_style/Select_style';
 import Loading from '../Modal/Loading';
 import Empty_modal from '../Modal/Empty_modal';
 import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
+import Error_ok from '../Modal/Error_ok';
 
 function User_main() {
     const [errorActive, setErrorActive] = useState(false);
@@ -43,6 +46,7 @@ function User_main() {
     const [codeText, setCodeText] = useState('');
     // переменная для получения данных карточек из бэка
     const [mainData, setMainData] = useState([]);
+    const [errorOkActive, setErrorOkActive] = useState(false);
 
     const [journalParam, setJournalParam] = useState({});
 
@@ -283,19 +287,23 @@ function User_main() {
                 } else {
                     setTextError(res.message);
                     setCodeText(res.code);
-                    setErrorEmptyActive(true);
+                    setErrorOkActive(true);
                 }
                 setIsLoading(false);
 
             }).catch((error) => {
                 setTextError(error.message);
                 setCodeText(error.code);
-                setErrorEmptyActive(true);
+                setErrorOkActive(true);
                 setIsLoading(false);
             });
             setModalEditActive(false);
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = `0px`;
+            document.body.style.overflow = '';
+            const usMainHeaders = document.getElementsByClassName('us_main_header');
+            for (let i = 0; i < usMainHeaders.length; i++) {
+                usMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
         }
     }
 
@@ -308,13 +316,13 @@ function User_main() {
             } else {
                 setTextError(res.message);
                 setCodeText(res.code);
-                setErrorEmptyActive(true);
+                setErrorOkActive(true);
             }
             setIsLoading(false);
         }).catch((error) => {
             setTextError(error.message);
             setCodeText(error.code);
-            setErrorEmptyActive(true);
+            setErrorOkActive(true);
             setIsLoading(false);
         });
 
@@ -357,184 +365,197 @@ function User_main() {
     function handleModalDepartment(data) {
         setDepartmentEdit(data);
     }
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
 
     return (
         <>
+
             {/* окно загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
             {/* шапка страницы */}
             <User_header />
-
-            {/* поиск */}
-            <div className='admin-main-search'>
-                <input
-                    type='text'
-                    value={inputValue}
-                    onChange={handleInputValue}
-                    placeholder='Поиск...'
-                />
-            </div>
-
-            {/* фильтры */}
-            <div className='filters'>
-                <div>
-                    <Select
-                        styles={customStyles}
-                        placeholder="Тип работы"
-                        value={selectedWorkType}
-                        onChange={handleSelectType}
-                        isSearchable={true}
-                        options={filterWorkType.map(workTypes => ({
-                            value: workTypes.id,
-                            label: workTypes.title,
-                        }))}
-                    />
-                </div>
-                <div>
-                    <Select
-                        styles={customStyles}
-                        placeholder="Дисциплина"
-                        value={selectedDiscipline}
-                        onChange={handleSelectDiscipline}
-                        isSearchable={true}
-                        options={filterDiscipline.map(disciplines => ({
-                            value: disciplines.id,
-                            label: disciplines.title,
-                        }))}
-                    />
-                </div>
-                <div>
-                    <Select
-                        styles={customStyles}
-                        placeholder="Преподаватель"
-                        value={selectedTeacher}
-                        onChange={handleSelectTeacher}
-                        isSearchable={true}
-                        options={filterEmployees.map(teachers => ({
-                            value: teachers.id,
-                            label: teachers.title,
-                        }))}
-                    />
-                </div>
-                <div>
-                    <Select
-                        styles={customStyles}
-                        placeholder="Группа"
-                        value={selectedGroup}
-                        onChange={handleSelectGroup}
-                        isSearchable={true}
-                        options={filterGroup.map(groups => ({
-                            value: groups.id,
-                            label: groups.title,
-                        }))}
-                    />
-                </div>
-                <div>
-                    <Select
-                        styles={customStyles}
-                        placeholder="Кафедра"
-                        value={selectedDepartment}
-                        onChange={handleSelectDepartment}
-                        isSearchable={true}
-                        options={filterDepartments.map(department => ({
-                            value: department.id,
-                            label: department.title,
-                        }))}
+            <div id='body-content'>
+                {/* поиск */}
+                <div className='admin-main-search'>
+                    <input
+                        type='text'
+                        value={inputValue}
+                        onChange={handleInputValue}
+                        placeholder='Поиск...'
                     />
                 </div>
 
-                {/* кнопки применить и сбросить */}
-                <button className='get-params' type='submit' onClick={getParams}>Применить</button>
-                <button className='delete-params' onClick={resetFilters}>Сбросить</button>
-            </div>
-
-            {/* данные о зарегистрированных работах (карточки) */}
-            {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
-
-            {searchResults.map(entries => (
-                <div className='cart-stud' key={entries.work.id}>
-                    <div className='data'>
-                        {new Date(entries.work.registrationDate).toLocaleString("ru-ru")}
+                {/* фильтры */}
+                <div className='filters'>
+                    <div>
+                        <Select
+                            styles={customStyles}
+                            placeholder="Тип работы"
+                            value={selectedWorkType}
+                            onChange={handleSelectType}
+                            isSearchable={true}
+                            options={filterWorkType.map(workTypes => ({
+                                value: workTypes.id,
+                                label: workTypes.title,
+                            }))}
+                        />
                     </div>
-                    <div className='content'>
-                        <div className='col1'>
-                            <p><span>ФИО:</span> {entries.student.fullName}</p>
-                            <p><span>Группа:</span> {entries.group.title}</p>
-                            <p><span>Тип работы:</span> {entries.work.type.title}</p>
-                            <p><span>Статус:</span> {entries.student.status.title}</p>
-                        </div>
-                        <div className='col2'>
-                            <p><span>Дисциплина:</span> {entries.discipline.title}</p>
-                            <p><span>Преподаватель:</span> {entries.employee.lastName} {entries.employee.firstName} {entries.employee.middleName}</p>
-                            <p><span>Кафедра:</span> {entries.department.title}</p>
-                            {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
-                        </div>
+                    <div>
+                        <Select
+                            styles={customStyles}
+                            placeholder="Дисциплина"
+                            value={selectedDiscipline}
+                            onChange={handleSelectDiscipline}
+                            isSearchable={true}
+                            options={filterDiscipline.map(disciplines => ({
+                                value: disciplines.id,
+                                label: disciplines.title,
+                            }))}
+                        />
                     </div>
-                    <button
-                        className='qr-setting'
-                        onClick={() => {
-                            if (isSetOpen === true && entries.work.id !== selectedItemId) {
-                                closeModal();
-                                openModal(entries.work.id);
-                            }
-                            else if (isSetOpen === true) {
-                                closeModal();
-                            }
-                            else {
-                                openModal(entries.work.id);
-                            }
-                        }}
-                    >
-                        <img src={require('../../img/setting.png')} alt='setting' />
+                    <div>
+                        <Select
+                            styles={customStyles}
+                            placeholder="Преподаватель"
+                            value={selectedTeacher}
+                            onChange={handleSelectTeacher}
+                            isSearchable={true}
+                            options={filterEmployees.map(teachers => ({
+                                value: teachers.id,
+                                label: teachers.title,
+                            }))}
+                        />
+                    </div>
+                    <div>
+                        <Select
+                            styles={customStyles}
+                            placeholder="Группа"
+                            value={selectedGroup}
+                            onChange={handleSelectGroup}
+                            isSearchable={true}
+                            options={filterGroup.map(groups => ({
+                                value: groups.id,
+                                label: groups.title,
+                            }))}
+                        />
+                    </div>
+                    <div>
+                        <Select
+                            styles={customStyles}
+                            placeholder="Кафедра"
+                            value={selectedDepartment}
+                            onChange={handleSelectDepartment}
+                            isSearchable={true}
+                            options={filterDepartments.map(department => ({
+                                value: department.id,
+                                label: department.title,
+                            }))}
+                        />
+                    </div>
+
+                    {/* кнопки применить и сбросить */}
+                    <button className='get-params' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
+                    {/* очистить фильтры */}
+                    <button className='delete-params' onClick={resetFilters}><FontAwesomeIcon icon={faUndo} /></button>
+                </div>
+
+                {/* данные о зарегистрированных работах (карточки) */}
+                {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
+
+                {searchResults.map(entries => (
+                    <div className='cart-stud' key={entries.work.id}>
+                        <div className='data'>
+                            {new Date(entries.work.registrationDate).toLocaleString("ru-ru")}
+                        </div>
+                        <div className='content'>
+                            <div className='col1'>
+                                <p><span>ФИО:</span> {entries.student.fullName}</p>
+                                <p><span>Группа:</span> {entries.group.title}</p>
+                                <p><span>Тип работы:</span> {entries.work.type.title}</p>
+                                <p><span>Статус:</span> {entries.student.status.title}</p>
+                            </div>
+                            <div className='col2'>
+                                <p><span>Дисциплина:</span> {entries.discipline.title}</p>
+                                <p><span>Преподаватель:</span> {entries.employee.lastName} {entries.employee.firstName} {entries.employee.middleName}</p>
+                                <p><span>Кафедра:</span> {entries.department.title}</p>
+                                {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
+                            </div>
+                        </div>
+                        <button
+                            className='qr-setting'
+                            onClick={() => {
+                                if (isSetOpen === true && entries.work.id !== selectedItemId) {
+                                    closeModal();
+                                    openModal(entries.work.id);
+                                }
+                                else if (isSetOpen === true) {
+                                    closeModal();
+                                }
+                                else {
+                                    openModal(entries.work.id);
+                                }
+                            }}
+                        >
+                            <img src={require('../../img/setting.png')} alt='setting' />
+                        </button>
+                        {isSetOpen && selectedItemId === entries.work.id && (
+                            <div className={`button-edit-delete ${isSetOpen && selectedItemId === entries.work.id ? 'active' : ''}`}>
+                                <button onClick={() => {
+
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+                                    setEditId(entries.work.id);
+                                    setDateTime(entries.work.registrationDate);
+                                    setErrorTitle('');
+
+                                    // setStudentEdit({ value: entries.student.id, label: entries.student.title });
+                                    // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
+                                    // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });
+                                    // setDepartmentEdit({ value: entries.department.id, label: entries.department.title });setStudentEdit({ value: entries.student.id, label: entries.student.title });
+                                    setStudentEdit(entries.student.fullName);
+                                    setDisciplineEdit(entries.discipline.title);
+                                    setWorkTypeEdit(entries.work.type.title);
+                                    // setEmplLastN();
+                                    // setEmplFirstN();
+                                    // setEmplMiddleN();
+                                    setDepartmentEdit(entries.department.title);
+                                    entries.work.title && setTitleEdit(entries.work.title);
+                                    setModalEditActive(true)
+                                }}>
+                                    <img src={require('../../img/edit.png')} alt='edit' />
+                                </button>
+                                <button onClick={() => {
+                                    setModalDeleteActive(true); setDeleteId(entries.work.id);
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+
+                                }}>
+                                    <img src={require('../../img/delete.png')} alt='delete' />
+                                </button>
+                            </div>)}
+                    </div>
+                ))}
+
+                {/* кнопка пагинации */}
+
+                {hasMoreData && (
+                    <button className='btn-loadMore' onClick={loadMore}>
+                        Загрузить ещё
                     </button>
-                    {isSetOpen && selectedItemId === entries.work.id && (
-                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === entries.work.id ? 'active' : ''}`}>
-                            <button onClick={() => {
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-                                setEditId(entries.work.id);
-                                setDateTime(entries.work.registrationDate);
-                                setErrorTitle('');
-
-                                // setStudentEdit({ value: entries.student.id, label: entries.student.title });
-                                // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
-                                // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });
-                                // setDepartmentEdit({ value: entries.department.id, label: entries.department.title });setStudentEdit({ value: entries.student.id, label: entries.student.title });
-                                setStudentEdit(entries.student.fullName);
-                                setDisciplineEdit(entries.discipline.title);
-                                setWorkTypeEdit(entries.work.type.title);
-                                // setEmplLastN();
-                                // setEmplFirstN();
-                                // setEmplMiddleN();
-                                setDepartmentEdit(entries.department.title);
-                                entries.work.title && setTitleEdit(entries.work.title);
-                                setModalEditActive(true)
-                            }}>
-                                <img src={require('../../img/edit.png')} alt='edit' />
-                            </button>
-                            <button onClick={() => {
-                                setModalDeleteActive(true); setDeleteId(entries.work.id);
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-                            }}>
-                                <img src={require('../../img/delete.png')} alt='delete' />
-                            </button>
-                        </div>)}
-                </div>
-            ))}
-
-            {/* кнопка пагинации */}
-
-            {hasMoreData && (
-                <button className='btn-loadMore' onClick={loadMore}>
-                    Загрузить ещё
-                </button>
-            )}
-
+                )}
+            </div>
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
                 <div className='modal-main'>
                     <div className='grid'>
@@ -650,9 +671,17 @@ function User_main() {
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
-                        document.body.style.overflow = 'auto';
-                        document.body.style.paddingRight = `0px`;
-                        
+
+                        document.body.style.overflow = '';
+                        const usMainHeaders = document.getElementsByClassName('us_main_header');
+                        for (let i = 0; i < usMainHeaders.length; i++) {
+                            usMainHeaders[i].style.paddingRight = `10px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = ``;
+
+                        // Восстанавливаем позицию прокрутки
+
+
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
@@ -663,14 +692,22 @@ function User_main() {
                         <button onClick={() => {
                             deleteData();
                             setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const usMainHeaders = document.getElementsByClassName('us_main_header');
+                            for (let i = 0; i < usMainHeaders.length; i++) {
+                                usMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
 
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const usMainHeaders = document.getElementsByClassName('us_main_header');
+                            for (let i = 0; i < usMainHeaders.length; i++) {
+                                usMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
 
 
                         }}>Отмена</button>
@@ -681,6 +718,7 @@ function User_main() {
             {/* модальное окно ошибки */}
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
 
         </>
     );

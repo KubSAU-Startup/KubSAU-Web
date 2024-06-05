@@ -22,7 +22,7 @@ function User_subject() {
     useEffect(() => {
         setVisibleItems(30);
         setIsLoading(true);
-        
+
         getAllDisciplines((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -79,28 +79,29 @@ function User_subject() {
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
 
             <User_header />
-            <div className='admin-main-search'>
-                <input
-                    type='text'
-                    value={searchTerm}
-                    onChange={handleChange}
-                    placeholder='Поиск...'
-                />
-            </div>
-
-            {searchResults.slice(0, visibleItems).map(res => (
-                <div className='cart-stud' key={res.id}>
-                    <div className='content'>
-                            <p><span>Название:</span> {res.title}</p>                        
-                    </div>
+            <div id='body-content'>
+                <div className='admin-main-search'>
+                    <input
+                        type='text'
+                        value={searchTerm}
+                        onChange={handleChange}
+                        placeholder='Поиск...'
+                    />
                 </div>
-            ))}
-            {/* кнопка пагинации */}
-            {isPaginationVisible && (
-                <button className='btn-loadMore' onClick={loadMore}>
-                    Загрузить ещё
-                </button>
-            )}</>
+
+                {searchResults.slice(0, visibleItems).map(res => (
+                    <div className='cart-stud' key={res.id}>
+                        <div className='content'>
+                            <p><span>Название:</span> {res.title}</p>
+                        </div>
+                    </div>
+                ))}
+                {/* кнопка пагинации */}
+                {isPaginationVisible && (
+                    <button className='btn-loadMore' onClick={loadMore}>
+                        Загрузить ещё
+                    </button>
+                )}</div></>
     );
 }
 

@@ -178,8 +178,12 @@ function User_prof() {
                 setIsLoading(false);
             });
 
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = `0px`;
+            document.body.style.overflow = '';
+            const usMainHeaders = document.getElementsByClassName('us_main_header');
+            for (let i = 0; i < usMainHeaders.length; i++) {
+                usMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
 
             setModalActive(false);
         }
@@ -243,8 +247,12 @@ function User_prof() {
                 setErrorOkActive(true);
                 setIsLoading(false);
             });
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = `0px`;
+            document.body.style.overflow = '';
+            const usMainHeaders = document.getElementsByClassName('us_main_header');
+            for (let i = 0; i < usMainHeaders.length; i++) {
+                usMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
             setModalEditActive(false);
 
         }
@@ -377,112 +385,128 @@ function User_prof() {
             {/* окно загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
             <User_header />
-            <div className='admin-main-search'>
-                <input
-                    type='text'
-                    value={searchTerm}
-                    onChange={handleChange}
-                    placeholder='Поиск...'
-                />
-            </div>
-            <div className='filters'>
-                <Select
-                    styles={customStyles}
-                    placeholder="Должность"
-                    value={filterType}
-                    onChange={handleFilterType}
-                    isSearchable={true}
-                    options={position}
-                />
-                <button className='get-params' type='submit' onClick={getParams}>Применить</button>
-                <button className='delete-params' onClick={resetParams}>Сбросить</button>
-
-            </div>
-
-            <button className='add-student' onClick={() => {
-                setModalActive(true);
-                document.body.style.overflow = 'hidden';
-                document.body.style.paddingRight = `${scrollBarWidth}px`;
-                setLastN('');
-                setFirstN('');
-                setMiddleN('');
-                setEmail('');
-                setModalStaff(null);
-                setErrorLastN('');
-                setErrorFirstN('');
-                setErrorMiddleN('');
-                setErrorStaff('');
-                setErrorEmail('');
-            }}>
-                <FontAwesomeIcon icon={faPlusCircle} />
-            </button>
-            {searchResults.slice(0, visibleItems).map(res => (
-
-                <div className='cart-stud' key={res.id}>
-                    <div className='content'>
-                        <div className='col1'>
-                            <p><span>ФИО сотрудника:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
-
-                        </div>
-                        <div className='col2'>
-                            <p><span>Должность:</span> {res.type && position.find(r => r.value === res.type)?.label}</p>
-                        </div>
-                    </div>
-                    <button
-                        className='qr-setting'
-                        onClick={() => {
-                            if (isSetOpen === true && res.id !== selectedItemId) {
-                                closeModal();
-                                openModal(res.id);
-                            }
-                            else if (isSetOpen === true) {
-                                closeModal();
-                            }
-                            else {
-                                openModal(res.id);
-                            }
-                        }}>
-                        <img src={require('../../img/setting.png')} alt='setting' />
-                    </button>
-                    {isSetOpen && selectedItemId === res.id && (
-                        <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
-                            <button onClick={() => {
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
-                                setErrorLastN('');
-                                setErrorFirstN('');
-                                setErrorMiddleN('');
-                                setErrorStaff('');
-                                setErrorEmail('');
-                                setModalEditActive(true);
-                                setFirstNEdit(res.firstName);
-                                setLastNEdit(res.lastName);
-                                setMiddleNEdit(res.middleName);
-                                setEmailEdit(res.email);
-                                setModalStaffEdit({ value: res.type, label: position.find(r => r.value === res.type).label });
-                                setEditId(res.id);
-
-                            }}>
-                                <img src={require('../../img/edit.png')} alt='edit' />
-                            </button>
-                            <button onClick={() => {
-                                setModalDeleteActive(true); setDeleteId(res.id);
-                                document.body.style.overflow = 'hidden';
-                                document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-                            }}>
-                                <img src={require('../../img/delete.png')} alt='delete' />
-                            </button>
-                        </div>)}
+            <div id='body-content'>
+                <div className='admin-main-search'>
+                    <input
+                        type='text'
+                        value={searchTerm}
+                        onChange={handleChange}
+                        placeholder='Поиск...'
+                    />
                 </div>
-            ))}
-            {/* кнопка пагинации */}
-            {isPaginationVisible && (
-                <button className='btn-loadMore' onClick={loadMore}>
-                    Загрузить ещё
-                </button>
-            )}
+                <div className='filters'>
+                    <Select
+                        styles={customStyles}
+                        placeholder="Должность"
+                        value={filterType}
+                        onChange={handleFilterType}
+                        isSearchable={true}
+                        options={position}
+                    />
+                    <button className='get-params' type='submit' onClick={getParams}>Применить</button>
+                    <button className='delete-params' onClick={resetParams}>Сбросить</button>
 
+                </div>
+
+                <button className='add-student' onClick={() => {
+                    setModalActive(true);
+                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                    document.body.style.overflow = 'hidden';
+                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                    for (let i = 0; i < usMainHeaders.length; i++) {
+                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                    }
+                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+                    setLastN('');
+                    setFirstN('');
+                    setMiddleN('');
+                    setEmail('');
+                    setModalStaff(null);
+                    setErrorLastN('');
+                    setErrorFirstN('');
+                    setErrorMiddleN('');
+                    setErrorStaff('');
+                    setErrorEmail('');
+                }}>
+                    <FontAwesomeIcon icon={faPlusCircle} />
+                </button>
+                {searchResults.slice(0, visibleItems).map(res => (
+
+                    <div className='cart-stud' key={res.id}>
+                        <div className='content'>
+                            <div className='col1'>
+                                <p><span>ФИО сотрудника:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
+
+                            </div>
+                            <div className='col2'>
+                                <p><span>Должность:</span> {res.type && position.find(r => r.value === res.type)?.label}</p>
+                            </div>
+                        </div>
+                        <button
+                            className='qr-setting'
+                            onClick={() => {
+                                if (isSetOpen === true && res.id !== selectedItemId) {
+                                    closeModal();
+                                    openModal(res.id);
+                                }
+                                else if (isSetOpen === true) {
+                                    closeModal();
+                                }
+                                else {
+                                    openModal(res.id);
+                                }
+                            }}>
+                            <img src={require('../../img/setting.png')} alt='setting' />
+                        </button>
+                        {isSetOpen && selectedItemId === res.id && (
+                            <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                                <button onClick={() => {
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+                                    setErrorLastN('');
+                                    setErrorFirstN('');
+                                    setErrorMiddleN('');
+                                    setErrorStaff('');
+                                    setErrorEmail('');
+                                    setModalEditActive(true);
+                                    setFirstNEdit(res.firstName);
+                                    setLastNEdit(res.lastName);
+                                    setMiddleNEdit(res.middleName);
+                                    setEmailEdit(res.email);
+                                    setModalStaffEdit({ value: res.type, label: position.find(r => r.value === res.type).label });
+                                    setEditId(res.id);
+
+                                }}>
+                                    <img src={require('../../img/edit.png')} alt='edit' />
+                                </button>
+                                <button onClick={() => {
+                                    setModalDeleteActive(true); setDeleteId(res.id);
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+                                }}>
+                                    <img src={require('../../img/delete.png')} alt='delete' />
+                                </button>
+                            </div>)}
+                    </div>
+                ))}
+                {/* кнопка пагинации */}
+                {isPaginationVisible && (
+                    <button className='btn-loadMore' onClick={loadMore}>
+                        Загрузить ещё
+                    </button>
+                )}
+            </div>
             <Empty_modal active={modalActive} setActive={setModalActive}>
 
                 <div className='modal-students'>
@@ -536,8 +560,12 @@ function User_prof() {
                         }}>Сохранить</button>
                         <button onClick={() => {
 
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const usMainHeaders = document.getElementsByClassName('us_main_header');
+                            for (let i = 0; i < usMainHeaders.length; i++) {
+                                usMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``; 
                             setLastN('');
                             setFirstN('');
                             setMiddleN('');
@@ -610,8 +638,12 @@ function User_prof() {
                             editData();
                         }}>Сохранить</button>
                         <button onClick={() => {
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const usMainHeaders = document.getElementsByClassName('us_main_header');
+                            for (let i = 0; i < usMainHeaders.length; i++) {
+                                usMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
                             setLastNEdit('');
                             setFirstNEdit('');
                             setMiddleNEdit('');
@@ -635,18 +667,27 @@ function User_prof() {
                     <div className='modal-button'>
                         <button onClick={() => {
                             deleteData(); setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const usMainHeaders = document.getElementsByClassName('us_main_header');
+                            for (let i = 0; i < usMainHeaders.length; i++) {
+                                usMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
 
                         }}>Удалить</button>
                         <button onClick={() => {
                             setModalDeleteActive(false);
-                            document.body.style.overflow = 'auto';
-                            document.body.style.paddingRight = `0px`;
+                            document.body.style.overflow = '';
+                            const usMainHeaders = document.getElementsByClassName('us_main_header');
+                            for (let i = 0; i < usMainHeaders.length; i++) {
+                                usMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
 
                         }}>Отмена</button>
                     </div>
                 </div>
+
             </Empty_modal>
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
