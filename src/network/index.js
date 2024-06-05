@@ -399,7 +399,18 @@ async function getAllWorkTypes(callback) {
     })
 }
 
+async function generateQrCodes(id, groups, callback) {
+    const url = `${baseUrl_test}/programs/${id}/qr`;
 
+    await axios.get(url, {
+        params: {
+            groupIds: groups
+        },
+        responseType: 'arraybuffer'
+    }).then((res) => {
+        callback(res.data);
+    })
+}
 
 function getTextError(data) {
     let textError = '';
@@ -425,7 +436,7 @@ export {
     getAllStudents, getTextError, getDataForQR, 
     // getDisciplinesForPrograms, getGroups, getStudents, 
     getAllDisciplines,
-    getAllWorkTypes, 
+    getAllWorkTypes, generateQrCodes,
     getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
     searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines, deleteWork
