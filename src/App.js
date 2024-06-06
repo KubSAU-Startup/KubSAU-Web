@@ -17,6 +17,7 @@ import User_main from './components/users/User_main';
 import User_subject from './components/users/User_subject';
 import User_prof from './components/users/User_prof';
 import Admin_groups from './components/admin/Admin_groups';
+import User_choice from './components/users/User_choice';
 
 function App() {
 
@@ -45,6 +46,8 @@ function App() {
         <Route path='AdminAccount' element={<Admin_account />} />
         <Route path='AdminUsers' element={<Admin_users />} />
         {/* <Route path='/' element={isAut  henticated ? <User_main /> : <Log />} /> */}
+        <Route path='UserChoice' element={<User_choice />} />
+
         <Route path='UserAccount' element={<User_account />} />
         <Route path='UserMain' element={<User_main />} />
         <Route path='UserSubject' element={<User_subject />} />

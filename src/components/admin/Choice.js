@@ -18,13 +18,14 @@ function Choice() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
 
     checkAccount((res) => {
       if (res.error) {
         setTextError(getTextError(res.error));
         setErrorActive(true);
         setIsLoading(false);
-      }else{
+      } else {
         setIsLoading(false);
       }
 
@@ -33,25 +34,27 @@ function Choice() {
 
   return (
     <>
-      <Loading active={isLoading} setActive={setIsLoading}/>
+      <Loading active={isLoading} setActive={setIsLoading} />
+      <div id='body-content'>
 
-      <div className='cont-carts'>
-       
-        <Link to={'/AdminMain'} className='views-info'>
-          <img className='choice-img' src={require('../../img/file.png')} />
-          <div className='choice-text'>
-            <p>Просмотр и редактирование информации</p>
-          </div>
-          <img className='choice-arrow' src={require('../../img/arrow.png')} />
-        </Link>
+        <div className='cont-carts'>
 
-        <Link to={'/CreateQR'} className='createQR'>
-          <img className='choice-img' src={require('../../img/qr.png')} />
-          <div className='choice-text'>
-            <p>Создать QR-код</p>
-          </div>
-          <img className='choice-arrow' src={require('../../img/arrow.png')} />
-        </Link>
+          <Link to={'/AdminMain'} className='views-info'>
+            <img className='choice-img' src={require('../../img/file.png')} />
+            <div className='choice-text'>
+              <p>Просмотр и редактирование информации</p>
+            </div>
+            <img className='choice-arrow' src={require('../../img/arrow.png')} />
+          </Link>
+
+          <Link to={'/CreateQR'} className='createQR'>
+            <img className='choice-img' src={require('../../img/qr.png')} />
+            <div className='choice-text'>
+              <p>Создать QR-код</p>
+            </div>
+            <img className='choice-arrow' src={require('../../img/arrow.png')} />
+          </Link>
+        </div>
       </div>
 
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />

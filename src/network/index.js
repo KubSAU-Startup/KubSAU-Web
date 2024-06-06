@@ -412,6 +412,26 @@ async function generateQrCodes(id, groups, callback) {
     })
 }
 
+async function modifySession(depId, callback) {
+    const url = `${baseUrl_test}/auth`;
+
+    await axios.patch(url,{
+        params:{
+            departmentId: depId
+        }
+    }).then((res) => {
+        callback(res.data);
+    })
+}
+async function getEmployeeById(id, callback) {
+    const url = `${baseUrl_test}/employees/${id}`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    })
+}
+
+
 function getTextError(data) {
     let textError = '';
     switch (data.code) {
@@ -432,13 +452,14 @@ function getTextError(data) {
 }
 
 export {
-    checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
-    getAllStudents, getTextError, getDataForQR, 
-    // getDisciplinesForPrograms, getGroups, getStudents, 
-    getAllDisciplines,
-    getAllWorkTypes, generateQrCodes,
-    getAllDepartments, addNewDepartment, deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
-    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, addNewStudent, editStudent, deleteStudent,
-    searchOfStudents, getAllEmployees, getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines, deleteWork
+    checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, 
+    getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
+    getAllStudents, getTextError, getDataForQR, getAllDisciplines,
+    getAllWorkTypes, generateQrCodes, getAllDepartments, addNewDepartment, 
+    deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
+    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, 
+    addNewStudent, editStudent, deleteStudent, searchOfStudents, getAllEmployees, 
+    getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines, 
+    deleteWork, modifySession, getEmployeeById
 }
 

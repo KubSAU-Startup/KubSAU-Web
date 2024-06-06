@@ -61,12 +61,12 @@ function Log() {
 
         checkAccount((res) => {
             if (res.success) {
-               
+
                 if (isAuthenticated) {
                     if (res.response.type === 1) {
                         navigate('/Choice');
                     } else if (res.response.type === 2 || res.response.type === 3) {
-                        navigate('/UserMain');
+                        navigate('/UserChoice');
                     }
                 }
             }
@@ -90,27 +90,30 @@ function Log() {
     return (
         <>
             <Loading active={isLoading} setActive={setIsLoading} />
+            <div id='body-content'>
 
-            <div className='conteiner'>
-                <form className='auth-form' onSubmit={handleSubmit(onSubmit)} action='/'>
-                    <div className='img-conteiner'>
-                        <img src={require('../../img/logo.webp')} alt='Логотип КубГАУ' />
-                    </div>
+                <div className='conteiner'>
+                    <form className='auth-form' onSubmit={handleSubmit(onSubmit)} action='/'>
+                        <div className='img-conteiner'>
+                            <img src={require('../../img/logo.webp')} alt='Логотип КубГАУ' />
+                        </div>
 
-                    <input className='auth-email auth-input' type="email" placeholder='Почта' {...register("email", {
-                        required: true, pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    })} /><br></br>
-                    {errors.email && <p className='auth-error'>Не корректный ввод почты</p>}
+                        <input className='auth-email auth-input' type="email" placeholder='Почта' {...register("email", {
+                            required: true, pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                        })} /><br></br>
+                        {errors.email && <p className='auth-error'>Не корректный ввод почты</p>}
 
-                    <div className='passw-eye'><input className='auth-input auth-pass' type={passwordShown ? "text" : "password"} placeholder='Пароль' {...register("password")} /><i onClick={togglePasswordVisiblity}>{passwordShown ? eyeSlah : eye}</i></div>
-                    <div className='forgot_pass' onClick={() => { setForgotPass(true) }}>Забыли пароль?</div>
-                    <div><input className='auth-submit' type='submit' value='Войти'></input></div>
-                </form>
-            </div>
+                        <div className='passw-eye'><input className='auth-input auth-pass' type={passwordShown ? "text" : "password"} placeholder='Пароль' {...register("password")} /><i onClick={togglePasswordVisiblity}>{passwordShown ? eyeSlah : eye}</i></div>
+                        <div className='forgot_pass' onClick={() => { setForgotPass(true) }}>Забыли пароль?</div>
+                        <div><input className='auth-submit' type='submit' value='Войти'></input></div>
+                    </form>
+                </div>
+            </div >
+
             <Error_auth_data active={errorActive} setActive={setErrorActive} />
             <Forgot_pass active={forgotPass} setActive={setForgotPass} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
-            </>
+        </>
     );
 }
 
