@@ -10,13 +10,15 @@ import { checkAccount } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { getTextError } from '../../network';
 import Loading from '../Modal/Loading';
+import Error_empty from '../Modal/Error_empty';
 
 function Choice() {
 
   const [errorActive, setErrorActive] = useState(false);
   const [textError, setTextError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-
+  const [codeText, setCodeText] = useState('');
+  const [errorEmptyActive, setErrorEmptyActive] = useState(false);
   useEffect(() => {
     setIsLoading(true);
 
@@ -29,7 +31,12 @@ function Choice() {
         setIsLoading(false);
       }
 
-    })
+    }).catch((error) => {
+      setTextError(error.message);
+      setCodeText(error.code);
+      setErrorEmptyActive(true);
+      setIsLoading(false);
+    });
   }, []);
 
   return (
@@ -58,6 +65,8 @@ function Choice() {
       </div>
 
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
+      <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+
     </>
   )
 }

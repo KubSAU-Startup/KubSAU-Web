@@ -90,3 +90,18 @@
 .auth-error.hide {
     visibility: hidden;
 }
+
+.url-input{
+    width: 500px;
+    padding: 10px;
+    background-color: #E2E2E2;
+    border: 1px solid #454545;
+    color: #000;
+    border-radius: 5px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+.url-modal-button{
+    display: flex;
+    justify-content: center;
+}

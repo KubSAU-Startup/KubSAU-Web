@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const baseUrl_test = 'https://kubsau-testbackend.melod1n.dedyn.io';
+// const localStorage.getItem('url') = 'https://kubsau-testbackend.melod1n.dedyn.io';
+// let localStorage.getItem('url') = localStorage.getItem('url');
+
 const baseUrl = 'https://kubsau-backend.melod1n.dedyn.io';
 
 
@@ -10,7 +12,7 @@ axios.interceptors.request.use(async request => {
 })
 
 async function loginAxios(loginInfo, callback) {
-    const url = `${baseUrl_test}/auth`
+    const url = `${localStorage.getItem('url')}/auth`
 
     await axios.post(url, {
         login: loginInfo.email,
@@ -24,7 +26,16 @@ async function loginAxios(loginInfo, callback) {
 }
 
 async function checkAccount(callback) {
-    const url = `${baseUrl_test}/account`;
+    const url = `${localStorage.getItem('url')}/account`;
+
+    await axios.get(url).then((res) => {
+        callback(res.data);
+    })
+}
+
+
+async function checkUrl(callback) {
+    const url = `${localStorage.getItem('url')}`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -32,7 +43,7 @@ async function checkAccount(callback) {
 }
 
 async function getFilterWorkType(callback) {
-    const url = `${baseUrl_test}/works/latest/filters/worktypes`;
+    const url = `${localStorage.getItem('url')}/works/latest/filters/worktypes`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -40,7 +51,7 @@ async function getFilterWorkType(callback) {
 }
 
 async function getFilterDiscipline(callback) {
-    const url = `${baseUrl_test}/works/latest/filters/disciplines`;
+    const url = `${localStorage.getItem('url')}/works/latest/filters/disciplines`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -48,7 +59,7 @@ async function getFilterDiscipline(callback) {
 }
 
 async function getFilterEmployees(callback) {
-    const url = `${baseUrl_test}/works/latest/filters/employees`;
+    const url = `${localStorage.getItem('url')}/works/latest/filters/employees`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -56,7 +67,7 @@ async function getFilterEmployees(callback) {
 }
 
 async function getFilterGroups(callback) {
-    const url = `${baseUrl_test}/works/latest/filters/groups`;
+    const url = `${localStorage.getItem('url')}/works/latest/filters/groups`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -64,7 +75,7 @@ async function getFilterGroups(callback) {
 }
 
 async function getFilterDepartments(callback) {
-    const url = `${baseUrl_test}/works/latest/filters/departments`;
+    const url = `${localStorage.getItem('url')}/works/latest/filters/departments`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -72,7 +83,7 @@ async function getFilterDepartments(callback) {
 }
 
 async function getDataAdminJournal(offset, limit, par, query, callback) {
-    const url = `${baseUrl_test}/works/latest`;
+    const url = `${localStorage.getItem('url')}/works/latest`;
 
     await axios.get(url, {
         params: {
@@ -91,7 +102,7 @@ async function getDataAdminJournal(offset, limit, par, query, callback) {
 }
 
 async function editWork(id, date, title, callback) {
-    const url = `${baseUrl_test}/works/${id}`;
+    const url = `${localStorage.getItem('url')}/works/${id}`;
     await axios.patch(url, {
         registrationDate: date,
         title: title
@@ -103,14 +114,14 @@ async function editWork(id, date, title, callback) {
 }
 
 async function deleteWork(index, callback) {
-    const url = `${baseUrl_test}/works/${index}`;
+    const url = `${localStorage.getItem('url')}/works/${index}`;
     await axios.delete(url).then((res) => {
         callback(res.data);
     })
 }
 
 async function getDataPrograms(offset, limit, param, text, callback) {
-    const url = `${baseUrl_test}/programs/search`;
+    const url = `${localStorage.getItem('url')}/programs/search`;
 
     await axios.get(url, {
         params: {
@@ -127,7 +138,7 @@ async function getDataPrograms(offset, limit, param, text, callback) {
 }
 
 async function editDisciplines(id, disciplineIds, workTypeIds, callback) {
-    const url = `${baseUrl_test}/programs/${id}/disciplines`;
+    const url = `${localStorage.getItem('url')}/programs/${id}/disciplines`;
     await axios.patch(url, {
         disciplineIds: disciplineIds,
         workTypeIds: workTypeIds
@@ -139,7 +150,7 @@ async function editDisciplines(id, disciplineIds, workTypeIds, callback) {
 }
 
 async function getDirectivitiesPrograms(callback) {
-    const url = `${baseUrl_test}/directivities`;
+    const url = `${localStorage.getItem('url')}/directivities`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -147,7 +158,7 @@ async function getDirectivitiesPrograms(callback) {
 }
 
 async function getAllDepartments(callback) {
-    const url = `${baseUrl_test}/departments`;
+    const url = `${localStorage.getItem('url')}/departments`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -156,7 +167,7 @@ async function getAllDepartments(callback) {
 }
 
 async function addNewDepartment(dapartmentTitle, departmentPhone, callback) {
-    const url = `${baseUrl_test}/departments`;
+    const url = `${localStorage.getItem('url')}/departments`;
     await axios.post(url, {
         title: dapartmentTitle,
         phone: departmentPhone
@@ -168,7 +179,7 @@ async function addNewDepartment(dapartmentTitle, departmentPhone, callback) {
 }
 
 async function editDepartment(id, dapartmentTitle, departmentPhone, callback) {
-    const url = `${baseUrl_test}/departments/${id}`;
+    const url = `${localStorage.getItem('url')}/departments/${id}`;
     await axios.patch(url, {
         title: dapartmentTitle,
         phone: departmentPhone
@@ -181,14 +192,14 @@ async function editDepartment(id, dapartmentTitle, departmentPhone, callback) {
 }
 
 async function deleteDepartment(index, callback) {
-    const url = `${baseUrl_test}/departments/${index}`;
+    const url = `${localStorage.getItem('url')}/departments/${index}`;
     await axios.delete(url).then((res) => {
         callback(res.data);
     })
 }
 
 async function getAllGroups(callback) {
-    const url = `${baseUrl_test}/groups`;
+    const url = `${localStorage.getItem('url')}/groups`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -197,7 +208,7 @@ async function getAllGroups(callback) {
 }
 
 async function getAllDirectivities(ext, callback) {
-    const url = `${baseUrl_test}/directivities`;
+    const url = `${localStorage.getItem('url')}/directivities`;
 
     await axios.get(url, {
         params: {
@@ -210,7 +221,7 @@ async function getAllDirectivities(ext, callback) {
 }
 
 async function getAllHeads(callback) {
-    const url = `${baseUrl_test}/heads`;
+    const url = `${localStorage.getItem('url')}/heads`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -219,7 +230,7 @@ async function getAllHeads(callback) {
 }
 
 async function addNewGroup(gropTitle, directId, callback) {
-    const url = `${baseUrl_test}/groups`;
+    const url = `${localStorage.getItem('url')}/groups`;
     await axios.post(url, {
         title: gropTitle,
         directivityId: directId
@@ -231,7 +242,7 @@ async function addNewGroup(gropTitle, directId, callback) {
 }
 
 async function editGroup(id, groupAbb, groupNumber, groupDirectivity, callback) {
-    const url = `${baseUrl_test}/groups/${id}`;
+    const url = `${localStorage.getItem('url')}/groups/${id}`;
     await axios.patch(url, {
         title: groupAbb + groupNumber,
         directivityId: groupDirectivity
@@ -243,14 +254,14 @@ async function editGroup(id, groupAbb, groupNumber, groupDirectivity, callback) 
     })
 }
 async function deleteGroup(index, callback) {
-    const url = `${baseUrl_test}/groups/${index}`;
+    const url = `${localStorage.getItem('url')}/groups/${index}`;
     await axios.delete(url).then((res) => {
         callback(res.data);
     })
 }
 
 async function getAllStudents(off, lim, callback) {
-    const url = `${baseUrl_test}/students?extended=true`;
+    const url = `${localStorage.getItem('url')}/students?extended=true`;
 
     await axios.get(url, {
         params: {
@@ -264,7 +275,7 @@ async function getAllStudents(off, lim, callback) {
 }
 
 async function searchOfStudents(offset, limit, param, query, callback) {
-    const url = `${baseUrl_test}/students/search`;
+    const url = `${localStorage.getItem('url')}/students/search`;
 
     await axios.get(url, {
         params: {
@@ -281,7 +292,7 @@ async function searchOfStudents(offset, limit, param, query, callback) {
 }
 
 async function addNewStudent(firstN, lastN, middleN, group, status, callback) {
-    const url = `${baseUrl_test}/students`;
+    const url = `${localStorage.getItem('url')}/students`;
     await axios.post(url, {
         firstName: firstN,
         lastName: lastN,
@@ -296,7 +307,7 @@ async function addNewStudent(firstN, lastN, middleN, group, status, callback) {
 }
 
 async function editStudent(id, firstN, lastN, middleN, group, status, callback) {
-    const url = `${baseUrl_test}/students/${id}`;
+    const url = `${localStorage.getItem('url')}/students/${id}`;
     await axios.patch(url, {
         firstName: firstN,
         lastName: lastN,
@@ -311,21 +322,21 @@ async function editStudent(id, firstN, lastN, middleN, group, status, callback) 
 }
 
 async function deleteStudent(index, callback) {
-    const url = `${baseUrl_test}/students/${index}`;
+    const url = `${localStorage.getItem('url')}/students/${index}`;
     await axios.delete(url).then((res) => {
         callback(res.data);
     })
 }
 
 async function getAllEmployees(callback) {
-    const url = `${baseUrl_test}/employees`;
+    const url = `${localStorage.getItem('url')}/employees`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
     })
 }
 async function addNewEmployee(firstN, lastN, middleN, email, typeUser, callback) {
-    const url = `${baseUrl_test}/employees`;
+    const url = `${localStorage.getItem('url')}/employees`;
     await axios.post(url, {
         firstName: firstN,
         lastName: lastN,
@@ -340,7 +351,7 @@ async function addNewEmployee(firstN, lastN, middleN, email, typeUser, callback)
 }
 
 async function editEmployee(id, firstN, lastN, middleN, email, typeUser, callback) {
-    const url = `${baseUrl_test}/employees/${id}`;
+    const url = `${localStorage.getItem('url')}/employees/${id}`;
     await axios.patch(url, {
         firstName: firstN,
         lastName: lastN,
@@ -354,14 +365,14 @@ async function editEmployee(id, firstN, lastN, middleN, email, typeUser, callbac
     })
 }
 async function deleteEmployee(index, callback) {
-    const url = `${baseUrl_test}/employees/${index}`;
+    const url = `${localStorage.getItem('url')}/employees/${index}`;
     await axios.delete(url).then((res) => {
         callback(res.data);
     })
 }
 
 async function getStudentsByGroups(param, callback) {
-    const url = `${baseUrl_test}/qr/groups/students`;
+    const url = `${localStorage.getItem('url')}/qr/groups/students`;
 
     await axios.get(url, {
         params: {
@@ -375,7 +386,7 @@ async function getStudentsByGroups(param, callback) {
 
 
 async function getDataForQR(callback) {
-    const url = `${baseUrl_test}/programs`;
+    const url = `${localStorage.getItem('url')}/programs`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -384,7 +395,7 @@ async function getDataForQR(callback) {
 }
 
 async function getAllDisciplines(callback) {
-    const url = `${baseUrl_test}/disciplines`;
+    const url = `${localStorage.getItem('url')}/disciplines`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -392,7 +403,7 @@ async function getAllDisciplines(callback) {
 }
 
 async function getAllWorkTypes(callback) {
-    const url = `${baseUrl_test}/worktypes`;
+    const url = `${localStorage.getItem('url')}/worktypes`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -400,7 +411,7 @@ async function getAllWorkTypes(callback) {
 }
 
 async function generateQrCodes(id, groups, callback) {
-    const url = `${baseUrl_test}/programs/${id}/qr`;
+    const url = `${localStorage.getItem('url')}/programs/${id}/qr`;
 
     await axios.get(url, {
         params: {
@@ -413,7 +424,7 @@ async function generateQrCodes(id, groups, callback) {
 }
 
 async function modifySession(depId, callback) {
-    const url = `${baseUrl_test}/auth`;
+    const url = `${localStorage.getItem('url')}/auth`;
 
     await axios.patch(url, {
         headers: { "Authorization": `Bearer ${localStorage.getItem('token')}` }
@@ -426,7 +437,7 @@ async function modifySession(depId, callback) {
     })
 }
 async function getEmployeeById(id, callback) {
-    const url = `${baseUrl_test}/employees/${id}`;
+    const url = `${localStorage.getItem('url')}/employees/${id}`;
 
     await axios.get(url).then((res) => {
         callback(res.data);
@@ -465,6 +476,6 @@ export {
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup,
     addNewStudent, editStudent, deleteStudent, searchOfStudents, getAllEmployees,
     getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines,
-    deleteWork, modifySession, getEmployeeById
+    deleteWork, modifySession, getEmployeeById, checkUrl
 }
 
