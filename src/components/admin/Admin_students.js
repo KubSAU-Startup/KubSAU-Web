@@ -11,7 +11,7 @@ import Error_modal from '../Modal/Error_modal';
 import Error_empty from '../Modal/Error_empty';
 import Error_ok from '../Modal/Error_ok';
 import Loading from '../Modal/Loading';
-import { getAllDirectivities, getAllGroups, getAllStudents, getTextError, addNewStudent, editStudent, deleteStudent, searchOfStudents } from '../../network';
+import { getAllDirectivities, getAllGroups, getTextError, addNewStudent, editStudent, deleteStudent, searchOfStudents } from '../../network';
 
 function Admin_students() {
     const [modalActive, setModalActive] = useState(false);

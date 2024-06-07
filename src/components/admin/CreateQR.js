@@ -10,7 +10,7 @@ import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faCheckCircle, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
-import { getAllGroups, getTextError, editDisciplines, generateQrCodes, getStudents, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms, getAllStudents, getStudentsByGroups } from '../../network';
+import { getAllGroups, getTextError, editDisciplines, generateQrCodes, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 // import FileSaver from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
@@ -318,9 +318,9 @@ function CreateQR() {
   };
 
   // // проверка авторизован ли пользователь
-  // if (isAuthenticated == false) {
-  //   return <Navigate to='/' />
-  // }
+  if (isAuthenticated == false) {
+    return <Navigate to='/' />
+  }
 
   // установка значений для создание qr
   function handleSelectSemester(data) {
@@ -563,22 +563,22 @@ function CreateQR() {
           </button>
           <nav className={`menu ${isOpen ? "active" : ""}`}>
             <ul className='menu_list'>
-              <Link to="/AdminMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
-              <Link to="/AdminDepartment" className='link-to'><li className='menu_item'>Кафедры</li></Link>
-              <Link to="/AdminStud" className='link-to'><li className='menu_item'>Студенты</li></Link>
-              <Link to="/AdminGroup" className='link-to'><li className='menu_item'>Группы</li></Link>
-              <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
+              <Link to="/admin/AdminMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
+              <Link to="/admin/AdminDepartment" className='link-to'><li className='menu_item'>Кафедры</li></Link>
+              <Link to="/admin/AdminStud" className='link-to'><li className='menu_item'>Студенты</li></Link>
+              <Link to="/admin/AdminGroup" className='link-to'><li className='menu_item'>Группы</li></Link>
+              <Link to="/admin/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
             </ul>
           </nav>
 
           {/* <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link> */}
 
-          <Link style={{ visibility: 'hidden' }} className='admin-to-qr' to="/CreateQR">
+          <Link style={{ visibility: 'hidden' }} className='admin-to-qr' to="/admin/CreateQR">
             <p>Создать QR-код</p>
             <img className='qr-arrow' src={require('../../img/arrow.png')} />
           </Link>
 
-          <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
+          <Link to='/admin/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
           <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
         </div>
       </div>

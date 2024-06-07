@@ -39,7 +39,7 @@ function Choice() {
 
         <div className='cont-carts'>
 
-          <Link to={'/AdminMain'} className='views-info'>
+          <Link to={'/admin/AdminMain'} className='views-info'>
             <img className='choice-img' src={require('../../img/file.png')} />
             <div className='choice-text'>
               <p>Просмотр и редактирование информации</p>
@@ -47,7 +47,7 @@ function Choice() {
             <img className='choice-arrow' src={require('../../img/arrow.png')} />
           </Link>
 
-          <Link to={'/CreateQR'} className='createQR'>
+          <Link to={'/admin/CreateQR'} className='createQR'>
             <img className='choice-img' src={require('../../img/qr.png')} />
             <div className='choice-text'>
               <p>Создать QR-код</p>

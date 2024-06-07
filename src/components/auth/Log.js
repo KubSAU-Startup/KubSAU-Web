@@ -64,9 +64,16 @@ function Log() {
 
                 if (isAuthenticated) {
                     if (res.response.type === 1) {
-                        navigate('/Choice');
+                        navigate('/admin/Choice');
                     } else if (res.response.type === 2 || res.response.type === 3) {
-                        navigate('/UserChoice');
+                        if (res.response.selectedDepartmentId === null) {
+                            navigate('/user/UserChoice');
+                            console.log('res.response.selectedDepartmentId === null')
+                        } else {
+                            navigate('/user/UserMain');
+                            console.log('else')
+
+                        }
                     }
                 }
             }

@@ -18,7 +18,6 @@ function User_choice() {
   const [textError, setTextError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [departments, setDepartments] = useState([]);
-  const [getDepartmentData, setGetDepartmentData] = useState(false);
   const [errorEmptyActive, setErrorEmptyActive] = useState(false);
   const [codeText, setCodeText] = useState('');
   const navigate = useNavigate();
@@ -34,7 +33,10 @@ function User_choice() {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        setDepartments(res.response.departments)
+        setDepartments(res.response.departments);
+        if (res.response.selectedDepartmentId !== null) {
+          navigate('/user/UserMain');
+        }
         console.log(res)
       }
 
@@ -45,10 +47,7 @@ function User_choice() {
       setIsLoading(false);
     });
   }, []);
-
-  // useEffect(()=>{
-
-  // },[getDepartmentData, navigate])
+  // console.log(localStorage.setItem('token'));
 
   const sendDepartment = (departmentId) => {
     modifySession(departmentId, (res) => {
@@ -56,13 +55,17 @@ function User_choice() {
         setTextError(getTextError(res.error));
         setErrorActive(true);
         setIsLoading(false);
-        setGetDepartmentData(false);
 
       } else {
         setIsLoading(false);
-        navigate('/UserMain');
+        // localStorage.removeItem('token')
+        // console.log(localStorage.setItem('token'));
+        const token = res.response.modifiedToken
+        console.log(res.response.modifiedToken);
 
-        setGetDepartmentData(true);
+        localStorage.setItem('token', res.response.modifiedToken)
+        navigate('/user/UserMain');
+
         console.log(res)
       }
     }).catch((error) => {

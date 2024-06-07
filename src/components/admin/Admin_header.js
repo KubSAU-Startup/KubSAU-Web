@@ -44,22 +44,22 @@ function Admin_header() {
                 </button>
                 <nav className={`menu ${isOpen ? "active" : ""}`}>
                     <ul className='menu_list'>
-                        <Link to="/AdminMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
-                        <Link to="/AdminDepartment" className='link-to'><li className='menu_item'>Кафедры</li></Link>
-                        <Link to="/AdminStud" className='link-to'><li className='menu_item'>Студенты</li></Link>
-                        <Link to="/AdminGroup" className='link-to'><li className='menu_item'>Группы</li></Link>
-                        <Link to="/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
+                        <Link to="/admin/AdminMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
+                        <Link to="/admin/AdminDepartment" className='link-to'><li className='menu_item'>Кафедры</li></Link>
+                        <Link to="/admin/AdminStud" className='link-to'><li className='menu_item'>Студенты</li></Link>
+                        <Link to="/admin/AdminGroup" className='link-to'><li className='menu_item'>Группы</li></Link>
+                        <Link to="/admin/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
                     </ul>
                 </nav>
 
                 {/* <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link> */}
 
-                <Link className='admin-to-qr' to="/CreateQR">
+                <Link className='admin-to-qr' to="/admin/CreateQR">
                     <p>Создать QR-код</p>
                     <img className='qr-arrow' src={require('../../img/arrow.png')} />
                 </Link>
 
-                <Link to='/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
+                <Link to='/admin/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
                 <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
             </div>
         </div>

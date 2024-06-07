@@ -415,8 +415,10 @@ async function generateQrCodes(id, groups, callback) {
 async function modifySession(depId, callback) {
     const url = `${baseUrl_test}/auth`;
 
-    await axios.patch(url,{
-        params:{
+    await axios.patch(url, {
+        headers: { "Authorization": `Bearer ${localStorage.getItem('token')}` }
+    },{
+        params: {
             departmentId: depId
         }
     }).then((res) => {
@@ -444,6 +446,9 @@ function getTextError(data) {
         case 103:
             textError = 'Сессия истекла!';
             break;
+        case 105:
+            textError = 'Недоступная кафедра';
+            break;
 
         default:
             textError = 'Неизвестная ошибка!';
@@ -452,14 +457,14 @@ function getTextError(data) {
 }
 
 export {
-    checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees, 
+    checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees,
     getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
     getAllStudents, getTextError, getDataForQR, getAllDisciplines,
-    getAllWorkTypes, generateQrCodes, getAllDepartments, addNewDepartment, 
+    getAllWorkTypes, generateQrCodes, getAllDepartments, addNewDepartment,
     deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
-    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup, 
-    addNewStudent, editStudent, deleteStudent, searchOfStudents, getAllEmployees, 
-    getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines, 
+    getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup,
+    addNewStudent, editStudent, deleteStudent, searchOfStudents, getAllEmployees,
+    getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines,
     deleteWork, modifySession, getEmployeeById
 }
 

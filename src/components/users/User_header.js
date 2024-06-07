@@ -51,14 +51,14 @@ function User_header() {
                 </button>
                 <nav className={`menu ${isOpen ? "active" : ""}`}>
                     <ul className='menu_list'>
-                        <Link to="/UserMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
-                        <Link to="/UserSubject" className='link-to'><li className='menu_item'>Дисциплины</li></Link>
-                        <Link to="/UserProf" className='link-to'><li className='menu_item'>Сотрудники</li></Link>
+                        <Link to="/user/UserMain" className='link-to'><li className='menu_item'>Последние записи</li></Link>
+                        <Link to="/user/UserSubject" className='link-to'><li className='menu_item'>Дисциплины</li></Link>
+                        <Link to="/user/UserProf" className='link-to'><li className='menu_item'>Сотрудники</li></Link>
                     </ul>
                 </nav>
 
 
-                <Link to='/UserAccount' className='user-to-account'>Мой аккаунт</Link>
+                <Link to='/user/UserAccount' className='user-to-account'>Мой аккаунт</Link>
                 {/* <div className='user-to-exit'>Выход</div> */}
 
                 <div className='user-to-exit' onClick={handleLogout}>Выход</div>
