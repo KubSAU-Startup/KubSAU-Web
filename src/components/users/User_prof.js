@@ -376,7 +376,7 @@ function User_prof() {
     }
 
     const position = [
-        { value: 1, label: 'Администратор' },
+        // { value: 1, label: 'Администратор' },
         { value: 2, label: 'Преподаватель' },
         { value: 3, label: 'Лаборант' }
     ]

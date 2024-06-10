@@ -9,13 +9,13 @@ import {
 import Select from 'react-select';
 import { customStylesModal } from '../Select_style/Select_style';
 import React, { useEffect, useState } from 'react';
-import { checkAccount, getEmployeeById, editEmployee } from '../../network';
+import { checkAccount, getEmployeeById, editEmployee, checkUrl, updatePassword } from '../../network';
 import Error_modal from '../Modal/Error_modal';
 import { getTextError } from '../../network';
 import Loading from '../Modal/Loading';
 import Error_empty from '../Modal/Error_empty';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLink, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faLink, faLock, faUser, faUserAlt, faUserAstronaut, faUserClock, faUserDoctor, faUserFriends, faUserLarge } from '@fortawesome/free-solid-svg-icons';
 import Error_ok from '../Modal/Error_ok';
 import Empty_modal from '../Modal/Empty_modal';
 
@@ -32,18 +32,34 @@ function Admin_account() {
     const [modalStaffEdit, setModalStaffEdit] = useState(null);
 
     const [modalEditActive, setModalEditActive] = useState(false);
+    const [passwordActive, setPasswordActive] = useState(false);
+
 
     const [errorEmail, setErrorEmail] = useState('');
     const [errorFirstN, setErrorFirstN] = useState('');
     const [errorLastN, setErrorLastN] = useState('');
     const [errorMiddleN, setErrorMiddleN] = useState('');
-    const [errorStaff, setErrorStaff] = useState('');
+
+    const [errorOldPasswd, setErrorOldPasswd] = useState('');
+    const [errorRepeatPasswd, setErrorRepeatPasswd] = useState('');
+    const [errorNewPasswd, setErrorNewPasswd] = useState('');
+
+    const [newPassword, setNewPassword] = useState('');
+    const [oldPassword, setOldPassword] = useState('');
+    const [repeatPassword, setRepeatPassword] = useState('');
 
     const [editId, setEditId] = useState(null);
     const [lastNEdit, setLastNEdit] = useState('');
     const [firstNEdit, setFirstNEdit] = useState('');
     const [middleNEdit, setMiddleNEdit] = useState('');
     const [emailEdit, setEmailEdit] = useState('');
+
+
+    const [errorUrl, setErrorUrl] = useState('');
+
+
+    const [urlActive, setUrlActive] = useState(false);
+    const [urlServer, setUrlServer] = useState("");
 
     useEffect(() => {
         setIsLoading(true);
@@ -54,7 +70,9 @@ function Admin_account() {
                 setIsLoading(false);
             } else {
                 setIsLoading(false);
-                setIdAccount(res.response)
+                setIdAccount(res.response);
+                console.log(res)
+
             }
         }).catch((error) => {
             setTextError(error.message);
@@ -75,7 +93,7 @@ function Admin_account() {
                     setIsLoading(false);
                 } else {
                     setIsLoading(false);
-                    setDataAccount(res.response)
+                    setDataAccount(res.response);
                 }
 
             }).catch((error) => {
@@ -113,9 +131,9 @@ function Admin_account() {
 
         } else {
 
-            await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, '',(res) => {
+            await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, '', (res) => {
                 if (res.success) {
-                   setDataAccount({
+                    setDataAccount({
                         id: editId,
                         firstName: firstNEdit,
                         lastName: lastNEdit,
@@ -123,7 +141,7 @@ function Admin_account() {
                         email: emailEdit,
                         type: modalStaffEdit.value
 
-                    }) 
+                    })
                 } else {
                     setTextError(res.message);
                     setCodeText(res.code);
@@ -157,6 +175,74 @@ function Admin_account() {
         }
     }
 
+    const editUrl = () => {
+        localStorage.setItem('url', urlServer);
+        if (urlServer === '') {
+            setErrorUrl('Заполните поле!');
+        }
+        setIsLoading(true);
+        checkUrl(res => {
+            if (res.version) {
+                console.log(res)
+                setUrlActive(false);
+                localStorage.setItem('url', urlServer);
+                // window.location.reload();
+            }
+            setIsLoading(false);
+
+        }).catch((error) => {
+            setErrorUrl(error.message);
+            setIsLoading(false);
+        });
+    }
+
+    const editPassword = () => {
+        setErrorNewPasswd('');
+        setErrorOldPasswd('');
+        setErrorRepeatPasswd('');
+        setIsLoading(true);
+        if (newPassword === '' || oldPassword === '' || repeatPassword === '' || newPassword !== repeatPassword) {
+            if (newPassword === '') {
+                setErrorNewPasswd('Введите новый пароль');
+            }
+            if (oldPassword === '') {
+                setErrorOldPasswd('Введите старый пароль');
+            }
+            if (repeatPassword === '') {
+                setErrorRepeatPasswd('Повторите новый пароль');
+            }
+            if (newPassword !== repeatPassword && repeatPassword !== '' && newPassword !== '') {
+                setErrorRepeatPasswd('Пароли не совпадают');
+            }
+            setIsLoading(false);
+        } else {
+            updatePassword(oldPassword, newPassword, res => {
+                setPasswordActive(false);
+                console.log(res.response);
+                setIsLoading(false);
+            }).catch(() => {
+                setErrorOldPasswd('Неверный пароль');
+                setIsLoading(false);
+
+            })
+        }
+    }
+
+    const handleUrlServer = e => {
+        setUrlServer(e.target.value);
+
+    };
+    const handleNewPassword = e => {
+        setNewPassword(e.target.value);
+
+    }; const handleOldPassword = e => {
+        setOldPassword(e.target.value);
+
+    }; const handleRepeatPassword = e => {
+        setRepeatPassword(e.target.value);
+
+    };
+
     const position = [
         { value: 1, label: 'Администратор' },
         { value: 2, label: 'Преподаватель' },
@@ -172,7 +258,8 @@ function Admin_account() {
 
                 <div className='account-content'>
                     <div className='img-account'>
-                        <img src={require('../../img/my_account.png')} />
+                        <FontAwesomeIcon icon={faUser} />
+                        {/* <img src={require('../../img/my_account.png')} /> */}
 
                     </div>
                     <div className='data-account'>
@@ -184,6 +271,7 @@ function Admin_account() {
                                 <span>Фамилия:</span><p>{dataAccount.lastName}</p>
                                 <span>Имя:</span><p>{dataAccount.firstName}</p>
                                 <span>Отчество:</span><p>{dataAccount.middleName}</p>
+                                <span>Факультет:</span><p>{idAccount && idAccount.faculty?.title}</p>
                                 <span>Статус:</span><p>{position.find(res => res.value === dataAccount.type)?.label}</p>
                                 <span>Почта:</span><p>{dataAccount.email}</p>
                             </div>
@@ -220,17 +308,20 @@ function Admin_account() {
                                 {/* <div> */}
                                 <FontAwesomeIcon icon={faLock} style={{ fontSize: '20px', color: '#26BD00' }} />
                                 <span>Пароль:</span>
-                                <input type={'password'} readOnly={true} className='secure-password' value={'https://kubsau-testbackend.melod1n.dedyn.io/'} />
+                                <div><button onClick={() => {
+                                    setPasswordActive(true);
+                                    setErrorOldPasswd('');
+                                    setErrorRepeatPasswd('');
+                                    setErrorNewPasswd('');
+                                    setNewPassword('');
+                                    setOldPassword('');
+                                    setRepeatPassword('');
+                                }}>Изменить пароль</button></div>
 
                                 <FontAwesomeIcon icon={faLink} style={{ fontSize: '20px', color: '#26BD00' }} />
                                 <span>URL:</span>
-                                <input type={'text'} readOnly={true} className='secure-password' value={'https://kubsau-testbackend.melod1n.dedyn.io/'} />
-
-
+                                <div><button onClick={() => { setUrlActive(true); setUrlServer(localStorage.getItem('url')); setErrorUrl('') }}>Изменить URL</button></div>
                             </div>
-
-                            <div><button>Изменить</button></div>
-
                         </div>
                     </div>
                 </div >
@@ -293,6 +384,60 @@ function Admin_account() {
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
+            <Empty_modal active={urlActive} setActive={setUrlActive}>
+                <div>
+                    <p><b>Введите URL:</b></p>
+                    <input
+                        className='url-input'
+                        value={urlServer}
+                        onChange={handleUrlServer}
+                        placeholder='URL...'
+                    />
+                    {(errorUrl !== '') && <p className='inputModalError' >{errorUrl}</p>}
+
+                    <div className='url-modal-button'>
+                        <button onClick={() => { editUrl() }}>Сохранить</button>
+                    </div>
+                </div>
+            </Empty_modal>
+            <Empty_modal active={passwordActive} setActive={setPasswordActive}>
+                <div className='content-password'>
+                    <p>Старый пароль:</p>
+                    <input
+
+                        className='password-input'
+                        value={oldPassword}
+                        onChange={handleOldPassword}
+                    />
+                    {(errorOldPasswd !== '') && <p className='inputModalError' style={{margin: '5px 0 0'}}>{errorOldPasswd}</p>}
+
+                </div>
+                <div className='content-password'>
+                    <p>Новый пароль:</p>
+                    <input
+                        className='password-input'
+                        value={newPassword}
+                        onChange={handleNewPassword}
+                    />
+                    {(errorNewPasswd !== '') && <p className='inputModalError' style={{margin: '5px 0 0'}}>{errorNewPasswd}</p>}
+
+                </div>
+                <div className='content-password'>
+                    <p>Повторите пароль:</p>
+                    <input
+                        className='password-input'
+                        value={repeatPassword}
+                        onChange={handleRepeatPassword}
+                    />
+                    {(errorRepeatPasswd !== '') && <p className='inputModalError' style={{margin: '5px 0 0'}}>{errorRepeatPasswd}</p>}
+
+                </div>
+                <div className='modal-button'>
+                    <button onClick={() => { editPassword() }}>Сохранить</button>
+                    <button onClick={() => { setPasswordActive(false) }}>Отмена</button>
+                </div>
+            </Empty_modal>
+
         </>
     );
 }

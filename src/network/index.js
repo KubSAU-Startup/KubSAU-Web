@@ -444,6 +444,20 @@ async function getEmployeeById(id, callback) {
     })
 }
 
+async function updatePassword(oldPass, newPass, callback) {
+    const url = `${localStorage.getItem('url')}/account`
+
+    await axios.patch(url, {
+        currentPassword: oldPass,
+        newPassword: newPass
+
+    }, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+    }).then((res) => {
+        callback(res.data);
+    })
+}
+
 
 function getTextError(data) {
     let textError = '';
@@ -476,6 +490,6 @@ export {
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup,
     addNewStudent, editStudent, deleteStudent, searchOfStudents, getAllEmployees,
     getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines,
-    deleteWork, modifySession, getEmployeeById, checkUrl
+    deleteWork, modifySession, getEmployeeById, checkUrl, updatePassword
 }
 

@@ -11,6 +11,7 @@ import Forgot_pass from '../Modal/Forgot_pass';
 import Loading from '../Modal/Loading';
 import Error_empty from '../Modal/Error_empty';
 import Empty_modal from '../Modal/Empty_modal';
+import Url_modal from '../Modal/Url_modal';
 const eye = <FontAwesomeIcon icon={faEye} />;
 const eyeSlah = <FontAwesomeIcon icon={faEyeSlash} />;
 
@@ -115,7 +116,7 @@ function Log() {
                 console.log(res)
                 setUrlActive(false);
                 localStorage.setItem('url', urlServer);
-                window.location.reload();
+                // window.location.reload();
 
             }
 
@@ -123,8 +124,6 @@ function Log() {
 
         }).catch((error) => {
             setErrorUrl(error.message);
-            // setCodeText(error.code);
-            // setErrorEmptyActive(true);
             setIsLoading(false);
         });
     }
@@ -159,7 +158,7 @@ function Log() {
             <Error_auth_data active={errorActive} setActive={setErrorActive} />
             <Forgot_pass active={forgotPass} setActive={setForgotPass} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
-            <Empty_modal active={urlActive} setActive={setUrlActive}>
+            <Url_modal active={urlActive}>
                 <div>
                     <p><b>Введите URL:</b></p>
                     <input
@@ -174,7 +173,7 @@ function Log() {
                         <button onClick={() => { editUrl() }}>Сохранить</button>
                     </div>
                 </div>
-            </Empty_modal>
+            </Url_modal>
         </>
     );
 }
