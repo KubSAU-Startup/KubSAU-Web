@@ -35,15 +35,17 @@ function User_choice() {
         if (res.error) {
           setTextError(getTextError(res.error));
           setErrorActive(true);
-          setIsLoading(false);
+          // setIsLoading(false);
         } else {
-          setIsLoading(false);
+          // setIsLoading(false);
           setDepartments(res.response.departments);
           if (res.response.selectedDepartmentId !== null) {
             navigate('/user/UserMain');
           }
           console.log(res)
         }
+        setIsLoading(false);
+
 
       }).catch((error) => {
         setTextError(error.message);
@@ -53,6 +55,7 @@ function User_choice() {
       });
     } else {
       setUrlActive(true);
+      setIsLoading(false);
 
     }
   }, []);
@@ -76,14 +79,13 @@ function User_choice() {
   };
 
   const sendDepartment = (departmentId) => {
+    setIsLoading(true);
     modifySession(departmentId, (res) => {
       if (res.error) {
         setTextError(getTextError(res.error));
         setErrorActive(true);
-        setIsLoading(false);
 
       } else {
-        setIsLoading(false);
         // localStorage.removeItem('token')
         // console.log(localStorage.setItem('token'));
         const token = res.response.modifiedToken
@@ -94,6 +96,8 @@ function User_choice() {
 
         console.log(res)
       }
+      setIsLoading(false);
+
     }).catch((error) => {
       setTextError(error.message);
       setCodeText(error.code);

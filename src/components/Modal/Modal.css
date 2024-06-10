@@ -127,3 +127,10 @@
 .btn-to-ok{
     width: 100%;
 }
+
+.inputModalError {
+    color: red;
+    font-size: 12px;
+    margin-top: -25px;
+    position: absolute;
+}

@@ -439,7 +439,7 @@ function User_main() {
                             }))}
                         />
                     </div>
-                    <div>
+                    {/* <div>
                         <Select
                             styles={customStyles}
                             placeholder="Кафедра"
@@ -451,7 +451,7 @@ function User_main() {
                                 label: department.title,
                             }))}
                         />
-                    </div>
+                    </div> */}
 
                     {/* кнопки применить и сбросить */}
                     <button className='get-params' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>

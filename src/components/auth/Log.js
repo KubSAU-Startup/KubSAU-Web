@@ -106,13 +106,17 @@ function Log() {
 
     const editUrl = () => {
         localStorage.setItem('url', urlServer);
-
+        if(urlServer === ''){
+            setErrorUrl('Заполните поле!');
+        }
         setIsLoading(true);
         checkUrl(res => {
             if (res.version) {
                 console.log(res)
                 setUrlActive(false);
                 localStorage.setItem('url', urlServer);
+                window.location.reload();
+
             }
 
             setIsLoading(false);

@@ -45,7 +45,7 @@ function User_header() {
     return (
         <div className='us_main_header'>
             <div className='us_main_header-content'>
-                <img className='us_main_logo' src={require('../../img/logo1.png')} />
+                <img className='us_main_logo' src={require('../../img/logo1.webp')} />
                 <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
                     <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
                 </button>

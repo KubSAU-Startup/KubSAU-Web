@@ -38,7 +38,7 @@ function Admin_header() {
     return (
         <div className='ad_main_header'>
             <div className='ad_main_header-content'>
-                <img className='ad_main_logo' src={require('../../img/logo1.png')} />
+                <img className='ad_main_logo' src={require('../../img/logo1.webp')} />
                 <button className='menu_button' ref={menuRef} onClick={() => setOpen(!isOpen)}>Журналы
                     <img className={`button_arrow ${isOpen ? "active" : ""}`} src={require('../../img/nav arrow.png')} />
                 </button>

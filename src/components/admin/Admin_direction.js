@@ -6,7 +6,7 @@ import Modal from '../Modal/Modal';
 import { customStyles } from '../Select_style/Select_style';
 import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faPlusCircle, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { getAllDirectivities, getTextError } from '../../network';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
@@ -276,8 +276,10 @@ function Admin_direction() {
                     />
 
 
-                    <button className='get-params' type='submit' onClick={getParams}>Применить</button>
-                    <button className='delete-params' onClick={resetParams}>Сбросить</button>
+                    {/* кнопка применить фильтры */}
+                    <button className='get-params' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
+                    {/* очистить фильтры */}
+                    <button className='delete-params' onClick={resetParams}><FontAwesomeIcon icon={faUndo} /></button>
 
                 </div>
 

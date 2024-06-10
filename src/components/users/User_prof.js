@@ -5,7 +5,7 @@ import Select from 'react-select';
 import { customStyles } from '../Select_style/Select_style';
 import { customStylesModal } from '../Select_style/Select_style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faPlusCircle, faUndo } from '@fortawesome/free-solid-svg-icons';
 import Empty_modal from '../Modal/Empty_modal';
 import Error_empty from '../Modal/Error_empty';
 import Error_ok from '../Modal/Error_ok';
@@ -403,8 +403,10 @@ function User_prof() {
                         isSearchable={true}
                         options={position}
                     />
-                    <button className='get-params' type='submit' onClick={getParams}>Применить</button>
-                    <button className='delete-params' onClick={resetParams}>Сбросить</button>
+                    {/* кнопка применить фильтры */}
+                    <button className='get-params' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
+                    {/* очистить фильтры */}
+                    <button className='delete-params' onClick={resetParams}><FontAwesomeIcon icon={faUndo} /></button>
 
                 </div>
 
