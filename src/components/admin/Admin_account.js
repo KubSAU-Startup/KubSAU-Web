@@ -15,9 +15,11 @@ import { getTextError } from '../../network';
 import Loading from '../Modal/Loading';
 import Error_empty from '../Modal/Error_empty';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faLink, faLock, faUser, faUserAlt, faUserAstronaut, faUserClock, faUserDoctor, faUserFriends, faUserLarge } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faLink, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import Error_ok from '../Modal/Error_ok';
 import Empty_modal from '../Modal/Empty_modal';
+const eye = <FontAwesomeIcon icon={faEye} />;
+const eyeSlah = <FontAwesomeIcon icon={faEyeSlash} />;
 
 function Admin_account() {
     const [errorActive, setErrorActive] = useState(false);
@@ -54,9 +56,11 @@ function Admin_account() {
     const [middleNEdit, setMiddleNEdit] = useState('');
     const [emailEdit, setEmailEdit] = useState('');
 
-
     const [errorUrl, setErrorUrl] = useState('');
-
+    const [passwordShown, setPasswordShown] = useState(false);
+    const [newPasswordShown, setNewPasswordShown] = useState(false);
+    const [oldPasswordShown, setOldPasswordShown] = useState(false);
+    const [repeatPasswordShown, setRepeatPasswordShown] = useState(false);
 
     const [urlActive, setUrlActive] = useState(false);
     const [urlServer, setUrlServer] = useState("");
@@ -71,8 +75,6 @@ function Admin_account() {
             } else {
                 setIsLoading(false);
                 setIdAccount(res.response);
-                console.log(res)
-
             }
         }).catch((error) => {
             setTextError(error.message);
@@ -183,7 +185,6 @@ function Admin_account() {
         setIsLoading(true);
         checkUrl(res => {
             if (res.version) {
-                console.log(res)
                 setUrlActive(false);
                 localStorage.setItem('url', urlServer);
                 // window.location.reload();
@@ -216,9 +217,8 @@ function Admin_account() {
             }
             setIsLoading(false);
         } else {
-            updatePassword(oldPassword, newPassword, res => {
+            updatePassword(oldPassword, newPassword, () => {
                 setPasswordActive(false);
-                console.log(res.response);
                 setIsLoading(false);
             }).catch(() => {
                 setErrorOldPasswd('Неверный пароль');
@@ -242,7 +242,18 @@ function Admin_account() {
         setRepeatPassword(e.target.value);
 
     };
-
+    const togglePasswordVisiblity = () => {
+        setPasswordShown(passwordShown ? false : true);
+    };
+    const toggleOldPasswordVisiblity = () => {
+        setOldPasswordShown(oldPasswordShown ? false : true);
+    };
+    const toggleNewPasswordVisiblity = () => {
+        setNewPasswordShown(newPasswordShown ? false : true);
+    };
+    const toggleRepeatPasswordVisiblity = () => {
+        setRepeatPasswordShown(repeatPasswordShown ? false : true);
+    };
     const position = [
         { value: 1, label: 'Администратор' },
         { value: 2, label: 'Преподаватель' },
@@ -316,6 +327,9 @@ function Admin_account() {
                                     setNewPassword('');
                                     setOldPassword('');
                                     setRepeatPassword('');
+                                    setOldPasswordShown(false);
+                                    setNewPasswordShown(false);
+                                    setRepeatPasswordShown(false);
                                 }}>Изменить пароль</button></div>
 
                                 <FontAwesomeIcon icon={faLink} style={{ fontSize: '20px', color: '#26BD00' }} />
@@ -404,32 +418,34 @@ function Admin_account() {
                 <div className='content-password'>
                     <p>Старый пароль:</p>
                     <input
-
+                        type={oldPasswordShown ? "text" : "password"}
                         className='password-input'
                         value={oldPassword}
                         onChange={handleOldPassword}
-                    />
-                    {(errorOldPasswd !== '') && <p className='inputModalError' style={{margin: '5px 0 0'}}>{errorOldPasswd}</p>}
+                    /><i style={{position: 'absolute', margin: '5px 15px'}} onClick={toggleOldPasswordVisiblity}>{oldPasswordShown ? eyeSlah : eye}</i>
+                    {(errorOldPasswd !== '') && <p className='inputModalError' style={{ margin: '5px 0 0' }}>{errorOldPasswd}</p>}
 
                 </div>
                 <div className='content-password'>
                     <p>Новый пароль:</p>
                     <input
+                        type={newPasswordShown ? "text" : "password"}
                         className='password-input'
                         value={newPassword}
                         onChange={handleNewPassword}
-                    />
-                    {(errorNewPasswd !== '') && <p className='inputModalError' style={{margin: '5px 0 0'}}>{errorNewPasswd}</p>}
+                    /><i style={{position: 'absolute', margin: '5px 15px'}} onClick={toggleNewPasswordVisiblity}>{newPasswordShown ? eyeSlah : eye}</i>
+                    {(errorNewPasswd !== '') && <p className='inputModalError' style={{ margin: '5px 0 0' }}>{errorNewPasswd}</p>}
 
                 </div>
                 <div className='content-password'>
                     <p>Повторите пароль:</p>
                     <input
+                        type={repeatPasswordShown ? "text" : "password"}
                         className='password-input'
                         value={repeatPassword}
                         onChange={handleRepeatPassword}
-                    />
-                    {(errorRepeatPasswd !== '') && <p className='inputModalError' style={{margin: '5px 0 0'}}>{errorRepeatPasswd}</p>}
+                    /><i style={{position: 'absolute', margin: '5px 15px'}} onClick={toggleRepeatPasswordVisiblity}>{repeatPasswordShown ? eyeSlah : eye}</i>
+                    {(errorRepeatPasswd !== '') && <p className='inputModalError' style={{ margin: '5px 0 0' }}>{errorRepeatPasswd}</p>}
 
                 </div>
                 <div className='modal-button'>
