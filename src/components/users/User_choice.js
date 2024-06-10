@@ -42,7 +42,6 @@ function User_choice() {
           if (res.response.selectedDepartmentId !== null) {
             navigate('/user/UserMain');
           }
-          console.log(res)
         }
         setIsLoading(false);
 
@@ -59,16 +58,13 @@ function User_choice() {
 
     }
   }, []);
-  // console.log(localStorage.setItem('token'));
   const editUrl = () => {
     setIsLoading(true);
     checkUrl(res => {
       if (res.version !== null) {
         setUrlActive(false);
         localStorage.setItem('url', urlServer);
-      } else {
-        console.log('res.version');
-      }
+      } 
       setIsLoading(false);
 
     })
@@ -86,15 +82,11 @@ function User_choice() {
         setErrorActive(true);
 
       } else {
-        // localStorage.removeItem('token')
-        // console.log(localStorage.setItem('token'));
+
         const token = res.response.modifiedToken
-        console.log(res.response.modifiedToken);
 
         localStorage.setItem('token', res.response.modifiedToken)
         navigate('/user/UserMain');
-
-        console.log(res)
       }
       setIsLoading(false);
 
