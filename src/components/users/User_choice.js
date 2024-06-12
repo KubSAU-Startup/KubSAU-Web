@@ -35,9 +35,7 @@ function User_choice() {
         if (res.error) {
           setTextError(getTextError(res.error));
           setErrorActive(true);
-          // setIsLoading(false);
         } else {
-          // setIsLoading(false);
           setDepartments(res.response.departments);
           if (res.response.selectedDepartmentId !== null) {
             navigate('/user/UserMain');
@@ -80,11 +78,8 @@ function User_choice() {
       if (res.error) {
         setTextError(getTextError(res.error));
         setErrorActive(true);
-
       } else {
-
         const token = res.response.modifiedToken
-
         localStorage.setItem('token', res.response.modifiedToken)
         navigate('/user/UserMain');
       }

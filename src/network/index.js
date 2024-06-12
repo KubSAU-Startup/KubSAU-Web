@@ -428,7 +428,7 @@ async function modifySession(depId, callback) {
 
     await axios.patch(url, {
         headers: { "Authorization": `Bearer ${localStorage.getItem('token')}` }
-    },{
+    }, {
         params: {
             departmentId: depId
         }
@@ -462,21 +462,30 @@ async function updatePassword(oldPass, newPass, callback) {
 function getTextError(data) {
     let textError = '';
     switch (data.code) {
-        case 101:
-            textError = 'Неверные учетные данные!';
+        case 1:
+            textError = 'Неизвестная ошибка';
             break;
-        case 102:
-            textError = 'Требуется токен доступа!';
+        case 2:
+            textError = 'Неизвестный метод';
             break;
-        case 103:
-            textError = 'Сессия истекла!';
+        case 3:
+            textError = 'Неправильный запрос';
             break;
-        case 105:
-            textError = 'Недоступная кафедра';
+        case 4:
+            textError = 'Доступ запрещен';
             break;
-
-        default:
-            textError = 'Неизвестная ошибка!';
+        case 5:
+            textError = 'Неверный формат токена';
+            break;
+        case 6:
+            textError = 'Ошибка неизвестного токена';
+            break;
+        case 'ERR_BAD_REQUEST':
+            textError = 'Неправильный запрос';
+            break;
+        case 'ERR_NETWORK':
+            textError = 'Соединение прервано';
+            break;
     }
     return textError;
 }

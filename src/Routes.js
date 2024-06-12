@@ -1,14 +1,17 @@
 import { Outlet, useNavigate } from "react-router-dom"
-import { checkAccount } from "./network";
+import { checkAccount, getTextError } from "./network";
 import { useEffect, useState } from "react";
 import Empty_modal from "./components/Modal/Empty_modal";
 import Error_empty from "./components/Modal/Error_empty";
+import Error_modal from "./components/Modal/Error_modal";
 
 
 export const AdminRoute = () => {
     const [errorEmptyActive, setErrorEmptyActive] = useState(false);
     const [codeText, setCodeText] = useState('');
     const [textError, setTextError] = useState('');
+    const [errorActive, setErrorActive] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -16,13 +19,18 @@ export const AdminRoute = () => {
     }, [])
     const isAdmin = () => {
         checkAccount(res => {
-            if (res.response.type === 1) {
-                return true
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
             } else {
-                navigate('/')
+                if (res.response.type === 1) {
+                    return true
+                } else {
+                    navigate('/')
+                }
             }
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
         });
@@ -33,6 +41,7 @@ export const AdminRoute = () => {
     return (
         <><Outlet />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
 
         </>
     )
@@ -43,6 +52,8 @@ export const UserRoute = () => {
     const [errorEmptyActive, setErrorEmptyActive] = useState(false);
     const [codeText, setCodeText] = useState('');
     const [textError, setTextError] = useState('');
+    const [errorActive, setErrorActive] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -51,13 +62,19 @@ export const UserRoute = () => {
     const isUser = () => {
 
         checkAccount(res => {
-            if (res.response.type !== 1) {
-                return true
+            if (res.error) {
+                setTextError(getTextError(res.error));
+                setErrorActive(true);
             } else {
-                navigate('/')
+                if (res.response.type !== 1) {
+                    return true
+                } else {
+                    navigate('/')
+                }
             }
+
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
         });
@@ -68,6 +85,7 @@ export const UserRoute = () => {
     return (
         <><Outlet />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
 
         </>
     )

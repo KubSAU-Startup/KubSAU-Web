@@ -26,13 +26,12 @@ function Admin_main() {
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    // переменные для получения фильтров из бэка
+
     const [filterWorkType, setFilterWorkType] = useState([]);
     const [filterDiscipline, setFilterDiscipline] = useState([]);
     const [filterEmployees, setFilterEmployees] = useState([]);
     const [filterGroup, setFilterGroup] = useState([]);
     const [filterDepartments, setFilterDepartments] = useState([]);
-    const [modalActive, setModalActive] = useState(false);
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
     const [dateTime, setDateTime] = useState(null);
@@ -44,17 +43,14 @@ function Admin_main() {
     const [titleEdit, setTitleEdit] = useState(null);
     const [errorTitle, setErrorTitle] = useState('');
     const [codeText, setCodeText] = useState('');
-    // переменная для получения данных карточек из бэка
+
     const [mainData, setMainData] = useState([]);
     const [errorOkActive, setErrorOkActive] = useState(false);
 
     const [journalParam, setJournalParam] = useState({});
-
-    // переменная поиска
     const [searchResults, setSearchResults] = useState([]);
 
-    // перменная запроса на поиск
-    const [searchTerm, setSearchTerm] = useState('');
+
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
     const [hasMoreData, setHasMoreData] = useState(true);
@@ -71,11 +67,13 @@ function Admin_main() {
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
 
+    // открытие модального окна для дополнительных функций карточки
     const openModal = (itemId) => {
         setSelectedItemId(itemId);
         setIsSetOpen(true);
     };
 
+    // закрытие модального окна для дополнительных функций карточки
     const closeModal = () => {
         setIsSetOpen(false);
     };
@@ -99,6 +97,7 @@ function Admin_main() {
 
     // получение данных для фильтров с бэка
     useEffect(() => {
+        setIsLoading(true);
         getFilterWorkType((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -109,7 +108,7 @@ function Admin_main() {
 
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -124,7 +123,7 @@ function Admin_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -139,7 +138,7 @@ function Admin_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -154,7 +153,7 @@ function Admin_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -168,7 +167,7 @@ function Admin_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -185,10 +184,8 @@ function Admin_main() {
         setSelectedDepartment(null);
         setSelectedGroup(null);
         setOffset(0);
-
-        // параметры для сброса
         setJournalParam({})
-
+        setIsLoading(false);
     };
 
 
@@ -204,6 +201,8 @@ function Admin_main() {
             groupId: selectedGroup ? selectedGroup.value : null,
             workTypeId: selectedWorkType ? selectedWorkType.value : null,
         });
+        setIsLoading(false);
+
     };
 
     // Функция поиска
@@ -211,6 +210,7 @@ function Admin_main() {
         setInputValue(e.target.value);
     };
 
+    // ожидание 1 сек перед отправкой запроса после ввода данных в поиск
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setDebouncedInputValue(inputValue);
@@ -223,6 +223,7 @@ function Admin_main() {
     useEffect(() => {
         setIsLoading(true);
         setHasMoreData(true);
+        // получение данных для отображения
         getDataAdminJournal(offset, limit, journalParam, debouncedInputValue, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -244,28 +245,25 @@ function Admin_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         })
     }, [offset, limit, journalParam, debouncedInputValue]);
 
+    // функция редактирования работы
     async function editData() {
         setIsLoading(true);
         if (workTypeEdit !== 'Курсовая')
             setTitleEdit('');
-
         setErrorTitle('');
-
         if (titleEdit === '') {
             setErrorTitle('Введите название работы');
             setIsLoading(false);
         } else {
-
             await editWork(editId, dateTime, titleEdit, (res) => {
                 if (res.success) {
-
                     const editWork = mainData.map(elem => {
                         if (elem.work.id === editId) {
                             return {
@@ -275,22 +273,18 @@ function Admin_main() {
                                     registrationDate: dateTime,
                                     title: titleEdit
                                 }
-
                             };
                         } else {
                             return elem; // если элемент не подлежит изменению, возвращаем его без изменений
                         }
                     });
-
                     setMainData(editWork);
-
                 } else {
                     setTextError(res.message);
                     setCodeText(res.code);
                     setErrorOkActive(true);
                 }
                 setIsLoading(false);
-
             }).catch((error) => {
                 setTextError(error.message);
                 setCodeText(error.code);
@@ -307,12 +301,12 @@ function Admin_main() {
         }
     }
 
+    // функция удаления
     async function deleteData() {
         setIsLoading(true);
         await deleteWork(deleteId, (res) => {
             if (res.success) {
                 setMainData(mainData.filter((a) => a.work.id !== deleteId));
-
             } else {
                 setTextError(res.message);
                 setCodeText(res.code);
@@ -325,9 +319,9 @@ function Admin_main() {
             setErrorOkActive(true);
             setIsLoading(false);
         });
-
     }
 
+    // изменение отображения данных
     useEffect(() => {
         setSearchResults(mainData);
     }, [mainData])
@@ -348,28 +342,16 @@ function Admin_main() {
     function handleSelectDepartment(data) {
         setSelectedDepartment(data);
     }
+
+    // получение новой даты
     function handleDateTime(data) {
         let dateObject = new Date(data);
         let timestamp = dateObject.getTime();
         setDateTime(timestamp);
     }
-    function handleModalDisciplene(data) {
-        setDisciplineEdit(data);
-    }
-    function handleModalStudent(data) {
-        setStudentEdit(data);
-    }
-    function handleModalWorkType(data) {
-        setWorkTypeEdit(data);
-    }
-    function handleModalDepartment(data) {
-        setDepartmentEdit(data);
-    }
-
 
     return (
         <>
-
             {/* окно загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
             {/* шапка страницы */}
@@ -397,8 +379,7 @@ function Admin_main() {
                             options={filterWorkType.map(workTypes => ({
                                 value: workTypes.id,
                                 label: workTypes.title,
-                            }))}
-                        />
+                            }))} />
                     </div>
                     <div>
                         <Select
@@ -410,8 +391,7 @@ function Admin_main() {
                             options={filterDiscipline.map(disciplines => ({
                                 value: disciplines.id,
                                 label: disciplines.title,
-                            }))}
-                        />
+                            }))} />
                     </div>
                     <div>
                         <Select
@@ -423,8 +403,7 @@ function Admin_main() {
                             options={filterEmployees.map(teachers => ({
                                 value: teachers.id,
                                 label: teachers.title,
-                            }))}
-                        />
+                            }))} />
                     </div>
                     <div>
                         <Select
@@ -436,8 +415,7 @@ function Admin_main() {
                             options={filterGroup.map(groups => ({
                                 value: groups.id,
                                 label: groups.title,
-                            }))}
-                        />
+                            }))} />
                     </div>
                     <div>
                         <Select
@@ -449,8 +427,7 @@ function Admin_main() {
                             options={filterDepartments.map(department => ({
                                 value: department.id,
                                 label: department.title,
-                            }))}
-                        />
+                            }))} />
                     </div>
 
                     {/* кнопки применить и сбросить */}
@@ -460,8 +437,6 @@ function Admin_main() {
                 </div>
 
                 {/* данные о зарегистрированных работах (карточки) */}
-                {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
-
                 {searchResults.map(entries => (
                     <div className='cart-stud' key={entries.work.id}>
                         <div className='data'>
@@ -481,6 +456,7 @@ function Admin_main() {
                                 {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
                             </div>
                         </div>
+                        {/* кнопка редактирования */}
                         <button
                             className='qr-setting'
                             onClick={() => {
@@ -494,14 +470,13 @@ function Admin_main() {
                                 else {
                                     openModal(entries.work.id);
                                 }
-                            }}
-                        >
+                            }}>
                             <img src={require('../../img/setting.png')} alt='setting' />
                         </button>
                         {isSetOpen && selectedItemId === entries.work.id && (
                             <div className={`button-edit-delete ${isSetOpen && selectedItemId === entries.work.id ? 'active' : ''}`}>
+                                {/* кнопка редактирования */}
                                 <button onClick={() => {
-
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
                                     const adminMainHeaders = document.getElementsByClassName('ad_main_header');
@@ -509,27 +484,19 @@ function Admin_main() {
                                         adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
                                     setEditId(entries.work.id);
                                     setDateTime(entries.work.registrationDate);
                                     setErrorTitle('');
-
-                                    // setStudentEdit({ value: entries.student.id, label: entries.student.title });
-                                    // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
-                                    // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });
-                                    // setDepartmentEdit({ value: entries.department.id, label: entries.department.title });setStudentEdit({ value: entries.student.id, label: entries.student.title });
                                     setStudentEdit(entries.student.fullName);
                                     setDisciplineEdit(entries.discipline.title);
                                     setWorkTypeEdit(entries.work.type.title);
-                                    // setEmplLastN();
-                                    // setEmplFirstN();
-                                    // setEmplMiddleN();
                                     setDepartmentEdit(entries.department.title);
                                     entries.work.title && setTitleEdit(entries.work.title);
                                     setModalEditActive(true)
                                 }}>
                                     <img src={require('../../img/edit.png')} alt='edit' />
                                 </button>
+                                {/* кнопка удаления */}
                                 <button onClick={() => {
                                     setModalDeleteActive(true); setDeleteId(entries.work.id);
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -539,8 +506,6 @@ function Admin_main() {
                                         adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
-
                                 }}>
                                     <img src={require('../../img/delete.png')} alt='delete' />
                                 </button>
@@ -549,19 +514,18 @@ function Admin_main() {
                 ))}
 
                 {/* кнопка пагинации */}
-
                 {hasMoreData && (
                     <button className='btn-loadMore' onClick={loadMore}>
                         Загрузить ещё
                     </button>
                 )}
             </div>
+
+            {/* модальное окно редактирования */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
                 <div className='modal-main'>
                     <div className='grid'>
-                        <div>
-                            <p><b>Дата регистрации: </b></p>
-                        </div>
+                        <div><p><b>Дата регистрации: </b></p></div>
                         <div>
                             <Flatpickr
                                 style={{
@@ -579,82 +543,14 @@ function Admin_main() {
                                 }}
                             />
                         </div>
-                        <div>
-                            <p><b>ФИО студента: </b></p>
-                        </div>
-                        <div>
-                            <p>{studentEdit}</p>
-
-                        </div>
-                        {/* <Select
-                            styles={customStylesModal}
-                            placeholder="Студент"
-                            value={studentEdit}
-                            maxMenuHeight={120}
-                            onChange={handleModalStudent}
-                            isSearchable={true}
-                            options={filterDiscipline.map(el => ({
-                                value: el.id,
-                                label: el.title,
-                            }))}
-                        /> */}
-                        <div>
-                            <p><b>Дисциплина: </b></p>
-                        </div>
-                        <div>
-                            <p>{disciplineEdit}</p>
-                            {/* <Select
-                                styles={customStylesModal}
-                                placeholder="Дисциплина"
-                                value={disciplineEdit}
-                                maxMenuHeight={120}
-                                onChange={handleModalDisciplene}
-                                isSearchable={true}
-                                options={filterDiscipline.map(el => ({
-                                    value: el.id,
-                                    label: el.title,
-                                }))}
-                            /> */}
-                        </div>
-                        <div>
-                            <p><b>Тип работы: </b></p>
-                        </div>
-                        <div>
-                            <p>{workTypeEdit}</p>
-
-                            {/* <Select
-                                styles={customStylesModal}
-                                placeholder="Тип работы"
-                                value={workTypeEdit}
-                                maxMenuHeight={120}
-                                onChange={handleModalWorkType}
-                                isSearchable={true}
-                                options={filterWorkType.map(el => ({
-                                    value: el.id,
-                                    label: el.title,
-                                }))}
-                            /> */}
-                        </div>
-                        <div>
-                            <p><b>Кафедра: </b></p>
-                        </div>
-                        <div>
-                            <p>{departmentEdit}</p>
-
-                            {/* <Select
-                                styles={customStylesModal}
-                                placeholder="Кафедра"
-                                value={departmentEdit}
-                                maxMenuHeight={120}
-                                onChange={handleModalDepartment}
-                                isSearchable={true}
-                                options={filterDepartments.map(el => ({
-                                    value: el.id,
-                                    label: el.title,
-                                }))}
-                            /> */}
-                        </div>
-
+                        <div><p><b>ФИО студента: </b></p></div>
+                        <div><p>{studentEdit}</p></div>
+                        <div><p><b>Дисциплина: </b></p></div>
+                        <div><p>{disciplineEdit}</p></div>
+                        <div><p><b>Тип работы: </b></p></div>
+                        <div><p>{workTypeEdit}</p></div>
+                        <div><p><b>Кафедра: </b></p></div>
+                        <div><p>{departmentEdit}</p></div>
                     </div>
                     <div>
                         {workTypeEdit === 'Курсовая' && <div className='input-conteiner'>
@@ -662,29 +558,27 @@ function Admin_main() {
                             <label className='label-name'>Название работы</label>
                         </div>}
                         {(errorTitle !== '') && <p className='inputModalError' >{errorTitle}</p>}
-
                     </div>
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
                         editData();
                     }}>Сохранить</button>
+
                     <button onClick={() => {
                         setModalEditActive(false);
-
+                        // Восстанавливаем позицию прокрутки
                         document.body.style.overflow = '';
                         const adminMainHeaders = document.getElementsByClassName('ad_main_header');
                         for (let i = 0; i < adminMainHeaders.length; i++) {
                             adminMainHeaders[i].style.paddingRight = `10px`;
                         }
                         document.getElementById('body-content').style.paddingRight = ``;
-
-                        // Восстанавливаем позицию прокрутки
-
-
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
+
+            {/* модальное окно удаления */}
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
@@ -698,8 +592,8 @@ function Admin_main() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Удалить</button>
+
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = '';
@@ -708,14 +602,12 @@ function Admin_main() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
-
                         }}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>
 
-            {/* модальное окно ошибки */}
+            {/* модальные окна ошибки */}
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />

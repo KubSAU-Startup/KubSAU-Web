@@ -13,7 +13,6 @@ function Error_empty({ active, text, codeText }) {
 
     const handleUrlServer = e => {
         setUrlServer(e.target.value);
-
     };
 
     const editUrl = () => {

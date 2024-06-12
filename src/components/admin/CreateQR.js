@@ -1,18 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Admin_header.css';
 import './CreateQR.css'
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Select from 'react-select';
-// import QRCode from 'qrcode';
 import QRCode from "qrcode.react";
-import JSZip, { filter, forEach } from "jszip";
-import Modal from '../Modal/Modal';
 import { faFilter, faUndo, faCheckCircle, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from '../Modal/Loading';
 import { getAllGroups, getTextError, editDisciplines, generateQrCodes, getAllDisciplines, getAllWorkTypes, getDataPrograms, getDirectivitiesPrograms } from '../../network';
 import Error_modal from '../Modal/Error_modal';
-// import FileSaver from 'file-saver';
 import { customStyles, customStylesModal, customStylesQR, customStylesTypeOfWork } from '../Select_style/Select_style';
 import Empty_modal from '../Modal/Empty_modal';
 import Error_empty from '../Modal/Error_empty';
@@ -24,27 +20,15 @@ function CreateQR() {
   const [isOpen, setOpen] = useState(false);
   const [emptyModalActive, setEmptyModalActive] = useState(false);
   const [editModalActive, setEditModalActive] = useState(false);
-  const [userStates, setUserStates] = useState({});
   const [errorGroup, setErrorGroup] = useState('');
   const [errorDis, setErrorDis] = useState('');
   const [errorType, setErrorType] = useState('');
 
-  const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [qrUrl, setQrUrl] = useState('');
-
-  const [addActive, setAddActive] = useState(false);
-  const [editActive, setEditActive] = useState(false);
-  const [dataDisciplines, setDataDisciplines] = useState({
-    response: [],
-    error: null,
-    success: true
-  });
 
   const [allDisciplines, setAllDisciplines] = useState([]);
-
   const [allWorkTypes, setAllWorkTypes] = useState([]);
 
   const [programQR, setProgramQR] = useState([]);
@@ -52,45 +36,25 @@ function CreateQR() {
 
   const [allGroups, setAllGroups] = useState([]);
   const [directivitiesPrograms, setDirectivitiesPrograms] = useState([]);
-
   const [groupQR, setGroupQR] = useState([]);
-
-  const [studQR, setStudQR] = useState(null);
-
-  const [workTypes, setWorkTypes] = useState({});
-  const [editWorkTypes, setEditWorkTypes] = useState({});
 
   const [errorActive, setErrorActive] = useState(false);
   const [textError, setTextError] = useState('');
   const [codeText, setCodeText] = useState('');
-
-  const [semester, setSemester] = useState(null);
-  const [program, setProgram] = useState(null);
-  const [group, setGroup] = useState(null);
   const [editTypes, setEditTypes] = useState([]);
 
   const [semesterFilter, setSemesterFilter] = useState(null);
   const [directivityFilter, setDirectivityFilter] = useState(null);
 
   const [qrParams, setQRParams] = useState({});
-
   const [directivityId, setDirectivityId] = useState(null);
-  const [getProgram, setGetProgram] = useState(null);
-  const [getSubject, setGetSubject] = useState(null);
 
-  const [getProgId, setGetProgId] = useState(null);
-  const [setting, setSetting] = useState(null);
   const [idProgram, setIdProgram] = useState(null);
-  const [getEditSemester, setGetEditSemester] = useState(null);
-  const [getEditProgram, setGetEditProgram] = useState(null);
-  const [getEditSubject, setGetEditSubject] = useState(null);
 
-  const [visibleItems, setVisibleItems] = useState(30);
   const [hasMoreData, setHasMoreData] = useState(true);
   const menuRef = useRef(null);
   const [inputValue, setInputValue] = useState("");
   const [debouncedInputValue, setDebouncedInputValue] = useState("");
-  const [dataQR, setDataQR] = useState([]);
 
   const [offset, setOffset] = useState(0);
   const limit = 30; // Количество элементов на странице
@@ -104,22 +68,15 @@ function CreateQR() {
 
   const [errorEmptyActive, setErrorEmptyActive] = useState(false);
   const [errorOkActive, setErrorOkActive] = useState(false);
-
-  const [disciplineAndType, setDisciplineAndType] = useState([]);
-  const [arrayUInt8, setArrayUInt8] = useState([]);
-
-
-  const [inputText, setInputText] = useState('');
-  const [qrCodeText, setQRCodeText] = useState('');
   let selectGroups = '';
 
+  // открытие модального окна для дополнительных функций карточки
   const openModal = (itemId) => {
-
-
     setSelectedItemId(itemId);
     setIsSetOpen(true);
   };
 
+  // закрытие модального окна для дополнительных функций карточки
   const closeModal = () => {
     setIsSetOpen(false);
 
@@ -127,10 +84,8 @@ function CreateQR() {
 
   // Обработчик клика вне модального окна
   const handleClickOutside = (event) => {
-
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       closeModal();
-
     }
   };
   useEffect(() => {
@@ -138,24 +93,18 @@ function CreateQR() {
     // Добавляем обработчик клика вне модального окна при открытии модального окна
     if (isSetOpen) {
       document.addEventListener('click', handleClickOutside);
-
     } else {
       document.removeEventListener('click', handleClickOutside);
-
     }
 
     // Очищаем обработчик при размонтировании компонента
     return () => {
-
       document.removeEventListener('click', handleClickOutside);
-
     };
   }, [isSetOpen]);
-  // useEffect(() => { console.log(studQR) }, [studQR])
 
   //загрузка данных с бэка
   useEffect(() => {
-
     setIsLoading(true);
     setHasMoreData(true);
     getDataPrograms(offset, limit, qrParams, debouncedInputValue, (res) => {
@@ -166,7 +115,6 @@ function CreateQR() {
         if (res.response.entries.length < limit) {
           setHasMoreData(false); // Если загружено меньше, чем лимит, значит, больше данных нет
         }
-
         // Если это первая страница, просто устанавливаем новые данные
         if (offset === 0) {
           setProgramQR(res.response.entries);
@@ -277,6 +225,7 @@ function CreateQR() {
 
   }, []);
 
+  // редактирование дисциплин в программе
   useEffect(() => {
     if (copyData) {
       const program = copyData.find(res => res.program.id === idProgram);
@@ -292,13 +241,13 @@ function CreateQR() {
       }
     }
   }, [copyData, idProgram, allWorkTypes, editModalActive]);
-  // console.log(editTypes);
 
   //поиск программ
   const handleInputValue = e => {
     setInputValue(e.target.value);
-
   };
+
+  // задержка отправки запроса в 1 сек (поиск)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setOffset(0);
@@ -307,6 +256,7 @@ function CreateQR() {
     return () => clearTimeout(timeoutId);
   }, [inputValue, 1000]);
 
+  // обновление данных для отображения
   useEffect(() => {
     setSearchResults(programQR);
   }, [programQR])
@@ -317,24 +267,10 @@ function CreateQR() {
     setIsAuthenticated(false);
   };
 
-  // // проверка авторизован ли пользователь
+  // проверка авторизован ли пользователь
   if (isAuthenticated == false) {
     return <Navigate to='/' />
   }
-
-  // установка значений для создание qr
-  function handleSelectSemester(data) {
-    setSemester(data);
-    setProgram(null);
-  }
-  function handleSelectProgram(data) {
-    setProgram(data);
-  }
-  function handleSelectGroup(data) {
-    setGroup(data);
-  }
-
-
 
   // запись значений фильтров
   function handleSelectSemesterFilter(data) {
@@ -343,11 +279,11 @@ function CreateQR() {
   function handelSelectDirectivityFilter(data) {
     setDirectivityFilter(data);
   }
-
   function handelSelectGroupsQR(data) {
     setGroupQR(data);
   }
 
+  // выбор новой дисциплины и его типа
   function handleNewDisciplineChange(data) {
     setNewDisc(data);
   }
@@ -373,7 +309,6 @@ function CreateQR() {
     setDirectivityFilter(null);
   }
 
-
   // функция загрузки данных пагинации
   const loadMore = () => {
     setOffset(prevOffset => prevOffset + limit);
@@ -387,6 +322,7 @@ function CreateQR() {
     }));
   };
 
+  // функция редактирования программы
   async function editData(discip, type) {
     setIsLoading(true);
     await editDisciplines(idProgram, discip, type, (res) => {
@@ -406,12 +342,10 @@ function CreateQR() {
     });
   }
 
-
-
+  // сохренение редактируемой программы
   const handleSave = () => {
     const disciplineIds = Object.keys(editTypes).join(',');
     const workTypeIds = Object.values(editTypes).map(type => type.value).join(',');
-    console.log(`Сохраненные данные: дисциплины - ${disciplineIds}, типы работ - ${workTypeIds}`);
     editData(disciplineIds, workTypeIds);
     setEditModalActive(false);
     document.body.style.overflow = '';
@@ -420,10 +354,9 @@ function CreateQR() {
       adMainHeaders[i].style.paddingRight = `10px`;
     }
     document.getElementById('body-content').style.paddingRight = ``;
-
-
   };
 
+  // закрытие окна редактирования программы
   const handleCancel = () => {
     setSearchResults(programQR);
     setCopyData(structuredClone(programQR));
@@ -434,16 +367,15 @@ function CreateQR() {
       adMainHeaders[i].style.paddingRight = `10px`;
     }
     document.getElementById('body-content').style.paddingRight = ``;
-
   };
 
+  // функция получения qr и скачивания архива
   const getQR = () => {
     setIsLoading(true);
     setErrorGroup('');
     if (groupQR.length === 0) {
       setErrorGroup('Выберите группу(ы)');
       setIsLoading(false);
-
     } else {
       for (const group of groupQR) {
         selectGroups = selectGroups + group.value + ',';
@@ -465,7 +397,6 @@ function CreateQR() {
             saveAs(blob, `${titleZip}.zip`);
           }
           setIsLoading(false);
-
         }).catch((error) => {
           setTextError(error.message);
           setCodeText(error.code);
@@ -481,15 +412,14 @@ function CreateQR() {
       }
       document.getElementById('body-content').style.paddingRight = ``;
       setErrorGroup('');
-
     }
   }
 
+  // функция добавления дисциплины
   const addDiscipline = () => {
     setErrorDis('');
     setErrorType('');
     if (newDisc === null || newTypes === null) {
-
       if (newDisc === null) {
         setErrorDis('Выберите дисциплину');
       }
@@ -515,9 +445,9 @@ function CreateQR() {
         setErrorType('');
       }
     }
-
   };
 
+  // функция удаления дисциплины из программы
   const deleteData = (disciplineId) => {
     setCopyData(prevState => {
       const updatedProgram = prevState.find(res => res.program.id === idProgram);
@@ -532,7 +462,7 @@ function CreateQR() {
       return updatedEditTypes;
     });
   };
-  // console.log(programQR)
+
   // массив для семестров
   const dataSemester = [{ value: 1, label: 1 },
   { value: 2, label: 2 },
@@ -546,8 +476,6 @@ function CreateQR() {
   { value: 10, label: 10 },
   { value: 11, label: 11 },
   { value: 12, label: 12 }];
-
-  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
   return (
     <>
@@ -570,28 +498,14 @@ function CreateQR() {
               <Link to="/admin/AdminDirection" className='link-to'><li className='menu_item'>Направления</li></Link>
             </ul>
           </nav>
-
-          {/* <Link to='/AdminUsers' className='admin-to-users'>Пользователи</Link> */}
-
           <Link style={{ visibility: 'hidden' }} className='admin-to-qr' to="/admin/CreateQR">
             <p>Создать QR-код</p>
             <img className='qr-arrow' src={require('../../img/arrow.png')} />
           </Link>
-
           <Link to='/admin/AdminAccount' className='admin-to-account'>Мой аккаунт</Link>
           <div className='admin-to-exit' onClick={handleLogout}>Выход</div>
         </div>
       </div>
-
-      <QRCode
-        style={{ display: 'none' }}
-        id="123456"
-        value={`${qrUrl}`}
-        size={290}
-        level={"H"}
-        includeMargin={true}
-      />
-
 
       {/* поиск */}
       <div id='body-content'>
@@ -613,7 +527,6 @@ function CreateQR() {
               value={semesterFilter}
               onChange={handleSelectSemesterFilter}
               isSearchable={true}
-              // isDisabled={semesterFilter === -1 && directivityFilter !== null ? true : false}
               options={dataSemester}
             />
           </div><div>
@@ -637,13 +550,7 @@ function CreateQR() {
         </div>
         {/* </div> */}
 
-
-        {/* кнопка вызова модального окна для создания программы */}
-        {/* <button className='add-qr-group' onClick={() => { setEmptyModalActive(true); setAddActive(true); }}>
-        <FontAwesomeIcon icon={faPlusCircle} />
-      </button> */}
-
-        {/* все созданные программы */}
+        {/* все программы */}
         {searchResults.map(value => (
           <div className='cart-qr-group' key={value.id}>
             <div className='data-qr'>
@@ -661,7 +568,7 @@ function CreateQR() {
                 </div>
               </div>
             </div>
-
+            {/* кнопка настроек */}
             <button
               className='qr-setting'
               onClick={() => {
@@ -675,13 +582,13 @@ function CreateQR() {
                 else {
                   openModal(value.program.id);
                 }
-              }}
-            >
+              }}>
               <img src={require('../../img/setting.png')} alt='setting' />
             </button>
 
             {isSetOpen && selectedItemId === value.program.id && (
               <div className={`button-edit-delete ${isSetOpen && selectedItemId === value.program.id ? 'active' : ''}`}>
+                {/* кнопка создания qr */}
                 <button className='btn-create-qr' onClick={() => {
                   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                   document.body.style.overflow = 'hidden';
@@ -698,6 +605,7 @@ function CreateQR() {
                 }}>
                   <img src={require('../../img/qr_white.png')} />
                 </button>
+                {/* кнопка редактирования программы */}
                 <button onClick={() => {
                   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                   document.body.style.overflow = 'hidden';
@@ -716,22 +624,19 @@ function CreateQR() {
                 }}>
                   <img src={require('../../img/edit.png')} alt='edit' />
                 </button>
-                {/* <button>
-                <img src={require('../../img/delete.png')} alt='delete' />
-              </button> */}
-
-
               </div>
             )}
           </div>
         ))}
-
+        {/* кнопка пагинации */}
         {hasMoreData && (
           <button className='btn-loadMore' onClick={loadMore}>
             Загрузить ещё
           </button>
         )}
       </div>
+
+      {/* модальное окно для выбора группы, чтобы создать qr */}
       <Empty_modal active={emptyModalActive} setActive={setEmptyModalActive}>
         <div className='modal-groups'>
           <div><p><b>Выберите группы: </b></p></div>
@@ -750,12 +655,10 @@ function CreateQR() {
               })
               )} />
             {(errorGroup !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorGroup}</p>}
-
           </div>
           <div className='modal-button'>
             <button onClick={() => {
               getQR();
-
             }}>Сгенерировать</button>
 
             <button onClick={() => {
@@ -766,13 +669,12 @@ function CreateQR() {
                 adMainHeaders[i].style.paddingRight = `10px`;
               }
               document.getElementById('body-content').style.paddingRight = ``;
-
             }}>Отмена</button>
           </div>
         </div>
       </Empty_modal>
 
-
+      {/* модально окно для редактирования программы */}
       <Empty_modal active={editModalActive} setActive={setEditModalActive}>
         <div className='modal-disciplines'>
           <p><b>{titleProgram}</b></p>
@@ -789,7 +691,6 @@ function CreateQR() {
                   label: res.title
                 }))} />
               {(errorDis !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDis}</p>}
-
             </div>
             <div>
               <Select
@@ -803,7 +704,6 @@ function CreateQR() {
                   label: res.title
                 }))} />
               {(errorType !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorType}</p>}
-
             </div>
             <button onClick={addDiscipline}>
               <FontAwesomeIcon icon={faCheckCircle} />
@@ -839,10 +739,7 @@ function CreateQR() {
         </div>
       </Empty_modal>
 
-
-
-
-      {/* модальное окно ошибки */}
+      {/* модальные окна ошибок */}
       <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
       <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
       <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />

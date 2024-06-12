@@ -15,17 +15,11 @@ import { getAllDirectivities, getAllGroups, getTextError, addNewStudent, editStu
 
 function Admin_students() {
     const [modalActive, setModalActive] = useState(false);
-    const [modalContActive, setModalContActive] = useState(false);
-    const [userStates, setUserStates] = useState({});
-    const [allUsers, setAllUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
-
     const [errorFirstN, setErrorFirstN] = useState('');
     const [errorLastN, setErrorLastN] = useState('');
     const [errorMiddleN, setErrorMiddleN] = useState('');
     const [errorGroup, setErrorGroup] = useState('');
     const [errorStatus, setErrorStatus] = useState('');
-
 
     const [filterGroup, setFilterGroup] = useState(null);
     const [filterGrade, setFilterGrade] = useState(null);
@@ -45,7 +39,6 @@ function Admin_students() {
         heads: [],
         grades: []
     });
-    const [allHeads, setAllHeads] = useState([]);
 
     const [inputValue, setInputValue] = useState("");
     const [debouncedInputValue, setDebouncedInputValue] = useState("");
@@ -55,33 +48,15 @@ function Admin_students() {
     const [allGroups, setAllGroups] = useState([]);
     const [studentsParam, setStudentsParam] = useState({});
 
-    const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-    const [cartStates, setCartStates] = useState({});
-    const [numberGroup, setNumberGroup] = useState('');
-    const [newNumberGroup, setNewNumberGroup] = useState(null);
     const [codeText, setCodeText] = useState('');
     const [errorEmptyActive, setErrorEmptyActive] = useState(false);
     const [errorOkActive, setErrorOkActive] = useState(false);
 
-    const [newDirectivity, setNewDirectivity] = useState(null);
-    const [newHead, setNewHead] = useState(null);
-
-
-    const [head, setHead] = useState(null);
-    const [directivity, setDirectivity] = useState(null);
-
-    const [abbGroup, setAbbGroup] = useState('');
-    const [newAbbGroup, setNewAbbGroup] = useState('');
-
-
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
-
-    const [visibleItems, setVisibleItems] = useState(10);
-    const [isPaginationVisible, setIsPaginationVisible] = useState(true);
 
     const [lastN, setLastN] = useState('');
     const [firstN, setFirstN] = useState('');
@@ -100,11 +75,13 @@ function Admin_students() {
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
 
+    // открытие модального окна для дополнительных функций карточки
     const openModal = (itemId) => {
         setSelectedItemId(itemId);
         setIsSetOpen(true);
     };
 
+    // закрытие модального окна для дополнительных функций карточки
     const closeModal = () => {
         setIsSetOpen(false);
     };
@@ -129,6 +106,7 @@ function Admin_students() {
     useEffect(() => {
         setIsLoading(true);
         setHasMoreData(true);
+        // получение данных для отобаражения на странице
         searchOfStudents(offset, limit, studentsParam, debouncedInputValue, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -153,7 +131,7 @@ function Admin_students() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -161,6 +139,7 @@ function Admin_students() {
 
     }, [offset, limit, studentsParam, debouncedInputValue])
 
+    // получение данных для фильтров
     useEffect(() => {
         getAllDirectivities(true, (res) => {
             setIsLoading(true);
@@ -172,7 +151,7 @@ function Admin_students() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -188,25 +167,19 @@ function Admin_students() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         })
     }, []);
 
-    useEffect(() => {
-        if (modalActive || modalEditActive || modalDeleteActive) {
-            document.body.classList.add('modal-open');
-        } else {
-            document.body.classList.remove('modal-open');
-        }
-    }, [modalActive, modalEditActive, modalDeleteActive]);
-
+    // запись данных поиска
     const handleInputValue = (e) => {
         setInputValue(e.target.value);
     };
 
+    // задержка в 1 сек перед отправкой поиска
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setDebouncedInputValue(inputValue);
@@ -214,16 +187,15 @@ function Admin_students() {
         return () => clearTimeout(timeoutId);
     }, [inputValue, 1000]);
 
+    // функция добавления
     async function addData() {
         setIsLoading(true);
-
         setErrorLastN('');
         setErrorFirstN('');
         setErrorMiddleN('');
         setErrorGroup('');
         setErrorStatus('');
         if (firstN === '' || lastN === '' || middleN === '' || modalGroup === null || modalStatus === null) {
-
             if (firstN === '') {
                 setErrorFirstN('Заполните имя');
             }
@@ -240,7 +212,6 @@ function Admin_students() {
                 setErrorStatus('Выберите статус студента');
             }
             setIsLoading(false);
-
         } else {
             await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
                 if (res.success) {
@@ -251,14 +222,12 @@ function Admin_students() {
                     setErrorEmptyActive(true);
                 }
                 setIsLoading(false);
-
             }).catch((error) => {
                 setTextError(error.message);
                 setCodeText(error.code);
                 setErrorOkActive(true);
                 setIsLoading(false);
             });
-
             document.body.style.overflow = '';
             const adminMainHeaders = document.getElementsByClassName('ad_main_header');
             for (let i = 0; i < adminMainHeaders.length; i++) {
@@ -266,12 +235,10 @@ function Admin_students() {
             }
             document.getElementById('body-content').style.paddingRight = ``;
             setModalActive(false);
-
-
         }
     }
-    // console.log(searchResults)
 
+    // функция редактирования
     async function editData() {
         setErrorLastN('');
         setErrorFirstN('');
@@ -279,9 +246,7 @@ function Admin_students() {
         setErrorGroup('');
         setErrorStatus('');
         setIsLoading(true);
-
         if (firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || modalEditGroup === null || modalEditStatus === null) {
-
             if (firstNEdit === '') {
                 setErrorFirstN('Заполните имя');
             }
@@ -298,11 +263,9 @@ function Admin_students() {
                 setErrorStatus('Выберите статус студента');
             }
             setIsLoading(false);
-
         } else {
             await editStudent(editId, firstNEdit, lastNEdit, middleNEdit, modalEditGroup.value, modalEditStatus.value, (res) => {
                 if (res.success) {
-
                     const editStudent = allStudents.map(elem => {
                         if (elem.id === editId) {
                             return {
@@ -317,9 +280,7 @@ function Admin_students() {
                             return elem; // если элемент не подлежит изменению, возвращаем его без изменений
                         }
                     });
-
                     setAllStudents(editStudent);
-
                 } else {
                     setTextError(res.message);
                     setCodeText(res.code);
@@ -339,9 +300,10 @@ function Admin_students() {
                 adminMainHeaders[i].style.paddingRight = `10px`;
             }
             document.getElementById('body-content').style.paddingRight = ``;
-
         }
     }
+
+    // функция удаления
     async function deleteData() {
         setIsLoading(true);
 
@@ -349,36 +311,35 @@ function Admin_students() {
             if (res.success) {
                 console.log(res.response);
                 setAllStudents(allStudents.filter((a) => a.id !== deleteId));
-
             } else {
                 setTextError(res.message);
                 setCodeText(res.code);
                 setErrorEmptyActive(true);
             }
             setIsLoading(false);
-
         }).catch((error) => {
             setTextError(error.message);
             setCodeText(error.code);
             setErrorOkActive(true);
             setIsLoading(false);
         });
-
     }
 
+    // обновление данных для отображения
     useEffect(() => {
         setSearchResults(allStudents)
     }, [allStudents])
 
+    // установление фильтров
     const getParams = () => {
         setIsLoading(true);
         setOffset(0);
-
         setStudentsParam({
             groupId: filterGroup ? filterGroup.value : null,
             gradeId: filterGrade ? filterGrade.value : null,
             statusId: filterStatus ? filterStatus.value : null
         });
+        setIsLoading(false);
     };
 
     // функция сброса фильтров
@@ -388,29 +349,29 @@ function Admin_students() {
         setFilterGrade(null);
         setFilterStatus(null);
         setOffset(0);
-
-        // параметры для сброса
         setStudentsParam({})
-
+        setIsLoading(false);
     };
+
+    // статусы студентов
     const statuses = [
         { value: 1, label: 'Учится' },
         { value: 2, label: 'Отчислен' },
         { value: 3, label: 'Академ' },
-
     ]
+
+    // функции для выбора данных в фильтрах
     function handleFilterGroup(data) {
         setFilterGroup(data);
     }
-
     function handleFilterGrade(data) {
         setFilterGrade(data);
     }
-
     function handleFilterStatus(data) {
         setFilterStatus(data);
     }
 
+    // функции для выбора данных в модальных окнах
     function handleModalGroup(data) {
         setModalGroup(data);
     }
@@ -423,14 +384,15 @@ function Admin_students() {
     function handleModalEditStatus(data) {
         setModalEditStatus(data);
     }
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     return (
         <>
             {/* окно загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
+            {/* шапка */}
             <Admin_header />
             <div id='body-content'>
+                {/* поиск */}
                 <div className='admin-main-search'>
                     <input
                         type='text'
@@ -439,6 +401,7 @@ function Admin_students() {
                         placeholder='Поиск...'
                     />
                 </div>
+                {/* фильтры */}
                 <div className='filters'>
                     <Select
                         styles={customStyles}
@@ -449,8 +412,7 @@ function Admin_students() {
                         options={allGroups.map(res => ({
                             value: res.id,
                             label: res.title,
-                        }))}
-                    />
+                        }))} />
                     <Select
                         styles={customStyles}
                         placeholder="Степень образования"
@@ -460,23 +422,21 @@ function Admin_students() {
                         options={allDirectivities.grades.map(res => ({
                             value: res.id,
                             label: res.title,
-                        }))}
-                    />
+                        }))} />
                     <Select
                         styles={customStyles}
                         placeholder="Статус"
                         value={filterStatus}
                         onChange={handleFilterStatus}
                         isSearchable={true}
-                        options={statuses}
-                    />
+                        options={statuses} />
                     {/* кнопки применить и сбросить */}
                     <button className='get-params' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
                     {/* очистить фильтры */}
                     <button className='delete-params' onClick={resetFilters}><FontAwesomeIcon icon={faUndo} /></button>
                 </div>
 
-
+                {/* кнопка добавления студента */}
                 <button className='add-student' onClick={() => {
                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                     document.body.style.overflow = 'hidden';
@@ -499,12 +459,10 @@ function Admin_students() {
                 }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
-                {searchResults.map(res => (
 
+                {/* вывод данных о студентах */}
+                {searchResults.map(res => (
                     <div className='cart-stud' key={res.id}>
-                        {/* <div className='data'>
-                        {user.id}
-                    </div> */}
                         <div className='content'>
                             <div className='col1'>
                                 <p><span>ФИО:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
@@ -546,6 +504,7 @@ function Admin_students() {
 
                             </div>
                         </div>
+                        {/* кнопка настроек */}
                         <button
                             className='qr-setting'
                             onClick={() => {
@@ -559,15 +518,12 @@ function Admin_students() {
                                 else {
                                     openModal(res.id);
                                 }
-                            }}
-                        // className='student-setting'
-                        // onClick={() => handleSettingClick(res.id)}
-                        >
+                            }}>
                             <img src={require('../../img/setting.png')} alt='setting' />
                         </button>
                         {isSetOpen && selectedItemId === res.id && (
                             <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
-                                {/* <div className={`button-edit-delete ${userStates[res.id] ? 'active' : ''}`}> */}
+                                {/* кнопка редактирования */}
                                 <button onClick={() => {
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
@@ -601,6 +557,7 @@ function Admin_students() {
                                 }}>
                                     <img src={require('../../img/edit.png')} alt='edit' />
                                 </button>
+                                {/* кнопка удаления */}
                                 <button onClick={() => {
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
@@ -609,7 +566,6 @@ function Admin_students() {
                                         adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
                                     setDeleteId(res.id);
                                     setModalDeleteActive(true);
                                 }}>
@@ -618,14 +574,16 @@ function Admin_students() {
                             </div>)}
                     </div>
                 ))}
+                {/* кнопка пагинации */}
                 {hasMoreData && (
                     <button className='btn-loadMore' onClick={loadMore}>
                         Загрузить ещё
                     </button>
                 )}
             </div>
-            <Empty_modal active={modalActive} setActive={setModalActive}>
 
+            {/* модальное окно добавления */}
+            <Empty_modal active={modalActive} setActive={setModalActive}>
                 <div className='modal-students'>
                     <div>
                         <div className='input-conteiner'>
@@ -633,7 +591,6 @@ function Admin_students() {
                             <label className='label-name'>Фамилия</label>
                         </div>
                         {(errorLastN !== '') && <p className='inputModalError' >{errorLastN}</p>}
-
                     </div>
                     <div>
                         <div className='input-conteiner'>
@@ -641,7 +598,6 @@ function Admin_students() {
                             <label className='label-name'>Имя</label>
                         </div>
                         {(errorFirstN !== '') && <p className='inputModalError' >{errorFirstN}</p>}
-
                     </div>
                     <div>
                         <div className='input-conteiner'>
@@ -649,9 +605,7 @@ function Admin_students() {
                             <label className='label-name'>Отчество</label>
                         </div>
                         {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
-
                     </div>
-
                     <div style={{ marginBottom: '20px' }}>
                         <Select
                             styles={customStylesModal}
@@ -666,9 +620,7 @@ function Admin_students() {
                             }))}
                         />
                         {(errorGroup !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorGroup}</p>}
-
                     </div>
-
                     <div>
                         <Select
                             styles={customStylesModal}
@@ -680,13 +632,12 @@ function Admin_students() {
                             options={statuses}
                         />
                         {(errorStatus !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorStatus}</p>}
-
                     </div>
                     <div className='modal-button'>
                         <button onClick={() => {
                             addData();
-
                         }}>Сохранить</button>
+
                         <button onClick={() => {
                             document.body.style.overflow = '';
                             const adminMainHeaders = document.getElementsByClassName('ad_main_header');
@@ -694,14 +645,13 @@ function Admin_students() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                             setModalActive(false);
                         }}>Отмена</button>
                     </div>
-
                 </div>
             </Empty_modal>
 
+            {/* модальное окно для редактирования */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
                 <div className='modal-students'>
                     <div>
@@ -710,30 +660,22 @@ function Admin_students() {
                             <label className='label-name'>Фамилия</label>
                         </div>
                         {(errorLastN !== '') && <p className='inputModalError' >{errorLastN}</p>}
-
                     </div>
-
                     <div>
                         <div className='input-conteiner'>
                             <input type='text' className='name-stud' placeholder=' ' value={firstNEdit} onChange={e => setFirstNEdit(e.target.value)} />
                             <label className='label-name'>Имя</label>
                         </div>
                         {(errorFirstN !== '') && <p className='inputModalError' >{errorFirstN}</p>}
-
                     </div>
-
                     <div>
                         <div className='input-conteiner'>
                             <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
                             <label className='label-name'>Отчество</label>
                         </div>
                         {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
-
                     </div>
-
-
                     <div style={{ marginBottom: '20px' }}>
-
                         <Select
                             styles={customStylesModal}
                             placeholder="Группа"
@@ -744,10 +686,8 @@ function Admin_students() {
                             options={allGroups.map(el => ({
                                 value: el.id,
                                 label: el.title,
-                            }))}
-                        />
+                            }))} />
                         {(errorGroup !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorGroup}</p>}
-
                     </div>
                     <div>
                         <Select
@@ -761,17 +701,15 @@ function Admin_students() {
                             ({
                                 value: el.id,
                                 label: el.title
-                            }))}
-                        />
+                            }))} />
                         {(errorStatus !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorStatus}</p>}
-
                     </div>
 
                     <div className='modal-button'>
                         <button onClick={() => {
                             editData();
-
                         }}>Сохранить</button>
+
                         <button onClick={() => {
                             setModalEditActive(false);
                             document.body.style.overflow = '';
@@ -780,12 +718,12 @@ function Admin_students() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Отмена</button>
                     </div>
-
                 </div>
             </Empty_modal>
+
+            {/* модальное окно для удаления */}
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
@@ -798,8 +736,8 @@ function Admin_students() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Удалить</button>
+
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = '';
@@ -808,12 +746,12 @@ function Admin_students() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>
 
+            {/* модальные окна ошибок */}
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />

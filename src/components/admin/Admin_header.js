@@ -27,10 +27,12 @@ function Admin_header() {
         };
     }, []);
 
+    // функция выхода из системы
     const handleLogout = () => {
         localStorage.removeItem('token');
         setIsAuthenticated(false);
     };
+
 
     if (!isAuthenticated) {
         return <Navigate to='/' />

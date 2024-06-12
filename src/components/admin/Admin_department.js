@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Admin_header from './Admin_header';
 import './Admin_department.css'
-import Modal from '../Modal/Modal';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
 import Error_empty from '../Modal/Error_empty';
@@ -18,13 +17,10 @@ function Admin_department() {
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
     const [allDepartments, setAllDepartments] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
-    // const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-    // const [getProgId, setGetProgId] = useState(null);
-    const [cartStates, setCartStates] = useState({});
     const [titleDepartment, setTitleDepartment] = useState('');
     const [phoneDepartment, setPhoneDepartment] = useState('');
     const [errorPhone, setErrorPhone] = useState('');
@@ -45,11 +41,13 @@ function Admin_department() {
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
 
+    // открытие модального окна для дополнительных функций карточки
     const openModal = (itemId) => {
         setSelectedItemId(itemId);
         setIsSetOpen(true);
     };
 
+    // закрытие модального окна для дополнительных функций карточки
     const closeModal = () => {
         setIsSetOpen(false);
     };
@@ -74,7 +72,7 @@ function Admin_department() {
     useEffect(() => {
         setVisibleItems(30);
         setIsLoading(true);
-
+        // получение данных о кафедрах
         getAllDepartments((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -85,7 +83,7 @@ function Admin_department() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -110,13 +108,7 @@ function Admin_department() {
         setIsLoading(false);
     };
 
-    const handleSettingClick = (cartId) => {
-
-        setCartStates(prevCartStates => ({
-            ...prevCartStates,
-            [cartId]: !prevCartStates[cartId],
-        }));
-    };
+    // добавление новой кафедры
     async function addDepartment() {
         setIsLoading(true);
 
@@ -157,15 +149,13 @@ function Admin_department() {
                 adminMainHeaders[i].style.paddingRight = `10px`;
             }
             document.getElementById('body-content').style.paddingRight = ``;
-
-
         }
     }
 
+    // восстановление поиска после обновления данных
     useEffect(() => {
         if (searchTerm) {
             const filteredResults = allDepartments.filter(item => {
-
                 // Проверяем условие для каждого поля, по которому хотим искать
                 return (
                     item.title.toLowerCase().includes(searchTerm) ||
@@ -174,12 +164,11 @@ function Admin_department() {
             });
             setSearchResults(filteredResults);
         } else {
-
             setSearchResults(allDepartments)
-
         }
     }, [allDepartments])
 
+    // редактирование кафедры
     async function editData() {
         setIsLoading(true);
         setErrorTitle('');
@@ -231,11 +220,10 @@ function Admin_department() {
                 adminMainHeaders[i].style.paddingRight = `10px`;
             }
             document.getElementById('body-content').style.paddingRight = ``;
-
         }
-
     }
 
+    // удаляем кафдеру
     async function deleteData(index) {
         setIsLoading(true);
 
@@ -256,8 +244,9 @@ function Admin_department() {
             setErrorOkActive(true);
             setIsLoading(false);
         });
-
     }
+
+    // проверка введенного пользователем телефона
     function isValidPhone(phone) {
         return /\+7 \([0-9]{3}\) [0-9]{3}-[0-9]{2}-[0-9]{2}/.test(phone);
     }
@@ -288,9 +277,10 @@ function Admin_department() {
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
 
+            {/* шапка страницы */}
             <Admin_header />
             <div id='body-content'>
-
+                {/* поиск */}
                 <div className='search-add'>
                     <div className='admin-main-search'>
                         <input
@@ -300,6 +290,8 @@ function Admin_department() {
                             placeholder='Поиск...'
                         />
                     </div>
+
+                    {/* кнопка добавления кафедры */}
                     <button className='add-student' onClick={() => {
                         setModalActive(true);
                         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -319,19 +311,18 @@ function Admin_department() {
                     </button>
                 </div>
 
+                {/* вывод данных на экран в виде карточек */}
                 {searchResults.slice(0, visibleItems).map(res => (
                     <div className='cart-stud' key={res.id}>
                         <div className='content'>
                             <div className='col1'>
                                 <p><span>Кафедра: </span>{res.title}</p>
-
                             </div>
                             <div className='col2'>
                                 <p><span>Номер телефона: </span>{res.phone}</p>
-
                             </div>
-
                         </div>
+                        {/* кнопка настроек карточки */}
                         <button
                             className='qr-setting'
                             onClick={() => {
@@ -345,15 +336,12 @@ function Admin_department() {
                                 else {
                                     openModal(res.id);
                                 }
-                            }}
-                        // className='department-setting'
-                        // onClick={() => handleSettingClick(res.id)}
-                        >
+                            }}>
                             <img src={require('../../img/setting.png')} alt='setting' />
                         </button>
                         {isSetOpen && selectedItemId === res.id && (
                             <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
-                                {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
+                                {/* кнопка редактирования */}
                                 <button onClick={() => {
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
@@ -372,16 +360,16 @@ function Admin_department() {
                                 }}>
                                     <img src={require('../../img/edit.png')} alt='edit' />
                                 </button>
+
+                                {/* кнопка удаления */}
                                 <button onClick={() => {
-                                   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-                                   document.body.style.overflow = 'hidden';
-                                   const adminMainHeaders = document.getElementsByClassName('ad_main_header');
-                                   for (let i = 0; i < adminMainHeaders.length; i++) {
-                                       adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
-                                   }
-                                   document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
-
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                                    for (let i = 0; i < adminMainHeaders.length; i++) {
+                                        adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                     setModalDeleteActive(true);
                                     setDeleteId(res.id);
                                 }}>
@@ -396,6 +384,8 @@ function Admin_department() {
                         Загрузить ещё
                     </button>
                 )}</div>
+
+            {/* модальное окно для добавления новой кафедры */}
             <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-department'>
                     <div>
@@ -404,16 +394,13 @@ function Admin_department() {
                             <label className='label-name'>Название кафедры</label>
                         </div>
                         {(errorTitle !== '') && <p className='inputModalError' >{errorTitle}</p>}
-
                     </div>
                     <div>
-
                         <div className='input-conteiner'>
                             <MaskInput alwaysShowMask mask={'+7 (000) 000-00-00'} size={20} showMask maskChar="_" className='phone-dapartment' placeholder=' ' value={phoneDepartment} onChange={e => setPhoneDepartment(e.target.value)} />
                             <label className='label-name'>Номер телефона</label>
                         </div>
                         {(errorPhone !== '') && <p className='inputModalError' >{errorPhone}</p>}
-
                     </div>
                 </div>
                 <div className='modal-button'>
@@ -436,6 +423,8 @@ function Admin_department() {
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
+
+            {/* модальное окно для редактирования кафедры */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
                 <div className='modal-department'>
                     <div>
@@ -449,12 +438,9 @@ function Admin_department() {
                     <div>
                         <div className='input-conteiner'>
                             <MaskInput alwaysShowMask mask={'+7 (000) 000-00-00'} size={20} showMask maskChar="_" className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} />
-
-                            {/* <input type='text' className='phone-dapartment' placeholder=' ' value={newPhone} onChange={e => setNewPhone(e.target.value)} /> */}
                             <label className='label-name'>Номер телефона</label>
                         </div>
                         {(errorPhone !== '') && <p className='inputModalError' >{errorPhone}</p>}
-
                     </div>
                 </div>
                 <div className='modal-button'>
@@ -470,8 +456,6 @@ function Admin_department() {
                         }
                         document.getElementById('body-content').style.paddingRight = ``;
 
-
-
                         setErrorPhone('');
                         setErrorTitle('');
                         setNewPhone('');
@@ -479,6 +463,8 @@ function Admin_department() {
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
+
+            {/* модально окно для удаления кафедры */}
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
@@ -492,8 +478,8 @@ function Admin_department() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-    
                         }}>Удалить</button>
+                        
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = '';
@@ -502,8 +488,6 @@ function Admin_department() {
                                 adminMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-    
-
                         }}>Отмена</button>
                     </div>
                 </div>

@@ -1,17 +1,8 @@
 import Admin_header from './Admin_header';
 import './Admin_account.css'
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate, Link, redirect, useNavigate
-} from "react-router-dom";
-import Select from 'react-select';
-import { customStylesModal } from '../Select_style/Select_style';
 import React, { useEffect, useState } from 'react';
-import { checkAccount, getEmployeeById, editEmployee, checkUrl, updatePassword } from '../../network';
+import { checkAccount, getEmployeeById, editEmployee, checkUrl, updatePassword, getTextError } from '../../network';
 import Error_modal from '../Modal/Error_modal';
-import { getTextError } from '../../network';
 import Loading from '../Modal/Loading';
 import Error_empty from '../Modal/Error_empty';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -35,7 +26,6 @@ function Admin_account() {
 
     const [modalEditActive, setModalEditActive] = useState(false);
     const [passwordActive, setPasswordActive] = useState(false);
-
 
     const [errorEmail, setErrorEmail] = useState('');
     const [errorFirstN, setErrorFirstN] = useState('');
@@ -65,26 +55,27 @@ function Admin_account() {
     const [urlActive, setUrlActive] = useState(false);
     const [urlServer, setUrlServer] = useState("");
 
+    // получение данных об аккаунте (id) при загрузке страницы
     useEffect(() => {
         setIsLoading(true);
         checkAccount((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
-                setIsLoading(false);
             } else {
-                setIsLoading(false);
                 setIdAccount(res.response);
             }
+            setIsLoading(false);
+
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         });
     }, []);
 
-
+    // после получения id аккаунта получаем дополнительные данные
     useEffect(() => {
         setIsLoading(true);
         if (idAccount !== null) {
@@ -92,14 +83,12 @@ function Admin_account() {
                 if (res.error) {
                     setTextError(getTextError(res.error));
                     setErrorActive(true);
-                    setIsLoading(false);
                 } else {
-                    setIsLoading(false);
                     setDataAccount(res.response);
                 }
-
+                setIsLoading(false);
             }).catch((error) => {
-                setTextError(error.message);
+                setTextError(getTextError(error));
                 setCodeText(error.code);
                 setErrorEmptyActive(true);
                 setIsLoading(false);
@@ -107,12 +96,15 @@ function Admin_account() {
         }
     }, [idAccount]);
 
+    // редактирование основных данных об аккаунте
     async function editData() {
         setIsLoading(true);
         setErrorEmail('');
         setErrorLastN('');
         setErrorFirstN('');
         setErrorMiddleN('');
+
+        // проверка ошибок ввода данных
         if (!isValidEmail(emailEdit) || firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || emailEdit === '') {
             if (!isValidEmail(emailEdit) && emailEdit !== '') {
                 setErrorEmail('Электронный адрес записан некорректно');
@@ -133,30 +125,34 @@ function Admin_account() {
 
         } else {
 
-            await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, '', (res) => {
+            // отправка запроса с новыми данными
+            await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit, (res) => {
                 if (res.success) {
+                    // изменение данных на странице
                     setDataAccount({
                         id: editId,
                         firstName: firstNEdit,
                         lastName: lastNEdit,
                         middleName: middleNEdit,
                         email: emailEdit,
-                        type: modalStaffEdit.value
+                        type: modalStaffEdit
 
                     })
                 } else {
-                    setTextError(res.message);
+                    setTextError(getTextError(res.error));
                     setCodeText(res.code);
                     setErrorEmptyActive(true);
                 }
                 setIsLoading(false);
 
             }).catch((error) => {
-                setTextError(error.message);
+                // обработка ошибок запроса
+                setTextError(getTextError(error));
                 setCodeText(error.code);
                 setErrorOkActive(true);
                 setIsLoading(false);
             });
+            // сбрасывание настроек при появлении скролла
             document.body.style.overflow = '';
             const usMainHeaders = document.getElementsByClassName('us_main_header');
             for (let i = 0; i < usMainHeaders.length; i++) {
@@ -164,10 +160,10 @@ function Admin_account() {
             }
             document.getElementById('body-content').style.paddingRight = ``;
             setModalEditActive(false);
-
         }
     }
 
+    // проверка введенной почты
     function isValidEmail(email) {
         if (email === '') {
             return true;
@@ -177,6 +173,7 @@ function Admin_account() {
         }
     }
 
+    // проверка введенной ссылки на сервер
     const editUrl = () => {
         localStorage.setItem('url', urlServer);
         if (urlServer === '') {
@@ -187,7 +184,6 @@ function Admin_account() {
             if (res.version) {
                 setUrlActive(false);
                 localStorage.setItem('url', urlServer);
-                // window.location.reload();
             }
             setIsLoading(false);
 
@@ -197,11 +193,13 @@ function Admin_account() {
         });
     }
 
+    // функция редактирования пароля пользователем
     const editPassword = () => {
         setErrorNewPasswd('');
         setErrorOldPasswd('');
         setErrorRepeatPasswd('');
         setIsLoading(true);
+        // проверка введенных данных в поля пользователем
         if (newPassword === '' || oldPassword === '' || repeatPassword === '' || newPassword !== repeatPassword) {
             if (newPassword === '') {
                 setErrorNewPasswd('Введите новый пароль');
@@ -217,34 +215,40 @@ function Admin_account() {
             }
             setIsLoading(false);
         } else {
-            updatePassword(oldPassword, newPassword, () => {
-                setPasswordActive(false);
+            // запрос на серевер с новым паролем
+            updatePassword(oldPassword, newPassword, (res) => {
+                console.log(res)
+                if(res.success){
+                    setPasswordActive(false);
+                }else{
+                   setErrorOldPasswd('Неверный пароль'); 
+                }
+                
                 setIsLoading(false);
-            }).catch(() => {
-                setErrorOldPasswd('Неверный пароль');
+            }).catch((error) => {
+                setTextError(getTextError(error));
+                setCodeText(error.code);
+                setErrorOkActive(true);
                 setIsLoading(false);
-
             })
         }
     }
 
+    // функции inputs ввода данных
     const handleUrlServer = e => {
         setUrlServer(e.target.value);
-
     };
     const handleNewPassword = e => {
         setNewPassword(e.target.value);
-
-    }; const handleOldPassword = e => {
+    };
+    const handleOldPassword = e => {
         setOldPassword(e.target.value);
-
-    }; const handleRepeatPassword = e => {
+    };
+    const handleRepeatPassword = e => {
         setRepeatPassword(e.target.value);
+    };
 
-    };
-    const togglePasswordVisiblity = () => {
-        setPasswordShown(passwordShown ? false : true);
-    };
+    // функции для показа введенного пароля пользователю
     const toggleOldPasswordVisiblity = () => {
         setOldPasswordShown(oldPasswordShown ? false : true);
     };
@@ -254,6 +258,8 @@ function Admin_account() {
     const toggleRepeatPasswordVisiblity = () => {
         setRepeatPasswordShown(repeatPasswordShown ? false : true);
     };
+
+    // массив перечисления должностей
     const position = [
         { value: 1, label: 'Администратор' },
         { value: 2, label: 'Преподаватель' },
@@ -262,22 +268,26 @@ function Admin_account() {
 
     return (
         <>
+            {/* компонент загрузки страницы */}
             <Loading active={isLoading} setActive={setIsLoading} />
 
+            {/* компонент шапки */}
             <Admin_header />
+
+            {/* контент страницы */}
             <div id='body-content'>
 
                 <div className='account-content'>
+
+                    {/* иконка пользователя */}
                     <div className='img-account'>
                         <FontAwesomeIcon icon={faUser} />
-                        {/* <img src={require('../../img/my_account.png')} /> */}
-
                     </div>
+
+                    {/* блок с личной информацией */}
                     <div className='data-account'>
                         <div className='personal-data'>
-                            <div>
-                                <h2>Личные данные</h2>
-                            </div>
+                            <div><h2>Личные данные</h2></div>
                             <div className='data'>
                                 <span>Фамилия:</span><p>{dataAccount.lastName}</p>
                                 <span>Имя:</span><p>{dataAccount.firstName}</p>
@@ -287,7 +297,9 @@ function Admin_account() {
                                 <span>Почта:</span><p>{dataAccount.email}</p>
                             </div>
 
+                            {/* кнопка редактирования */}
                             <button onClick={() => {
+                                // подстраивание страницы под скрытый скролл
                                 const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                 document.body.style.overflow = 'hidden';
                                 const usMainHeaders = document.getElementsByClassName('us_main_header');
@@ -295,6 +307,7 @@ function Admin_account() {
                                     usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                 }
                                 document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+                                // обнуление и выбор необходимых данных
                                 setErrorLastN('');
                                 setErrorFirstN('');
                                 setErrorMiddleN('');
@@ -304,22 +317,18 @@ function Admin_account() {
                                 setLastNEdit(dataAccount.lastName);
                                 setMiddleNEdit(dataAccount.middleName);
                                 setEmailEdit(dataAccount.email);
-                                setModalStaffEdit({ value: dataAccount.type, label: position.find(r => r.value === dataAccount.type).label });
                                 setEditId(dataAccount.id);
-
+                                setModalStaffEdit(position.find(res => res.value === dataAccount.type)?.value)
                             }}>Редактировать</button>
-
                         </div>
                         <div className='secure'>
-                            <div>
-                                <h2>Безопасность</h2>
-
-                            </div>
+                            <div><h2>Безопасность</h2></div>
                             <div className='data'>
-                                {/* <div> */}
                                 <FontAwesomeIcon icon={faLock} style={{ fontSize: '20px', color: '#26BD00' }} />
                                 <span>Пароль:</span>
+                                {/* копка изменения пароля */}
                                 <div><button onClick={() => {
+                                    // обнуление и выбор необходимых данных
                                     setPasswordActive(true);
                                     setErrorOldPasswd('');
                                     setErrorRepeatPasswd('');
@@ -334,12 +343,20 @@ function Admin_account() {
 
                                 <FontAwesomeIcon icon={faLink} style={{ fontSize: '20px', color: '#26BD00' }} />
                                 <span>URL:</span>
-                                <div><button onClick={() => { setUrlActive(true); setUrlServer(localStorage.getItem('url')); setErrorUrl('') }}>Изменить URL</button></div>
+                                {/* кнопка изменения пароля */}
+                                <div><button onClick={() => {
+                                    // обнуление и выбор необходимых данных
+                                    setUrlActive(true);
+                                    setUrlServer(localStorage.getItem('url'));
+                                    setErrorUrl('')
+                                }}>Изменить URL</button></div>
                             </div>
                         </div>
                     </div>
                 </div >
             </div >
+
+            {/* модальное окно для редактирования основной информации об аккаунте */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
                 <div className='modal-students'>
                     <div>
@@ -374,13 +391,13 @@ function Admin_account() {
                         {(errorEmail !== '') && <p className='inputModalError' >{errorEmail}</p>}
 
                     </div>
-                    <div>
-                    </div>
 
+                    {/* кнопки модального окна */}
                     <div className='modal-button'>
                         <button onClick={() => {
                             editData();
                         }}>Сохранить</button>
+                        {/* сбор настроек после пояления скролла */}
                         <button onClick={() => {
                             document.body.style.overflow = '';
                             const usMainHeaders = document.getElementsByClassName('us_main_header');
@@ -389,15 +406,18 @@ function Admin_account() {
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
                             setModalEditActive(false);
-
                         }}>Отмена</button>
                     </div>
 
                 </div>
             </Empty_modal>
+
+            {/* модальные окна ошибок */}
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
+
+            {/* модальное окно для редактирования url */}
             <Empty_modal active={urlActive} setActive={setUrlActive}>
                 <div>
                     <p><b>Введите URL:</b></p>
@@ -414,6 +434,8 @@ function Admin_account() {
                     </div>
                 </div>
             </Empty_modal>
+
+            {/* модальное окно для редактирования пароля */}
             <Empty_modal active={passwordActive} setActive={setPasswordActive}>
                 <div className='content-password'>
                     <p>Старый пароль:</p>
@@ -422,7 +444,7 @@ function Admin_account() {
                         className='password-input'
                         value={oldPassword}
                         onChange={handleOldPassword}
-                    /><i style={{position: 'absolute', margin: '5px 15px'}} onClick={toggleOldPasswordVisiblity}>{oldPasswordShown ? eyeSlah : eye}</i>
+                    /><i style={{ position: 'absolute', margin: '5px 15px' }} onClick={toggleOldPasswordVisiblity}>{oldPasswordShown ? eyeSlah : eye}</i>
                     {(errorOldPasswd !== '') && <p className='inputModalError' style={{ margin: '5px 0 0' }}>{errorOldPasswd}</p>}
 
                 </div>
@@ -433,7 +455,7 @@ function Admin_account() {
                         className='password-input'
                         value={newPassword}
                         onChange={handleNewPassword}
-                    /><i style={{position: 'absolute', margin: '5px 15px'}} onClick={toggleNewPasswordVisiblity}>{newPasswordShown ? eyeSlah : eye}</i>
+                    /><i style={{ position: 'absolute', margin: '5px 15px' }} onClick={toggleNewPasswordVisiblity}>{newPasswordShown ? eyeSlah : eye}</i>
                     {(errorNewPasswd !== '') && <p className='inputModalError' style={{ margin: '5px 0 0' }}>{errorNewPasswd}</p>}
 
                 </div>
@@ -444,7 +466,7 @@ function Admin_account() {
                         className='password-input'
                         value={repeatPassword}
                         onChange={handleRepeatPassword}
-                    /><i style={{position: 'absolute', margin: '5px 15px'}} onClick={toggleRepeatPasswordVisiblity}>{repeatPasswordShown ? eyeSlah : eye}</i>
+                    /><i style={{ position: 'absolute', margin: '5px 15px' }} onClick={toggleRepeatPasswordVisiblity}>{repeatPasswordShown ? eyeSlah : eye}</i>
                     {(errorRepeatPasswd !== '') && <p className='inputModalError' style={{ margin: '5px 0 0' }}>{errorRepeatPasswd}</p>}
 
                 </div>

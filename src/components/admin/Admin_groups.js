@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Admin_header from './Admin_header';
 import Select from 'react-select';
 import './Admin_groups.css'
-import Modal from '../Modal/Modal';
 import Loading from '../Modal/Loading';
 import Error_modal from '../Modal/Error_modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,7 +10,7 @@ import { addNewGroup, editGroup, deleteGroup, getAllDirectivities, getAllGroups,
 import Empty_modal from '../Modal/Empty_modal';
 import Error_empty from '../Modal/Error_empty';
 import Error_ok from '../Modal/Error_ok';
-import { customStylesModal, customStylesTypeOfWork } from '../Select_style/Select_style';
+import { customStylesModal } from '../Select_style/Select_style';
 
 function Admin_groups() {
     const [modalActive, setModalActive] = useState(false);
@@ -21,13 +20,11 @@ function Admin_groups() {
     const [allDirectivities, setAllDirectivities] = useState([]);
     const [allHeads, setAllHeads] = useState([]);
 
-
     const [searchResults, setSearchResults] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-    const [cartStates, setCartStates] = useState({});
     const [numberGroup, setNumberGroup] = useState('');
     const [newNumberGroup, setNewNumberGroup] = useState('');
 
@@ -35,10 +32,8 @@ function Admin_groups() {
     const [errorDir, setErrorDir] = useState(null);
     const [errorGroup, setErrorGroup] = useState(null);
 
-
     const [newDirectivity, setNewDirectivity] = useState(null);
     const [newHead, setNewHead] = useState(null);
-
 
     const [head, setHead] = useState(null);
     const [directivity, setDirectivity] = useState(null);
@@ -57,11 +52,13 @@ function Admin_groups() {
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
 
+    // открытие модального окна для дополнительных функций карточки
     const openModal = (itemId) => {
         setSelectedItemId(itemId);
         setIsSetOpen(true);
     };
 
+    // закрытие модального окна для дополнительных функций карточки
     const closeModal = () => {
         setIsSetOpen(false);
     };
@@ -87,6 +84,8 @@ function Admin_groups() {
     useEffect(() => {
         setVisibleItems(30);
         setIsLoading(true);
+
+        // получение данных о группах
         getAllGroups((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -97,12 +96,13 @@ function Admin_groups() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         });
 
+        // получение данных о направленностях
         getAllDirectivities(false, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -112,12 +112,13 @@ function Admin_groups() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         });
 
+        // получение данных о направлениях
         getAllHeads((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -127,7 +128,7 @@ function Admin_groups() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -153,16 +154,9 @@ function Admin_groups() {
         setIsLoading(false);
     };
 
-    const handleSettingClick = (cartId) => {
-
-        setCartStates(prevCartStates => ({
-            ...prevCartStates,
-            [cartId]: !prevCartStates[cartId],
-        }));
-    };
+    // добавление новой группы
     async function addData() {
         setIsLoading(true);
-
         setErrorHead('');
         setErrorDir('');
         setErrorGroup('');
@@ -208,7 +202,9 @@ function Admin_groups() {
 
     }
 
+    // восстанавливаем поиск после обновления данных
     useEffect(() => {
+        setIsLoading(true);
         if (searchTerm) {
             const filteredResults = allGroups.filter(item => {
 
@@ -222,13 +218,13 @@ function Admin_groups() {
             setSearchResults(filteredResults);
         } else {
             setSearchResults(allGroups)
-
         }
+        setIsLoading(false);
     }, [allGroups])
 
+    // редактируем группу
     async function editData() {
         setIsLoading(true);
-
         setErrorHead(null);
         setErrorDir(null);
         setErrorGroup('');
@@ -258,9 +254,7 @@ function Admin_groups() {
                             return elem; // если элемент не подлежит изменению, возвращаем его без изменений
                         }
                     });
-
                     setAllGroups(editGroup);
-
                 } else {
                     setTextError(res.message);
                     setCodeText(res.code);
@@ -280,26 +274,23 @@ function Admin_groups() {
                 adMainHeaders[i].style.paddingRight = `10px`;
             }
             document.getElementById('body-content').style.paddingRight = ``;
-
             setModalEditActive(false);
-
         }
     }
 
+    // удаляем группу
     async function deleteData(index) {
         setIsLoading(true);
 
         await deleteGroup(index, (res) => {
             if (res.success) {
                 setAllGroups(allGroups.filter((a) => a.id !== index));
-
             } else {
                 setTextError(res.message);
                 setCodeText(res.code);
                 setErrorEmptyActive(true);
             }
             setIsLoading(false);
-
         }).catch((error) => {
             setTextError(error.message);
             setCodeText(error.code);
@@ -324,6 +315,7 @@ function Admin_groups() {
         }
     }, [searchResults, visibleItems]);
 
+    // функции для выбора данных в выпадающих списках в модальных окнах
     function handleHeadChange(data) {
         setHead(data);
         if (data !== null) {
@@ -331,7 +323,6 @@ function Admin_groups() {
         }
         setDirectivity(null);
     }
-
     function handledirectivityChange(data) {
         setDirectivity(data);
     }
@@ -345,7 +336,6 @@ function Admin_groups() {
     function handleNewDirectivityChange(data) {
         setNewDirectivity(data);
     }
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     return (
         <>
@@ -355,6 +345,7 @@ function Admin_groups() {
             {/* модальное окно ошибки */}
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
 
+            {/* шапка страницы */}
             <Admin_header />
             <div id='body-content'>
                 <div className='search-add'>
@@ -366,6 +357,8 @@ function Admin_groups() {
                             placeholder='Поиск...'
                         />
                     </div>
+
+                    {/* кнопка добавления группы */}
                     <button className='add-student' onClick={() => {
                         setErrorHead('');
                         setErrorDir('');
@@ -374,7 +367,6 @@ function Admin_groups() {
                         setDirectivity(null);
                         setNumberGroup('');
                         setAbbGroup('');
-
                         setModalActive(true);
 
                         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -384,12 +376,12 @@ function Admin_groups() {
                             adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                         }
                         document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
                     }}>
                         <FontAwesomeIcon icon={faPlusCircle} />
                     </button>
                 </div>
 
+                {/* вывод данных на экран */}
                 {searchResults.slice(0, visibleItems).map(res => (
                     <div className='cart-stud' key={res.id}>
                         <div className='content'>
@@ -403,6 +395,7 @@ function Admin_groups() {
                                 <p><span>Направленность: </span>{allDirectivities.find((el) => el.id === res.directivityId) && allDirectivities.find((el) => el.id === res.directivityId).title}</p>
                             </div>
                         </div>
+                        {/* кнопка настроек */}
                         <button
                             className='qr-setting'
                             onClick={() => {
@@ -416,15 +409,12 @@ function Admin_groups() {
                                 else {
                                     openModal(res.id);
                                 }
-                            }}
-                        // className='student-setting'
-                        // onClick={() => handleSettingClick(res.id)}
-                        >
+                            }}>
                             <img src={require('../../img/setting.png')} alt='setting' />
                         </button>
                         {isSetOpen && selectedItemId === res.id && (
                             <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
-                                {/* <div className={`button-edit-delete ${cartStates[res.id] ? 'active' : ''}`}> */}
+                                {/* кнопка редактирования данных */}
                                 <button onClick={() => {
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
@@ -453,6 +443,8 @@ function Admin_groups() {
                                 }}>
                                     <img src={require('../../img/edit.png')} alt='edit' />
                                 </button>
+
+                                {/* кнопка удаления данных */}
                                 <button onClick={() => {
                                     setModalDeleteActive(true); setDeleteId(res.id);
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -462,7 +454,6 @@ function Admin_groups() {
                                         adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
                                 }}>
                                     <img src={require('../../img/delete.png')} alt='delete' />
                                 </button>
@@ -475,10 +466,11 @@ function Admin_groups() {
                         Загрузить ещё
                     </button>
                 )}</div>
+
+            {/* модальное окно добавления группы */}
             <Empty_modal active={modalActive} setActive={setModalActive} >
                 <div className='modal-group'>
                     <div style={{ marginBottom: '30px' }}>
-
                         <Select
                             styles={customStylesModal}
                             placeholder="Направление"
@@ -490,13 +482,11 @@ function Admin_groups() {
                                 value: res.id,
                                 label: res.title
                             }
-                            ))}
-                        />
+                            ))}/>
                         {(errorHead !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorHead}</p>}
-
                     </div>
-                    <div style={{ marginBottom: '30px' }}>
 
+                    <div style={{ marginBottom: '30px' }}>
                         <Select
                             styles={customStylesModal}
                             placeholder="Направленность"
@@ -508,11 +498,8 @@ function Admin_groups() {
                             options={head && allDirectivities.filter((el) => el.headId === head.value).map(res => ({
                                 value: res.id,
                                 label: res.title
-                            }))}
-
-                        />
+                            }))}/>
                         {(errorDir !== '' && head !== null) && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDir}</p>}
-
                     </div>
                     <div>
                         <div className='value-input group'>
@@ -523,7 +510,6 @@ function Admin_groups() {
                             </div>
                         </div>
                         {(errorGroup !== '') && <p className='inputModalError' >{errorGroup}</p>}
-
                     </div>
                 </div>
                 <div className='modal-button'>
@@ -539,10 +525,11 @@ function Admin_groups() {
                             adMainHeaders[i].style.paddingRight = `10px`;
                         }
                         document.getElementById('body-content').style.paddingRight = ``;
-
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
+
+            {/* модальное окно редактирования группы */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
                 <div style={{ marginBottom: '30px' }}>
                     <Select
@@ -556,11 +543,10 @@ function Admin_groups() {
                             value: res.id,
                             label: res.title
                         }
-                        ))}
-                    />
+                        ))}/>
                     {(errorHead !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorHead}</p>}
-
                 </div>
+
                 <div style={{ marginBottom: '30px' }}>
                     <Select
                         styles={customStylesModal}
@@ -573,12 +559,10 @@ function Admin_groups() {
                         options={newHead && allDirectivities.filter((el) => el.headId === newHead.value).map(res => ({
                             value: res.id,
                             label: res.title
-                        }))}
-
-                    />
+                        }))}/>
                     {(errorDir !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDir}</p>}
-
                 </div>
+
                 <div>
                     <div className='value-input'>
                         {newHead !== null && <p>{newAbbGroup}</p>}
@@ -588,13 +572,12 @@ function Admin_groups() {
                         </div>
                     </div>
                     {(errorGroup !== '') && <p className='inputModalError' >{errorGroup}</p>}
-
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => {
                         editData();
-
                     }}>Сохранить</button>
+
                     <button onClick={() => {
                         setModalEditActive(false);
                         document.body.style.overflow = '';
@@ -603,10 +586,11 @@ function Admin_groups() {
                             adMainHeaders[i].style.paddingRight = `10px`;
                         }
                         document.getElementById('body-content').style.paddingRight = ``;
-
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
+
+            {/* модальное окно удаления группы */}
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
@@ -619,8 +603,8 @@ function Admin_groups() {
                                 adMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Удалить</button>
+
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = '';
@@ -629,11 +613,12 @@ function Admin_groups() {
                                 adMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Отмена</button>
                     </div>
                 </div>
             </Empty_modal>
+
+            {/* модальные окна ошибок */}
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />
