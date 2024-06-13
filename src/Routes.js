@@ -67,7 +67,6 @@ export const UserRoute = () => {
                 setErrorActive(true);
             } else {
                 if (res.response.type !== 1) {
-                    // return true
                     if(res.response.selectedDepartmentId === null){
                         navigate('/user/UserChoice');
                     }else{
