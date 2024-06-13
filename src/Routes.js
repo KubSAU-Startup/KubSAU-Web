@@ -1,7 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom"
 import { checkAccount, getTextError } from "./network";
 import { useEffect, useState } from "react";
-import Empty_modal from "./components/Modal/Empty_modal";
 import Error_empty from "./components/Modal/Error_empty";
 import Error_modal from "./components/Modal/Error_modal";
 

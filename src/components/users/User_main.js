@@ -8,7 +8,7 @@ import Error_modal from '../Modal/Error_modal';
 import Error_empty from '../Modal/Error_empty';
 import { faFilter, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { customStyles, customStylesModal } from '../Select_style/Select_style';
+import { customStyles } from '../Select_style/Select_style';
 import Loading from '../Modal/Loading';
 import Empty_modal from '../Modal/Empty_modal';
 import "flatpickr/dist/themes/material_green.css";
@@ -26,13 +26,11 @@ function User_main() {
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    // переменные для получения фильтров из бэка
+
     const [filterWorkType, setFilterWorkType] = useState([]);
     const [filterDiscipline, setFilterDiscipline] = useState([]);
     const [filterEmployees, setFilterEmployees] = useState([]);
     const [filterGroup, setFilterGroup] = useState([]);
-    const [filterDepartments, setFilterDepartments] = useState([]);
-    const [modalActive, setModalActive] = useState(false);
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
     const [dateTime, setDateTime] = useState(null);
@@ -44,17 +42,12 @@ function User_main() {
     const [titleEdit, setTitleEdit] = useState(null);
     const [errorTitle, setErrorTitle] = useState('');
     const [codeText, setCodeText] = useState('');
-    // переменная для получения данных карточек из бэка
+
     const [mainData, setMainData] = useState([]);
     const [errorOkActive, setErrorOkActive] = useState(false);
 
     const [journalParam, setJournalParam] = useState({});
-
-    // переменная поиска
     const [searchResults, setSearchResults] = useState([]);
-
-    // перменная запроса на поиск
-    const [searchTerm, setSearchTerm] = useState('');
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
     const [hasMoreData, setHasMoreData] = useState(true);
@@ -71,11 +64,13 @@ function User_main() {
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
 
+    // открытие модального окна для дополнительных функций карточки
     const openModal = (itemId) => {
         setSelectedItemId(itemId);
         setIsSetOpen(true);
     };
 
+    // закрытие модального окна для дополнительных функций карточки
     const closeModal = () => {
         setIsSetOpen(false);
     };
@@ -99,6 +94,7 @@ function User_main() {
 
     // получение данных для фильтров с бэка
     useEffect(() => {
+        setIsLoading(true);
         getFilterWorkType((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -109,7 +105,7 @@ function User_main() {
 
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -124,7 +120,7 @@ function User_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -139,7 +135,7 @@ function User_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
@@ -154,25 +150,12 @@ function User_main() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         });
-        getFilterDepartments((res) => {
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-            } else {
-                setFilterDepartments(res.response);
-            }
-            setIsLoading(false);
-        }).catch((error) => {
-            setTextError(error.message);
-            setCodeText(error.code);
-            setErrorEmptyActive(true);
-            setIsLoading(false);
-        });
+
     }, []);
 
 
@@ -185,12 +168,9 @@ function User_main() {
         setSelectedDepartment(null);
         setSelectedGroup(null);
         setOffset(0);
-
-        // параметры для сброса
         setJournalParam({})
-
+        setIsLoading(false);
     };
-
 
     // Функция для получения данных с сервера и выполнения поиска
     const getParams = () => {
@@ -204,6 +184,7 @@ function User_main() {
             groupId: selectedGroup ? selectedGroup.value : null,
             workTypeId: selectedWorkType ? selectedWorkType.value : null,
         });
+        setIsLoading(false);
     };
 
     // Функция поиска
@@ -211,6 +192,7 @@ function User_main() {
         setInputValue(e.target.value);
     };
 
+    // ожидание 1 сек перед отправкой запроса после ввода данных в поиск
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setDebouncedInputValue(inputValue);
@@ -218,11 +200,10 @@ function User_main() {
         return () => clearTimeout(timeoutId);
     }, [inputValue, 1000]);
 
-
-
     useEffect(() => {
         setIsLoading(true);
         setHasMoreData(true);
+        // получение данных для отображения
         getDataAdminJournal(offset, limit, journalParam, debouncedInputValue, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -251,6 +232,7 @@ function User_main() {
         })
     }, [offset, limit, journalParam, debouncedInputValue]);
 
+    // функция редактирования работы
     async function editData() {
         setIsLoading(true);
         if (workTypeEdit !== 'Курсовая')
@@ -307,12 +289,12 @@ function User_main() {
         }
     }
 
+    // функция удаления
     async function deleteData() {
         setIsLoading(true);
         await deleteWork(deleteId, (res) => {
             if (res.success) {
                 setMainData(mainData.filter((a) => a.work.id !== deleteId));
-
             } else {
                 setTextError(res.message);
                 setCodeText(res.code);
@@ -328,6 +310,7 @@ function User_main() {
 
     }
 
+    // изменение отображения данных
     useEffect(() => {
         setSearchResults(mainData);
     }, [mainData])
@@ -345,28 +328,14 @@ function User_main() {
     function handleSelectGroup(data) {
         setSelectedGroup(data);
     }
-    function handleSelectDepartment(data) {
-        setSelectedDepartment(data);
-    }
+    
+    // получение новой даты
     function handleDateTime(data) {
         let dateObject = new Date(data);
         let timestamp = dateObject.getTime();
         setDateTime(timestamp);
     }
-    function handleModalDisciplene(data) {
-        setDisciplineEdit(data);
-    }
-    function handleModalStudent(data) {
-        setStudentEdit(data);
-    }
-    function handleModalWorkType(data) {
-        setWorkTypeEdit(data);
-    }
-    function handleModalDepartment(data) {
-        setDepartmentEdit(data);
-    }
-
-
+    
     return (
         <>
 
@@ -439,19 +408,6 @@ function User_main() {
                             }))}
                         />
                     </div>
-                    {/* <div>
-                        <Select
-                            styles={customStyles}
-                            placeholder="Кафедра"
-                            value={selectedDepartment}
-                            onChange={handleSelectDepartment}
-                            isSearchable={true}
-                            options={filterDepartments.map(department => ({
-                                value: department.id,
-                                label: department.title,
-                            }))}
-                        />
-                    </div> */}
 
                     {/* кнопки применить и сбросить */}
                     <button className='get-params' onClick={getParams} type='submit' ><FontAwesomeIcon icon={faFilter} /></button>
@@ -460,8 +416,6 @@ function User_main() {
                 </div>
 
                 {/* данные о зарегистрированных работах (карточки) */}
-                {/* sort((a, b) => b.work.registrationDate - a.work.registrationDate). */}
-
                 {searchResults.map(entries => (
                     <div className='cart-stud' key={entries.work.id}>
                         <div className='data'>
@@ -481,6 +435,7 @@ function User_main() {
                                 {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
                             </div>
                         </div>
+                        {/* кнопка настроек */}
                         <button
                             className='qr-setting'
                             onClick={() => {
@@ -500,6 +455,7 @@ function User_main() {
                         </button>
                         {isSetOpen && selectedItemId === entries.work.id && (
                             <div className={`button-edit-delete ${isSetOpen && selectedItemId === entries.work.id ? 'active' : ''}`}>
+                                {/* кнопка редактирования */}
                                 <button onClick={() => {
 
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -509,27 +465,19 @@ function User_main() {
                                         usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
                                     setEditId(entries.work.id);
                                     setDateTime(entries.work.registrationDate);
                                     setErrorTitle('');
-
-                                    // setStudentEdit({ value: entries.student.id, label: entries.student.title });
-                                    // setDisciplineEdit({ value: entries.discipline.id, label: entries.discipline.title });
-                                    // setWorkTypeEdit({ value: entries.work.type.id, label: entries.work.type.title });
-                                    // setDepartmentEdit({ value: entries.department.id, label: entries.department.title });setStudentEdit({ value: entries.student.id, label: entries.student.title });
                                     setStudentEdit(entries.student.fullName);
                                     setDisciplineEdit(entries.discipline.title);
                                     setWorkTypeEdit(entries.work.type.title);
-                                    // setEmplLastN();
-                                    // setEmplFirstN();
-                                    // setEmplMiddleN();
                                     setDepartmentEdit(entries.department.title);
                                     entries.work.title && setTitleEdit(entries.work.title);
                                     setModalEditActive(true)
                                 }}>
                                     <img src={require('../../img/edit.png')} alt='edit' />
                                 </button>
+                                {/* кнопка удаления */}
                                 <button onClick={() => {
                                     setModalDeleteActive(true); setDeleteId(entries.work.id);
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -539,8 +487,6 @@ function User_main() {
                                         usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
-
                                 }}>
                                     <img src={require('../../img/delete.png')} alt='delete' />
                                 </button>
@@ -549,13 +495,14 @@ function User_main() {
                 ))}
 
                 {/* кнопка пагинации */}
-
                 {hasMoreData && (
                     <button className='btn-loadMore' onClick={loadMore}>
                         Загрузить ещё
                     </button>
                 )}
             </div>
+
+            {/* модальное окно редактирования */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive} >
                 <div className='modal-main'>
                     <div className='grid'>
@@ -579,82 +526,14 @@ function User_main() {
                                 }}
                             />
                         </div>
-                        <div>
-                            <p><b>ФИО студента: </b></p>
-                        </div>
-                        <div>
-                            <p>{studentEdit}</p>
-
-                        </div>
-                        {/* <Select
-                            styles={customStylesModal}
-                            placeholder="Студент"
-                            value={studentEdit}
-                            maxMenuHeight={120}
-                            onChange={handleModalStudent}
-                            isSearchable={true}
-                            options={filterDiscipline.map(el => ({
-                                value: el.id,
-                                label: el.title,
-                            }))}
-                        /> */}
-                        <div>
-                            <p><b>Дисциплина: </b></p>
-                        </div>
-                        <div>
-                            <p>{disciplineEdit}</p>
-                            {/* <Select
-                                styles={customStylesModal}
-                                placeholder="Дисциплина"
-                                value={disciplineEdit}
-                                maxMenuHeight={120}
-                                onChange={handleModalDisciplene}
-                                isSearchable={true}
-                                options={filterDiscipline.map(el => ({
-                                    value: el.id,
-                                    label: el.title,
-                                }))}
-                            /> */}
-                        </div>
-                        <div>
-                            <p><b>Тип работы: </b></p>
-                        </div>
-                        <div>
-                            <p>{workTypeEdit}</p>
-
-                            {/* <Select
-                                styles={customStylesModal}
-                                placeholder="Тип работы"
-                                value={workTypeEdit}
-                                maxMenuHeight={120}
-                                onChange={handleModalWorkType}
-                                isSearchable={true}
-                                options={filterWorkType.map(el => ({
-                                    value: el.id,
-                                    label: el.title,
-                                }))}
-                            /> */}
-                        </div>
-                        <div>
-                            <p><b>Кафедра: </b></p>
-                        </div>
-                        <div>
-                            <p>{departmentEdit}</p>
-
-                            {/* <Select
-                                styles={customStylesModal}
-                                placeholder="Кафедра"
-                                value={departmentEdit}
-                                maxMenuHeight={120}
-                                onChange={handleModalDepartment}
-                                isSearchable={true}
-                                options={filterDepartments.map(el => ({
-                                    value: el.id,
-                                    label: el.title,
-                                }))}
-                            /> */}
-                        </div>
-
+                       <div><p><b>ФИО студента: </b></p></div>
+                        <div><p>{studentEdit}</p></div>
+                        <div><p><b>Дисциплина: </b></p></div>
+                        <div><p>{disciplineEdit}</p></div>
+                        <div><p><b>Тип работы: </b></p></div>
+                        <div><p>{workTypeEdit}</p></div>
+                        <div><p><b>Кафедра: </b></p></div>
+                        <div><p>{departmentEdit}</p></div>
                     </div>
                     <div>
                         {workTypeEdit === 'Курсовая' && <div className='input-conteiner'>
@@ -671,20 +550,18 @@ function User_main() {
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
-
+                        // Восстанавливаем позицию прокрутки
                         document.body.style.overflow = '';
                         const usMainHeaders = document.getElementsByClassName('us_main_header');
                         for (let i = 0; i < usMainHeaders.length; i++) {
                             usMainHeaders[i].style.paddingRight = `10px`;
                         }
                         document.getElementById('body-content').style.paddingRight = ``;
-
-                        // Восстанавливаем позицию прокрутки
-
-
                     }}>Отмена</button>
                 </div>
             </Empty_modal>
+
+            {/* модальное окно удаления */}
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
@@ -708,8 +585,6 @@ function User_main() {
                                 usMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
-
                         }}>Отмена</button>
                     </div>
                 </div>

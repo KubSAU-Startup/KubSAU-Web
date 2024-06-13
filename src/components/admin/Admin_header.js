@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Admin_header.css';
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 function Admin_header() {
     const [isOpen, setOpen] = useState(false);

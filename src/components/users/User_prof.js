@@ -26,23 +26,19 @@ function User_prof() {
 
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
-
     const [allEmployees, setAllEmployees] = useState([]);
-    const [filterData, setFilterData] = useState([]);
 
     const [searchResults, setSearchResults] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [errorActive, setErrorActive] = useState(false);
     const [textError, setTextError] = useState('');
-    const [error, setError] = useState('');
+
     const [errorEmail, setErrorEmail] = useState('');
     const [errorFirstN, setErrorFirstN] = useState('');
     const [errorLastN, setErrorLastN] = useState('');
     const [errorMiddleN, setErrorMiddleN] = useState('');
     const [errorStaff, setErrorStaff] = useState('');
-
-
 
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
@@ -63,11 +59,13 @@ function User_prof() {
     const [isSetOpen, setIsSetOpen] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
 
+    // открытие модального окна для дополнительных функций карточки
     const openModal = (itemId) => {
         setSelectedItemId(itemId);
         setIsSetOpen(true);
     };
 
+    // закрытие модального окна для дополнительных функций карточки
     const closeModal = () => {
         setIsSetOpen(false);
     };
@@ -89,10 +87,10 @@ function User_prof() {
         };
     }, []);
 
+    // получение всех данных о сотрудниках
     useEffect(() => {
         setIsLoading(true);
         setVisibleItems(30);
-
         getAllEmployees((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -103,17 +101,15 @@ function User_prof() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         })
-
     }, []);
 
     //скрытие кнопки пагинации, если закончились данные для отображения
     useEffect(() => {
-
         if (searchResults.length <= visibleItems) {
             setIsPaginationVisible(false); // Скрыть кнопку пагинации
         } else {
@@ -121,22 +117,14 @@ function User_prof() {
         }
     }, [searchResults, visibleItems]);
 
-    useEffect(() => {
-        if (modalActive || modalEditActive || modalDeleteActive) {
-            document.body.classList.add('modal-open');
-        } else {
-            document.body.classList.remove('modal-open');
-        }
-    }, [modalActive, modalEditActive, modalDeleteActive]);
-
     // функция пагинации
     const loadMore = () => {
         setVisibleItems(prevVisibleItems => prevVisibleItems + 30);
     };
 
+    // добавление сотрудника
     async function addData() {
         setIsLoading(true);
-
         setErrorEmail('');
         setErrorLastN('');
         setErrorFirstN('');
@@ -170,14 +158,12 @@ function User_prof() {
                     setErrorEmptyActive(true);
                 }
                 setIsLoading(false);
-
             }).catch((error) => {
                 setTextError(error.message);
                 setCodeText(error.code);
                 setErrorOkActive(true);
                 setIsLoading(false);
             });
-
             document.body.style.overflow = '';
             const usMainHeaders = document.getElementsByClassName('us_main_header');
             for (let i = 0; i < usMainHeaders.length; i++) {
@@ -187,9 +173,9 @@ function User_prof() {
 
             setModalActive(false);
         }
-
     }
 
+    // редактирование данных о сотруднике
     async function editData() {
         setIsLoading(true);
         setErrorEmail('');
@@ -214,9 +200,7 @@ function User_prof() {
                 setErrorStaff('Выберите должность');
             }
             setIsLoading(false);
-
         } else {
-
             await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit.value, (res) => {
                 if (res.success) {
                     const editData = allEmployees.map(elem => {
@@ -240,7 +224,6 @@ function User_prof() {
                     setErrorEmptyActive(true);
                 }
                 setIsLoading(false);
-
             }).catch((error) => {
                 setTextError(error.message);
                 setCodeText(error.code);
@@ -254,39 +237,36 @@ function User_prof() {
             }
             document.getElementById('body-content').style.paddingRight = ``;
             setModalEditActive(false);
-
         }
     }
+
+    // функция удаления данных о сотруднике
     async function deleteData() {
         setIsLoading(true);
-
         await deleteEmployee(deleteId, (res) => {
             if (res.success) {
                 setAllEmployees(allEmployees.filter((a) => a.id !== deleteId));
-
             } else {
                 setTextError(res.message);
                 setCodeText(res.code);
                 setErrorEmptyActive(true);
             }
             setIsLoading(false);
-
         }).catch((error) => {
             setTextError(error.message);
             setCodeText(error.code);
             setErrorOkActive(true);
             setIsLoading(false);
         });
-
     }
 
+    // обновление показываемых данных
     useEffect(() => {
         setSearchResults(allEmployees);
         if (searchTerm !== '' || filterType !== null) {
             getParams()
         }
     }, [allEmployees])
-
 
     // Функция поиска
     const handleChange = (e) => {
@@ -297,9 +277,7 @@ function User_prof() {
         if (filterType !== null) {
             filteredResults = filteredResults.filter(res => res.type === filterType.value);
         }
-
         filteredResults = filteredResults.filter(item => {
-
             // Проверяем условие для каждого поля, по которому хотим искать
             return (
                 item.lastName.toLowerCase().includes(searchTerm) ||
@@ -309,17 +287,15 @@ function User_prof() {
             );
         });
         setSearchResults(filteredResults);
-
         setIsLoading(false);
     };
 
-
+    // функция фильтрации
     const getParams = () => {
+        setIsLoading(true);
         let filteredResults = [...allEmployees]; // Создаем копию исходных данных для фильтрации
         if (searchTerm) {
-
             filteredResults = filteredResults.filter(item => {
-
                 // Проверяем условие для каждого поля, по которому хотим искать
                 return (
                     item.lastName.toLowerCase().includes(searchTerm) ||
@@ -332,17 +308,17 @@ function User_prof() {
         if (filterType !== null) {
             filteredResults = filteredResults.filter(res => res.type === filterType.value);
         }
-        setFilterData(filteredResults);
         setSearchResults(filteredResults); // Присваиваем результаты фильтрации обратно в состояние
+        setIsLoading(false);
     }
 
+    // сброс фильтров
     const resetParams = () => {
+        setIsLoading(true);
         setFilterType(null);
         let filteredResults = [...allEmployees]; // Создаем копию исходных данных для фильтрации
         if (searchTerm) {
-
             filteredResults = filteredResults.filter(item => {
-
                 // Проверяем условие для каждого поля, по которому хотим искать
                 return (
                     item.lastName.toLowerCase().includes(searchTerm) ||
@@ -353,7 +329,10 @@ function User_prof() {
             });
         }
         setSearchResults(filteredResults);
+        setIsLoading(false);
     }
+
+    // запись выбранных данных для фильтров
     function handleFilterType(data) {
         setFilterType(data);
     }
@@ -364,17 +343,16 @@ function User_prof() {
         setModalStaffEdit(data);
     }
 
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-
+    // проверка введенной почты
     function isValidEmail(email) {
         if (email === '') {
             return true;
         } else {
             return /\S+@\S+\.\S+/.test(email);
-
         }
     }
 
+    // массив должностей сотрудников
     const position = [
         // { value: 1, label: 'Администратор' },
         { value: 2, label: 'Преподаватель' },
@@ -384,8 +362,10 @@ function User_prof() {
         <>
             {/* окно загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
+            {/* шапка страницы */}
             <User_header />
             <div id='body-content'>
+                {/* поиск */}
                 <div className='admin-main-search'>
                     <input
                         type='text'
@@ -394,6 +374,7 @@ function User_prof() {
                         placeholder='Поиск...'
                     />
                 </div>
+                {/* фильтры */}
                 <div className='filters'>
                     <Select
                         styles={customStyles}
@@ -410,6 +391,7 @@ function User_prof() {
 
                 </div>
 
+                {/* кнопка добавления */}
                 <button className='add-student' onClick={() => {
                     setModalActive(true);
                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -432,18 +414,19 @@ function User_prof() {
                 }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
                 </button>
-                {searchResults.slice(0, visibleItems).map(res => (
 
+                {/* данные о сотрудниках */}
+                {searchResults.slice(0, visibleItems).map(res => (
                     <div className='cart-stud' key={res.id}>
                         <div className='content'>
                             <div className='col1'>
                                 <p><span>ФИО сотрудника:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
-
                             </div>
                             <div className='col2'>
                                 <p><span>Должность:</span> {res.type && position.find(r => r.value === res.type)?.label}</p>
                             </div>
                         </div>
+                        {/* кнопка настроек */}
                         <button
                             className='qr-setting'
                             onClick={() => {
@@ -462,6 +445,7 @@ function User_prof() {
                         </button>
                         {isSetOpen && selectedItemId === res.id && (
                             <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                                {/* кнопка редактирования */}
                                 <button onClick={() => {
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
@@ -486,6 +470,7 @@ function User_prof() {
                                 }}>
                                     <img src={require('../../img/edit.png')} alt='edit' />
                                 </button>
+                                {/* кнопка удаления */}
                                 <button onClick={() => {
                                     setModalDeleteActive(true); setDeleteId(res.id);
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -495,7 +480,6 @@ function User_prof() {
                                         usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
                                 }}>
                                     <img src={require('../../img/delete.png')} alt='delete' />
                                 </button>
@@ -509,10 +493,10 @@ function User_prof() {
                     </button>
                 )}
             </div>
-            <Empty_modal active={modalActive} setActive={setModalActive}>
 
+            {/* модальное окно добавления сотрудника */}
+            <Empty_modal active={modalActive} setActive={setModalActive}>
                 <div className='modal-students'>
-                    {/* {error && <p style={{ color: 'red' }}>{error}</p>} */}
                     <div>
                         <div className='input-conteiner'>
                             <input type='text' className='name-stud' placeholder=' ' value={lastN} onChange={e => setLastN(e.target.value)} />
@@ -542,7 +526,6 @@ function User_prof() {
                         {(errorEmail && email !== '') && <p className='inputModalError' >{errorEmail}</p>}
                     </div>
                     <div>
-
                         <Select
                             styles={customStylesModal}
                             placeholder="Должность"
@@ -558,16 +541,15 @@ function User_prof() {
                     <div className='modal-button'>
                         <button onClick={() => {
                             addData();
-
                         }}>Сохранить</button>
-                        <button onClick={() => {
 
+                        <button onClick={() => {
                             document.body.style.overflow = '';
                             const usMainHeaders = document.getElementsByClassName('us_main_header');
                             for (let i = 0; i < usMainHeaders.length; i++) {
                                 usMainHeaders[i].style.paddingRight = `10px`;
                             }
-                            document.getElementById('body-content').style.paddingRight = ``; 
+                            document.getElementById('body-content').style.paddingRight = ``;
                             setLastN('');
                             setFirstN('');
                             setMiddleN('');
@@ -581,10 +563,10 @@ function User_prof() {
                             setErrorEmail('');
                         }}>Отмена</button>
                     </div>
-
                 </div>
             </Empty_modal>
 
+            {/* модальное окно редактирования сотрудника */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
                 <div className='modal-students'>
                     <div>
@@ -620,8 +602,6 @@ function User_prof() {
 
                     </div>
                     <div>
-
-
                         <Select
                             styles={customStylesModal}
                             placeholder="Должность"
@@ -632,13 +612,13 @@ function User_prof() {
                             options={position}
                         />
                         {(errorStaff !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }}>{errorStaff}</p>}
-
                     </div>
 
                     <div className='modal-button'>
                         <button onClick={() => {
                             editData();
                         }}>Сохранить</button>
+
                         <button onClick={() => {
                             document.body.style.overflow = '';
                             const usMainHeaders = document.getElementsByClassName('us_main_header');
@@ -660,9 +640,10 @@ function User_prof() {
 
                         }}>Отмена</button>
                     </div>
-
                 </div>
             </Empty_modal>
+
+            {/* модальное окно удаления сотрудника */}
             <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
@@ -675,8 +656,8 @@ function User_prof() {
                                 usMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Удалить</button>
+
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = '';
@@ -685,12 +666,12 @@ function User_prof() {
                                 usMainHeaders[i].style.paddingRight = `10px`;
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
-
                         }}>Отмена</button>
                     </div>
                 </div>
-
             </Empty_modal>
+
+            {/* модальные окна ошибок */}
             <Error_modal active={errorActive} text={textError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
             <Error_ok active={errorOkActive} setActive={setErrorOkActive} text={textError} codeText={codeText} />

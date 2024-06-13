@@ -1,7 +1,5 @@
 import './Choice.css';
-import {
-  BrowserRouter as Link
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
 import { checkAccount } from '../../network';
 import Error_modal from '../Modal/Error_modal';

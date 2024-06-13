@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 function Error_ok({ active, text, codeText, setActive }) {
     const modalRef = useRef(null);
 
+    // проверка клика вне окна
     const handleCloseModal = (event) => {
         if (!modalRef.current.contains(event.target)) {
             setActive(false); // Закрыть модальное окно только если клик был снаружи

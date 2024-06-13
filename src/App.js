@@ -1,7 +1,7 @@
 import './App.css';
 import React, { useState, useEffect } from "react"
 
-import { Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Choice from './components/admin/Choice';
 import Admin_main from './components/admin/Admin_main';
 import CreateQR from './components/admin/CreateQR';
@@ -34,6 +34,8 @@ function App() {
 
   return (
     <div className="App">
+   <BrowserRouter>
+
       <Routes>
         <Route path='/' element={<Log />} />
         <Route path='admin/' element={<AdminRoute />}>
@@ -55,6 +57,7 @@ function App() {
           <Route path='UserProf' element={<User_prof />} />
         </Route>
       </Routes>
+      </BrowserRouter>
 
     </div>
   );

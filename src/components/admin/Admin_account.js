@@ -47,7 +47,6 @@ function Admin_account() {
     const [emailEdit, setEmailEdit] = useState('');
 
     const [errorUrl, setErrorUrl] = useState('');
-    const [passwordShown, setPasswordShown] = useState(false);
     const [newPasswordShown, setNewPasswordShown] = useState(false);
     const [oldPasswordShown, setOldPasswordShown] = useState(false);
     const [repeatPasswordShown, setRepeatPasswordShown] = useState(false);
@@ -169,28 +168,31 @@ function Admin_account() {
             return true;
         } else {
             return /\S+@\S+\.\S+/.test(email);
-
         }
     }
 
     // проверка введенной ссылки на сервер
     const editUrl = () => {
         localStorage.setItem('url', urlServer);
+        setIsLoading(true);
+
         if (urlServer === '') {
             setErrorUrl('Заполните поле!');
-        }
-        setIsLoading(true);
-        checkUrl(res => {
-            if (res.version) {
-                setUrlActive(false);
-                localStorage.setItem('url', urlServer);
-            }
             setIsLoading(false);
 
-        }).catch((error) => {
-            setErrorUrl(error.message);
-            setIsLoading(false);
-        });
+        } else {
+            checkUrl(res => {
+                if (res.version) {
+                    setUrlActive(false);
+                    localStorage.setItem('url', urlServer);
+                }
+                setIsLoading(false);
+
+            }).catch((error) => {
+                setErrorUrl(error.message);
+                setIsLoading(false);
+            });
+        }
     }
 
     // функция редактирования пароля пользователем

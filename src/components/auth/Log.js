@@ -1,16 +1,14 @@
 import './Log.css';
 import { useForm } from "react-hook-form";
 import React, { useEffect, useState } from 'react';
-import { checkAccount, checkUrl, loginAxios } from "../../network"
+import { checkAccount, checkUrl, getTextError, loginAxios } from "../../network"
 import Error_auth_data from '../Modal/Error_auth_data';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faL } from "@fortawesome/free-solid-svg-icons";
-import { faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { Link, Navigate, Route, Redirect, useHistory, useNavigate } from 'react-router-dom';
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from 'react-router-dom';
 import Forgot_pass from '../Modal/Forgot_pass';
 import Loading from '../Modal/Loading';
 import Error_empty from '../Modal/Error_empty';
-import Empty_modal from '../Modal/Empty_modal';
 import Url_modal from '../Modal/Url_modal';
 const eye = <FontAwesomeIcon icon={faEye} />;
 const eyeSlah = <FontAwesomeIcon icon={faEyeSlash} />;
@@ -31,8 +29,9 @@ function Log() {
 
     const navigate = useNavigate();
 
-    const { register, handleSubmit, formState: { errors }, reset, watch, getValues } = useForm();
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
+    // функция регистрации пользователя
     const onSubmit = (data) => {
         setIsLoading(true);
 
@@ -48,12 +47,14 @@ function Log() {
             setIsLoading(false);
 
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         });
     }
+
+    // проверка наличия токена
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -63,22 +64,20 @@ function Log() {
         }
     }, []);
 
+    // проверка наличия url
     useEffect(() => {
         if (localStorage.getItem('url')) {
             checkAccount((res) => {
                 if (res.success) {
-
+                    // если пользователь был уже авторизован, то переход на необходимую страницу
                     if (isAuthenticated) {
                         if (res.response.type === 1) {
                             navigate('/admin/Choice');
                         } else if (res.response.type === 2 || res.response.type === 3) {
                             if (res.response.selectedDepartmentId === null) {
                                 navigate('/user/UserChoice');
-                                console.log('res.response.selectedDepartmentId === null')
                             } else {
                                 navigate('/user/UserMain');
-                                console.log('else')
-
                             }
                         }
                     }
@@ -88,26 +87,26 @@ function Log() {
                     setIsAuthenticated(false);
                 }
             }).catch((error) => {
-                setTextError(error.message);
+                setTextError(getTextError(error));
                 setCodeText(error.code);
                 setErrorEmptyActive(true);
                 setIsLoading(false);
             });
         } else {
             setUrlActive(true);
-
         }
-
     }, [isAuthenticated, navigate]);
 
+    // функция, показывающая введенный пароль
     const [passwordShown, setPasswordShown] = useState(false);
     const togglePasswordVisiblity = () => {
         setPasswordShown(passwordShown ? false : true);
     };
 
+    // функция для записи url
     const editUrl = () => {
         localStorage.setItem('url', urlServer);
-        if(urlServer === ''){
+        if (urlServer === '') {
             setErrorUrl('Заполните поле!');
         }
         setIsLoading(true);
@@ -116,37 +115,34 @@ function Log() {
                 console.log(res)
                 setUrlActive(false);
                 localStorage.setItem('url', urlServer);
-                // window.location.reload();
-
             }
-
             setIsLoading(false);
-
         }).catch((error) => {
             setErrorUrl(error.message);
             setIsLoading(false);
         });
     }
+
+    // считывание введенного url
     const handleUrlServer = e => {
         setUrlServer(e.target.value);
-
     };
 
     return (
         <>
+            {/* компонент загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
             <div id='body-content'>
-
+                {/* форма ввода логина и пароля */}
                 <div className='conteiner'>
                     <form className='auth-form' onSubmit={handleSubmit(onSubmit)} action='/'>
                         <div className='img-conteiner'>
                             <img src={require('../../img/logo.webp')} alt='Логотип КубГАУ' />
                         </div>
-
                         <input className='auth-email auth-input' type="email" placeholder='Почта' {...register("email", {
                             required: true, pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                         })} /><br></br>
-                        {errors.email && <p className='auth-error'>Не корректный ввод почты</p>}
+                        {errors.email && <p className='auth-error'>Некорректный e-mail</p>}
 
                         <div className='passw-eye'><input className='auth-input auth-pass' type={passwordShown ? "text" : "password"} placeholder='Пароль' {...register("password")} /><i onClick={togglePasswordVisiblity}>{passwordShown ? eyeSlah : eye}</i></div>
                         <div className='forgot_pass' onClick={() => { setForgotPass(true) }}>Забыли пароль?</div>
@@ -154,10 +150,11 @@ function Log() {
                     </form>
                 </div>
             </div >
-
+            {/* модальные окна ошибок */}
             <Error_auth_data active={errorActive} setActive={setErrorActive} />
             <Forgot_pass active={forgotPass} setActive={setForgotPass} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
+            {/* модальное окно для ввода url */}
             <Url_modal active={urlActive}>
                 <div>
                     <p><b>Введите URL:</b></p>

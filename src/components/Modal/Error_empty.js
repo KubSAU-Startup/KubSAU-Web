@@ -4,20 +4,21 @@ import './Modal.css'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Loading from './Loading';
-import { checkUrl } from '../../network';
+import { checkUrl, getTextError } from '../../network';
 
 function Error_empty({ active, text, codeText }) {
     const [urlServer, setUrlServer] = useState("");
     const [errorUrl, setErrorUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // считываение записанной ссылки пользователем
     const handleUrlServer = e => {
         setUrlServer(e.target.value);
     };
 
+    // функция проверки и сохранения нового url
     const editUrl = () => {
         localStorage.setItem('url', urlServer);
-
         setIsLoading(true);
         checkUrl(res => {
             if (res.version) {
@@ -25,16 +26,17 @@ function Error_empty({ active, text, codeText }) {
                 localStorage.setItem('url', urlServer);
                 window.location.reload();
             }
-
             setIsLoading(false);
-
         }).catch((error) => {
-            setErrorUrl(error.message);
+            setErrorUrl(getTextError(error));
             setIsLoading(false);
         });
     }
     return (
-        <><Loading active={isLoading} setActive={setIsLoading} />
+        <>
+            {/* компонент загрузки */}
+            <Loading active={isLoading} setActive={setIsLoading} />
+            {/* модальное окно */}
             <div className={`modal ${active ? 'active' : ''}`}>
                 <div className='modal-content'>
                     <div className='error-modal-empty'>
@@ -51,7 +53,7 @@ function Error_empty({ active, text, codeText }) {
                             value={urlServer}
                             onChange={handleUrlServer}
                             placeholder='URL...' />
-                        {(errorUrl !== '') && <p style={{color: 'red', fontSize: '12px', marginTop: '-25px', position: 'absolute'}}>{errorUrl}</p>}
+                        {(errorUrl !== '') && <p style={{ color: 'red', fontSize: '12px', marginTop: '-25px', position: 'absolute' }}>{errorUrl}</p>}
 
                         <div className='url-modal-button'>
                             <button

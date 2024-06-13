@@ -8,7 +8,6 @@ import Error_empty from '../Modal/Error_empty';
 
 function User_subject() {
     const [searchTerm, setSearchTerm] = useState('');
-
     const [isLoading, setIsLoading] = useState(true);
     const [searchResults, setSearchResults] = useState([]);
     const [errorActive, setErrorActive] = useState(false);
@@ -19,10 +18,10 @@ function User_subject() {
     const [isPaginationVisible, setIsPaginationVisible] = useState(true);
     const [allDisciplines, setAllDisciplines] = useState([]);
 
+    // получение данных о дисциплинах
     useEffect(() => {
         setVisibleItems(30);
         setIsLoading(true);
-
         getAllDisciplines((res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
@@ -33,12 +32,11 @@ function User_subject() {
             }
             setIsLoading(false);
         }).catch((error) => {
-            setTextError(error.message);
+            setTextError(getTextError(error));
             setCodeText(error.code);
             setErrorEmptyActive(true);
             setIsLoading(false);
         })
-
     }, []);
 
     //скрытие кнопки пагинации, если закончились данные для отображения
@@ -74,12 +72,17 @@ function User_subject() {
 
     return (
         <>
+            {/* компонент загрузки */}
             <Loading active={isLoading} setActive={setIsLoading} />
+
+            {/* окна ошибок */}
             <Error_modal active={errorActive} setActive={setErrorActive} text={textError} setText={setTextError} />
             <Error_empty active={errorEmptyActive} text={textError} codeText={codeText} />
 
+            {/* шапка */}
             <User_header />
             <div id='body-content'>
+                {/* поиск */}
                 <div className='admin-main-search'>
                     <input
                         type='text'
@@ -89,6 +92,7 @@ function User_subject() {
                     />
                 </div>
 
+                {/* вывод всех дисциплин */}
                 {searchResults.slice(0, visibleItems).map(res => (
                     <div className='cart-stud' key={res.id}>
                         <div className='content'>
@@ -96,6 +100,7 @@ function User_subject() {
                         </div>
                     </div>
                 ))}
+
                 {/* кнопка пагинации */}
                 {isPaginationVisible && (
                     <button className='btn-loadMore' onClick={loadMore}>

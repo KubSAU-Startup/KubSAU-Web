@@ -8,7 +8,7 @@ import Error_modal from '../Modal/Error_modal';
 import Error_empty from '../Modal/Error_empty';
 import { faFilter, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { customStyles, customStylesModal } from '../Select_style/Select_style';
+import { customStyles } from '../Select_style/Select_style';
 import Loading from '../Modal/Loading';
 import Empty_modal from '../Modal/Empty_modal';
 import "flatpickr/dist/themes/material_green.css";
@@ -188,7 +188,6 @@ function Admin_main() {
         setIsLoading(false);
     };
 
-
     // Функция для получения данных с сервера и выполнения поиска
     const getParams = () => {
         setIsLoading(true);
@@ -217,8 +216,6 @@ function Admin_main() {
         }, 1000);
         return () => clearTimeout(timeoutId);
     }, [inputValue, 1000]);
-
-
 
     useEffect(() => {
         setIsLoading(true);
@@ -456,7 +453,7 @@ function Admin_main() {
                                 {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
                             </div>
                         </div>
-                        {/* кнопка редактирования */}
+                        {/* кнопка настроек */}
                         <button
                             className='qr-setting'
                             onClick={() => {
