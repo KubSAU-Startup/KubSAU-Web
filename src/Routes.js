@@ -61,12 +61,18 @@ export const UserRoute = () => {
     const isUser = () => {
 
         checkAccount(res => {
+            console.log(res)
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
             } else {
                 if (res.response.type !== 1) {
-                    return true
+                    // return true
+                    if(res.response.selectedDepartmentId === null){
+                        navigate('/user/UserChoice');
+                    }else{
+                        return true;
+                    }
                 } else {
                     navigate('/')
                 }

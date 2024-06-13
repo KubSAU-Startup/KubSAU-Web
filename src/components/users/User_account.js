@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faLink, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import Error_ok from '../Modal/Error_ok';
 import Empty_modal from '../Modal/Empty_modal';
+import { Link, useNavigate } from 'react-router-dom';
 const eye = <FontAwesomeIcon icon={faEye} />;
 const eyeSlah = <FontAwesomeIcon icon={faEyeSlash} />;
 
@@ -54,6 +55,7 @@ function User_account() {
     const [userDepartments, setUserDepartments] = useState([]);
     const [urlActive, setUrlActive] = useState(false);
     const [urlServer, setUrlServer] = useState("");
+    const navigate = useNavigate();
 
     // получение данных об аккаунте (id) при загрузке страницы
     useEffect(() => {
@@ -196,6 +198,12 @@ function User_account() {
                 setErrorUrl(error.message);
                 setIsLoading(false);
             });
+            document.body.style.overflow = '';
+            const usMainHeaders = document.getElementsByClassName('us_main_header');
+            for (let i = 0; i < usMainHeaders.length; i++) {
+                usMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
         }
     }
 
@@ -236,7 +244,13 @@ function User_account() {
                 setCodeText(error.code);
                 setErrorOkActive(true);
                 setIsLoading(false);
-            })
+            });
+            document.body.style.overflow = '';
+            const usMainHeaders = document.getElementsByClassName('us_main_header');
+            for (let i = 0; i < usMainHeaders.length; i++) {
+                usMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
         }
     }
 
@@ -327,6 +341,11 @@ function User_account() {
                                 setEditId(dataAccount.id);
                             }}>Редактировать</button>
 
+                            {/* кнопка смены кафедры */}
+                            <button style={{ marginLeft: '20px' }} onClick={() => {
+                                navigate('/user/UserChoice');
+                            }}>Сменить кафедру</button>
+
                         </div>
                         <div className='secure'>
                             <div><h2>Безопасность</h2>
@@ -335,6 +354,14 @@ function User_account() {
                                 <span>Пароль:</span>
                                 {/* копка изменения пароля */}
                                 <div><button onClick={() => {
+                                    // подстраивание страницы под скрытый скролл
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                     // обнуление и выбор необходимых данных
                                     setPasswordActive(true);
                                     setErrorOldPasswd('');
@@ -352,6 +379,14 @@ function User_account() {
                                 <span>URL:</span>
                                 {/* кнопка изменения пароля */}
                                 <div><button onClick={() => {
+                                    // подстраивание страницы под скрытый скролл
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                     // обнуление и выбор необходимых данных
                                     setUrlActive(true);
                                     setUrlServer(localStorage.getItem('url'));
@@ -477,7 +512,15 @@ function User_account() {
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => { editPassword() }}>Сохранить</button>
-                    <button onClick={() => { setPasswordActive(false) }}>Отмена</button>
+                    <button onClick={() => {
+                        document.body.style.overflow = '';
+                        const usMainHeaders = document.getElementsByClassName('us_main_header');
+                        for (let i = 0; i < usMainHeaders.length; i++) {
+                            usMainHeaders[i].style.paddingRight = `10px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = ``;
+                        setPasswordActive(false);
+                    }}>Отмена</button>
                 </div>
             </Empty_modal>
 
