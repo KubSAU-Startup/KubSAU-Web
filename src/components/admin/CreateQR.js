@@ -725,7 +725,7 @@ function CreateQR() {
                       label: res.title
                     }))} />
 
-                  <button onClick={() => { deleteData(val.id); console.log(programQR.find(res => res.program.id === idProgram)) }}>
+                  <button onClick={() => { deleteData(val.id); }}>
                     <FontAwesomeIcon icon={faXmarkCircle} />
                   </button>
                 </div>

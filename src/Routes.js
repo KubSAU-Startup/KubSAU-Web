@@ -47,7 +47,6 @@ export const AdminRoute = () => {
 }
 
 export const UserRoute = () => {
-    const [urlActive, setUrlActive] = useState(false);
     const [errorEmptyActive, setErrorEmptyActive] = useState(false);
     const [codeText, setCodeText] = useState('');
     const [textError, setTextError] = useState('');
@@ -61,7 +60,6 @@ export const UserRoute = () => {
     const isUser = () => {
 
         checkAccount(res => {
-            console.log(res)
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);

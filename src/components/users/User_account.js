@@ -231,7 +231,6 @@ function User_account() {
         } else {
             // запрос на серевер с новым паролем
             updatePassword(oldPassword, newPassword, (res) => {
-                console.log(res)
                 if (res.success) {
                     setPasswordActive(false);
                 } else {

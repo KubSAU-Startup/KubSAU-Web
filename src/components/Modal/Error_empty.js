@@ -22,7 +22,6 @@ function Error_empty({ active, text, codeText }) {
         setIsLoading(true);
         checkUrl(res => {
             if (res.version) {
-                console.log(res)
                 localStorage.setItem('url', urlServer);
                 window.location.reload();
             }

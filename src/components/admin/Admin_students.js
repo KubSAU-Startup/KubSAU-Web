@@ -309,7 +309,6 @@ function Admin_students() {
 
         await deleteStudent(deleteId, (res) => {
             if (res.success) {
-                console.log(res.response);
                 setAllStudents(allStudents.filter((a) => a.id !== deleteId));
             } else {
                 setTextError(res.message);

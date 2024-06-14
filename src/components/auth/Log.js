@@ -112,7 +112,6 @@ function Log() {
         setIsLoading(true);
         checkUrl(res => {
             if (res.version) {
-                console.log(res)
                 setUrlActive(false);
                 localStorage.setItem('url', urlServer);
             }

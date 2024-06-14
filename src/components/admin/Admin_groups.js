@@ -102,13 +102,14 @@ function Admin_groups() {
             setIsLoading(false);
         });
 
-        // получение данных о направленностях
-        getAllDirectivities(false, (res) => {
+        // получение данных о направленностях и направлениях
+        getAllDirectivities(true, (res) => {
             if (res.error) {
                 setTextError(getTextError(res.error));
                 setErrorActive(true);
             } else {
                 setAllDirectivities(res.response.directivities);
+                setAllHeads(res.response.heads)
             }
             setIsLoading(false);
         }).catch((error) => {
@@ -117,23 +118,6 @@ function Admin_groups() {
             setErrorEmptyActive(true);
             setIsLoading(false);
         });
-
-        // получение данных о направлениях
-        getAllHeads((res) => {
-            if (res.error) {
-                setTextError(getTextError(res.error));
-                setErrorActive(true);
-            } else {
-                setAllHeads(res.response.heads);
-            }
-            setIsLoading(false);
-        }).catch((error) => {
-            setTextError(getTextError(error));
-            setCodeText(error.code);
-            setErrorEmptyActive(true);
-            setIsLoading(false);
-        });
-
     }, []);
 
     // Функция поиска
@@ -423,6 +407,8 @@ function Admin_groups() {
                                         adMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
+
+
                                     setErrorHead(null);
                                     setErrorDir(null);
                                     setErrorGroup('');
@@ -482,7 +468,7 @@ function Admin_groups() {
                                 value: res.id,
                                 label: res.title
                             }
-                            ))}/>
+                            ))} />
                         {(errorHead !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorHead}</p>}
                     </div>
 
@@ -498,7 +484,7 @@ function Admin_groups() {
                             options={head && allDirectivities.filter((el) => el.headId === head.value).map(res => ({
                                 value: res.id,
                                 label: res.title
-                            }))}/>
+                            }))} />
                         {(errorDir !== '' && head !== null) && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDir}</p>}
                     </div>
                     <div>
@@ -543,7 +529,7 @@ function Admin_groups() {
                             value: res.id,
                             label: res.title
                         }
-                        ))}/>
+                        ))} />
                     {(errorHead !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorHead}</p>}
                 </div>
 
@@ -559,7 +545,7 @@ function Admin_groups() {
                         options={newHead && allDirectivities.filter((el) => el.headId === newHead.value).map(res => ({
                             value: res.id,
                             label: res.title
-                        }))}/>
+                        }))} />
                     {(errorDir !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorDir}</p>}
                 </div>
 

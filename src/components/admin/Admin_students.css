@@ -13,6 +13,7 @@
     margin-left: auto;
     margin-right: auto;
     min-width: 1000px;
+    box-sizing: content-box;
 }
 
 

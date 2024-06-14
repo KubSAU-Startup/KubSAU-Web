@@ -192,6 +192,12 @@ function Admin_account() {
                 setErrorUrl(error.message);
                 setIsLoading(false);
             });
+            document.body.style.overflow = '';
+            const usMainHeaders = document.getElementsByClassName('us_main_header');
+            for (let i = 0; i < usMainHeaders.length; i++) {
+                usMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
         }
     }
 
@@ -219,20 +225,25 @@ function Admin_account() {
         } else {
             // запрос на серевер с новым паролем
             updatePassword(oldPassword, newPassword, (res) => {
-                console.log(res)
-                if(res.success){
+                if (res.success) {
                     setPasswordActive(false);
-                }else{
-                   setErrorOldPasswd('Неверный пароль'); 
+                } else {
+                    setErrorOldPasswd('Неверный пароль');
                 }
-                
+
                 setIsLoading(false);
             }).catch((error) => {
                 setTextError(getTextError(error));
                 setCodeText(error.code);
                 setErrorOkActive(true);
                 setIsLoading(false);
-            })
+            });
+            document.body.style.overflow = '';
+            const usMainHeaders = document.getElementsByClassName('us_main_header');
+            for (let i = 0; i < usMainHeaders.length; i++) {
+                usMainHeaders[i].style.paddingRight = `10px`;
+            }
+            document.getElementById('body-content').style.paddingRight = ``;
         }
     }
 
@@ -330,6 +341,14 @@ function Admin_account() {
                                 <span>Пароль:</span>
                                 {/* копка изменения пароля */}
                                 <div><button onClick={() => {
+                                    // подстраивание страницы под скрытый скролл
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                     // обнуление и выбор необходимых данных
                                     setPasswordActive(true);
                                     setErrorOldPasswd('');
@@ -347,6 +366,14 @@ function Admin_account() {
                                 <span>URL:</span>
                                 {/* кнопка изменения пароля */}
                                 <div><button onClick={() => {
+                                    // подстраивание страницы под скрытый скролл
+                                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                                    document.body.style.overflow = 'hidden';
+                                    const usMainHeaders = document.getElementsByClassName('us_main_header');
+                                    for (let i = 0; i < usMainHeaders.length; i++) {
+                                        usMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
+                                    }
+                                    document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                     // обнуление и выбор необходимых данных
                                     setUrlActive(true);
                                     setUrlServer(localStorage.getItem('url'));
@@ -474,7 +501,15 @@ function Admin_account() {
                 </div>
                 <div className='modal-button'>
                     <button onClick={() => { editPassword() }}>Сохранить</button>
-                    <button onClick={() => { setPasswordActive(false) }}>Отмена</button>
+                    <button onClick={() => {
+                        document.body.style.overflow = '';
+                        const usMainHeaders = document.getElementsByClassName('us_main_header');
+                        for (let i = 0; i < usMainHeaders.length; i++) {
+                            usMainHeaders[i].style.paddingRight = `10px`;
+                        }
+                        document.getElementById('body-content').style.paddingRight = ``;
+                        setPasswordActive(false);
+                    }}>Отмена</button>
                 </div>
             </Empty_modal>
 

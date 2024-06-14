@@ -19,8 +19,9 @@
     border-radius: 20px;
     border: 2px solid #04D300;
     background: rgba(15, 7, 7, 0.00);
-    width: 670px;
-    padding: 20px 80px;
+    /* width: 670px; */
+    padding: 20px 45px;
+    margin-right: 70px;
     margin-bottom: 30px;
 }
 

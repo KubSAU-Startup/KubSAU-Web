@@ -22,11 +22,11 @@ function Empty_modal({ active, children, setActive }) {
     };
 
     return (
-        <div className={`modal ${active ? "active" : ""}`} onClick={handleCloseModal}>
-            <div className='modal-content' ref={modalRef}>
-                {children}
+            <div className={`modal ${active ? "active" : ""}`} onClick={handleCloseModal}>
+                <div className='modal-content' ref={modalRef}>
+                    {children}
+                </div>
             </div>
-        </div>
     );
 }
 
