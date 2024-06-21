@@ -351,8 +351,8 @@ function Admin_students() {
     // статусы студентов
     const statuses = [
         { value: 1, label: 'Учится' },
-        { value: 2, label: 'Отчислен' },
-        { value: 3, label: 'Академ' },
+        { value: 2, label: 'Академ' },
+        { value: 3, label: 'Отчислен' },
     ]
 
     // функции для выбора данных в фильтрах
