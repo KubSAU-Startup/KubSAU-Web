@@ -1,10 +1,5 @@
 import axios from 'axios'
 
-// const localStorage.getItem('url') = 'https://kubsau-testbackend.melod1n.dedyn.io';
-// let localStorage.getItem('url') = localStorage.getItem('url');
-
-const baseUrl = 'https://kubsau-backend.melod1n.dedyn.io';
-
 
 axios.interceptors.request.use(async request => {
     request.headers.Authorization = `Bearer ${localStorage.getItem('token')}`
@@ -260,22 +255,8 @@ async function deleteGroup(index, callback) {
     })
 }
 
-async function getAllStudents(off, lim, callback) {
-    const url = `${localStorage.getItem('url')}/students?extended=true`;
-
-    await axios.get(url, {
-        params: {
-            offset: off,
-            limit: lim
-        }
-    }).then((res) => {
-        callback(res.data);
-    })
-
-}
-
 async function searchOfStudents(offset, limit, param, query, callback) {
-    const url = `${localStorage.getItem('url')}/students/search`;
+    const url = `${localStorage.getItem('url')}/students`;
 
     await axios.get(url, {
         params: {
@@ -283,7 +264,7 @@ async function searchOfStudents(offset, limit, param, query, callback) {
             limit: limit,
             groupId: param.groupId,
             gradeId: param.gradeId,
-            statusId: param.statusId,
+            status: param.statusId,
             query: query
         }
     }).then((res) => {
@@ -298,7 +279,7 @@ async function addNewStudent(firstN, lastN, middleN, group, status, callback) {
         lastName: lastN,
         middleName: middleN,
         groupId: group,
-        statusId: status
+        status: status
     }, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
@@ -313,7 +294,7 @@ async function editStudent(id, firstN, lastN, middleN, group, status, callback) 
         lastName: lastN,
         middleName: middleN,
         groupId: group,
-        statusId: status
+        status: status
     }, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }).then((res) => {
@@ -369,29 +350,6 @@ async function deleteEmployee(index, callback) {
     await axios.delete(url).then((res) => {
         callback(res.data);
     })
-}
-
-async function getStudentsByGroups(param, callback) {
-    const url = `${localStorage.getItem('url')}/qr/groups/students`;
-
-    await axios.get(url, {
-        params: {
-            groupIds: param
-        }
-    }).then((res) => {
-        callback(res.data);
-    })
-}
-
-
-
-async function getDataForQR(callback) {
-    const url = `${localStorage.getItem('url')}/programs`;
-
-    await axios.get(url).then((res) => {
-        callback(res.data);
-    })
-
 }
 
 async function getAllDisciplines(callback) {
@@ -493,12 +451,12 @@ function getTextError(data) {
 export {
     checkAccount, getFilterWorkType, getFilterDiscipline, getFilterEmployees,
     getFilterGroups, getFilterDepartments, loginAxios, getDataAdminJournal,
-    getAllStudents, getTextError, getDataForQR, getAllDisciplines,
+    getTextError, getAllDisciplines,
     getAllWorkTypes, generateQrCodes, getAllDepartments, addNewDepartment,
     deleteDepartment, editDepartment, getDataPrograms, getDirectivitiesPrograms,
     getAllGroups, getAllDirectivities, getAllHeads, addNewGroup, editGroup, deleteGroup,
     addNewStudent, editStudent, deleteStudent, searchOfStudents, getAllEmployees,
-    getStudentsByGroups, addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines,
+    addNewEmployee, editEmployee, deleteEmployee, editWork, editDisciplines,
     deleteWork, modifySession, getEmployeeById, checkUrl, updatePassword
 }
 

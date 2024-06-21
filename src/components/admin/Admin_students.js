@@ -33,7 +33,6 @@ function Admin_students() {
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
     const [allStudents, setAllStudents] = useState([]);
-    const [allStatus, setAllStatus] = useState([]);
     const [allDirectivities, setAllDirectivities] = useState({
         directivities: [],
         heads: [],
@@ -119,13 +118,10 @@ function Admin_students() {
                 // Если это первая страница, просто устанавливаем новые данные
                 if (offset === 0) {
                     setAllStudents(res.response.students);
-                    setAllStatus(res.response.statuses)
                     setSearchResults(res.response.students);
                 } else {
                     // Иначе обновляем данные
                     setAllStudents(prevData => [...prevData, ...res.response.students]);
-                    setAllStatus([...res.response.statuses])
-
                     setSearchResults(prevResults => [...prevResults, ...res.response.students]);
                 }
             }
@@ -274,7 +270,7 @@ function Admin_students() {
                                 lastName: lastNEdit,
                                 middleName: middleNEdit,
                                 groupId: modalEditGroup.value,
-                                statusId: modalEditStatus.value
+                                status: modalEditStatus.value
                             };
                         } else {
                             return elem; // если элемент не подлежит изменению, возвращаем его без изменений
@@ -336,7 +332,7 @@ function Admin_students() {
         setStudentsParam({
             groupId: filterGroup ? filterGroup.value : null,
             gradeId: filterGrade ? filterGrade.value : null,
-            statusId: filterStatus ? filterStatus.value : null
+            status: filterStatus ? filterStatus.value : null
         });
         setIsLoading(false);
     };
@@ -499,7 +495,7 @@ function Admin_students() {
                                 {res.id && <p><span>Статус: </span>{
                                     statuses.find(el =>
                                         el.value === allStudents.find(r =>
-                                            r.id === res.id)?.statusId)?.label}</p>}
+                                            r.id === res.id)?.status)?.label}</p>}
 
                             </div>
                         </div>
@@ -545,12 +541,12 @@ function Admin_students() {
                                         label: allGroups.find(el => el.id === res.groupId)?.title
                                     })
                                     setModalEditStatus({
-                                        value: allStatus.find(el =>
+                                        value: statuses.find(el =>
                                             el.id === allStudents.find(r =>
-                                                r.id === res.id).statusId)?.id,
-                                        label: allStatus.find(el =>
+                                                r.id === res.id).status)?.id,
+                                        label: statuses.find(el =>
                                             el.id === allStudents.find(r =>
-                                                r.id === res.id).statusId)?.title
+                                                r.id === res.id).status)?.title
                                     })
                                     setModalEditActive(true);
                                 }}>
@@ -696,7 +692,7 @@ function Admin_students() {
                             maxMenuHeight={120}
                             onChange={handleModalEditStatus}
                             isSearchable={true}
-                            options={allStatus.map(el =>
+                            options={statuses.map(el =>
                             ({
                                 value: el.id,
                                 label: el.title
