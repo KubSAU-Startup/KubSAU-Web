@@ -340,8 +340,6 @@ function CreateQR() {
 
       if (res.success) {
         setProgramQR(structuredClone(copyData));
-        console.log(copyData);
-
       } else {
         setTextError(res.message);
         setCodeText(res.code);
@@ -358,11 +356,8 @@ function CreateQR() {
 
   // сохренение редактируемой программы
   const handleSave = () => {
-    console.log(programQR);
-
     const disciplineIds = Object.keys(editTypes).join(',');
     const workTypeIds = Object.values(editTypes).map(type => type.value).join(',');
-    console.log('asfdfasdasdf', workTypeIds)
     editData(disciplineIds, workTypeIds);
     setEditModalActive(false);
     document.body.style.overflow = '';

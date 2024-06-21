@@ -236,7 +236,7 @@
     width: 700px;
     height: 400px;
     padding: 20px;
-    overflow-y: auto;
+    overflow-y: scroll;
     border: 3px solid #008A0E;
     border-radius: 5px;
 }

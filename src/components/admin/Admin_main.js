@@ -347,6 +347,13 @@ function Admin_main() {
         setDateTime(timestamp);
     }
 
+    // статусы студентов
+    const statuses = [
+        { value: 1, label: 'Учится' },
+        { value: 2, label: 'Академ' },
+        { value: 3, label: 'Отчислен' },
+    ]
+
     return (
         <>
             {/* окно загрузки */}
@@ -444,7 +451,7 @@ function Admin_main() {
                                 <p><span>ФИО:</span> {entries.student.fullName}</p>
                                 <p><span>Группа:</span> {entries.group.title}</p>
                                 <p><span>Тип работы:</span> {entries.work.type.title}</p>
-                                <p><span>Статус:</span> {entries.student.status.title}</p>
+                                <p><span>Статус:</span> {statuses.find(r => r.value === entries.student.status)?.label}</p>
                             </div>
                             <div className='col2'>
                                 <p><span>Дисциплина:</span> {entries.discipline.title}</p>
