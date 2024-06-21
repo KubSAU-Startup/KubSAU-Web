@@ -320,14 +320,28 @@ function CreateQR() {
       ...prevState,
       [disciplineId]: selectedOption
     }));
+    setCopyData(copyData.map(res => {
+      if (res.program.id === idProgram) {
+        res.disciplines = res.disciplines.map(discipline => {
+          if (discipline.id === disciplineId) {
+            discipline.workTypeId = selectedOption.value;
+          }
+          return discipline;
+        });
+      }
+      return res;
+    }))
   };
 
   // функция редактирования программы
   async function editData(discip, type) {
     setIsLoading(true);
     await editDisciplines(idProgram, discip, type, (res) => {
+
       if (res.success) {
         setProgramQR(structuredClone(copyData));
+        console.log(copyData);
+
       } else {
         setTextError(res.message);
         setCodeText(res.code);
@@ -344,8 +358,11 @@ function CreateQR() {
 
   // сохренение редактируемой программы
   const handleSave = () => {
+    console.log(programQR);
+
     const disciplineIds = Object.keys(editTypes).join(',');
     const workTypeIds = Object.values(editTypes).map(type => type.value).join(',');
+    console.log('asfdfasdasdf', workTypeIds)
     editData(disciplineIds, workTypeIds);
     setEditModalActive(false);
     document.body.style.overflow = '';
@@ -563,7 +580,10 @@ function CreateQR() {
                 <span>Дисциплины: </span>
                 <div className='dicip'>
                   {value.disciplines.map((res) => (
-                    <p>{res.title}</p>
+                    <div>
+                      <p>{res.title}</p>
+                      <p className='work-type'>{allWorkTypes.find(r=>r.id === res.workTypeId)?.title}</p>
+                    </div>
                   ))}
                 </div>
               </div>

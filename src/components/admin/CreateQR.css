@@ -103,6 +103,7 @@
 .data-qr {
     display: grid;
     grid-template-columns: 0.3fr 0.7fr;
+    column-gap: 20px;
     color: #000;
     font-size: 16px;
     font-weight: 400;
@@ -132,6 +133,23 @@
 
 }
 
+.dicip>div {
+    margin-bottom: 30px;
+    position: relative;
+    width: 100%;
+    float: left;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.work-type {
+    font-size: 14px;
+    color: green;
+    position: absolute;
+    top: auto;
+    bottom: -10px;
+    margin: 0px !important;
+}
 
 .data-qr p {
     margin-bottom: 10px;
@@ -209,7 +227,7 @@
     width: 700px;
 }
 
-.modal-disciplines > p {
+.modal-disciplines>p {
     margin-bottom: 20px;
 
 }
@@ -237,7 +255,7 @@
     padding: 0 20px;
 }
 
-.edit-content button{
+.edit-content button {
     background: none;
     display: flex;
     align-items: center;
@@ -252,12 +270,12 @@
     height: 0;
 }
 
-.edit-content button:hover{
+.edit-content button:hover {
     color: #a50000;
 
 }
 
-.add-content{
+.add-content {
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
@@ -266,7 +284,7 @@
     /* grid-row: auto; */
 }
 
-.add-content button{
+.add-content button {
     background: none;
     display: flex;
     align-items: center;
@@ -281,7 +299,7 @@
     height: 0;
 }
 
-.add-content button:hover{
+.add-content button:hover {
     background: none;
     color: #008A0E;
 }
