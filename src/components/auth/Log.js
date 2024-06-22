@@ -145,6 +145,7 @@ function Log() {
 
                         <div className='passw-eye'><input className='auth-input auth-pass' type={passwordShown ? "text" : "password"} placeholder='Пароль' {...register("password")} /><i onClick={togglePasswordVisiblity}>{passwordShown ? eyeSlah : eye}</i></div>
                         <div className='forgot_pass' onClick={() => { setForgotPass(true) }}>Забыли пароль?</div>
+                        <div className='chenge-url' onClick={() => { setUrlActive(true) }}>Изменить URL</div>
                         <div><input className='auth-submit' type='submit' value='Войти'></input></div>
                     </form>
                 </div>

@@ -519,8 +519,13 @@ function CreateQR() {
         </div>
       </div>
 
-      {/* поиск */}
+
       <div id='body-content'>
+        {/* название страницы */}
+        <div className='page-name'>
+          <p>QR-коды</p>
+        </div>
+        {/* поиск */}
         <div className='admin-main-search'>
           <input
             type='text'
@@ -577,7 +582,7 @@ function CreateQR() {
                   {value.disciplines.map((res) => (
                     <div>
                       <p>{res.title}</p>
-                      <p className='work-type'>{allWorkTypes.find(r=>r.id === res.workTypeId)?.title}</p>
+                      <p className='work-type'>{allWorkTypes.find(r => r.id === res.workTypeId)?.title}</p>
                     </div>
                   ))}
                 </div>
@@ -649,6 +654,8 @@ function CreateQR() {
             Загрузить ещё
           </button>
         )}
+        {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
       </div>
 
       {/* модальное окно для выбора группы, чтобы создать qr */}

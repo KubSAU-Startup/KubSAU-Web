@@ -280,6 +280,10 @@ function Admin_department() {
             {/* шапка страницы */}
             <Admin_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Кафедры факультета</p>
+                </div>
                 {/* поиск */}
                 <div className='search-add'>
                     <div className='admin-main-search'>
@@ -383,7 +387,10 @@ function Admin_department() {
                     <button className='btn-loadMore' onClick={loadMore}>
                         Загрузить ещё
                     </button>
-                )}</div>
+                )}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
+            </div>
 
             {/* модальное окно для добавления новой кафедры */}
             <Empty_modal active={modalActive} setActive={setModalActive} >
@@ -479,7 +486,7 @@ function Admin_department() {
                             }
                             document.getElementById('body-content').style.paddingRight = ``;
                         }}>Удалить</button>
-                        
+
                         <button onClick={() => {
                             setModalDeleteActive(false);
                             document.body.style.overflow = '';

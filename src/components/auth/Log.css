@@ -50,8 +50,6 @@
     background: #E2E2E2;
     color: #454545;
     font-size: 15px;
-    /* margin-top: 10px;
-    margin-bottom: 10px; */
 }
 
 .passw-eye i {
@@ -62,10 +60,19 @@
 .forgot_pass {
     color: #4E4E4E;
     font-size: 15px;
-    /* display: inline; */
     cursor: pointer;
     margin: 20px 0;
     float: left;
+}
+
+.chenge-url{
+    color: #006f07;
+    font-size: 15px;
+    cursor: pointer;
+    margin: 0;
+    margin-bottom: 20px;
+    float: left;
+    text-decoration: underline;
 }
 
 .auth-submit {

@@ -387,6 +387,10 @@ function Admin_students() {
             {/* шапка */}
             <Admin_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Студенты</p>
+                </div>
                 {/* поиск */}
                 <div className='admin-main-search'>
                     <input
@@ -575,6 +579,8 @@ function Admin_students() {
                         Загрузить ещё
                     </button>
                 )}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
             </div>
 
             {/* модальное окно добавления */}

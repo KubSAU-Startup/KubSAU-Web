@@ -82,6 +82,10 @@ function User_subject() {
             {/* шапка */}
             <User_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Дисциплины кафедры</p>
+                </div>
                 {/* поиск */}
                 <div className='admin-main-search'>
                     <input
@@ -106,7 +110,10 @@ function User_subject() {
                     <button className='btn-loadMore' onClick={loadMore}>
                         Загрузить ещё
                     </button>
-                )}</div></>
+                )}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
+            </div></>
     );
 }
 

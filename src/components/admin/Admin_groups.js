@@ -332,7 +332,12 @@ function Admin_groups() {
             {/* шапка страницы */}
             <Admin_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Группы</p>
+                </div>
                 <div className='search-add'>
+                    {/* поиск */}
                     <div className='admin-main-search'>
                         <input
                             type='text'
@@ -451,7 +456,10 @@ function Admin_groups() {
                     <button className='btn-loadMore' onClick={loadMore}>
                         Загрузить ещё
                     </button>
-                )}</div>
+                )}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
+            </div>
 
             {/* модальное окно добавления группы */}
             <Empty_modal active={modalActive} setActive={setModalActive} >

@@ -361,6 +361,10 @@ function Admin_main() {
             {/* шапка страницы */}
             <Admin_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Последние записи</p>
+                </div>
                 {/* поиск */}
                 <div className='admin-main-search'>
                     <input
@@ -524,6 +528,8 @@ function Admin_main() {
                         Загрузить ещё
                     </button>
                 )}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
             </div>
 
             {/* модальное окно редактирования */}

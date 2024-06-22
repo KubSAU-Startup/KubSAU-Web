@@ -328,14 +328,21 @@ function User_main() {
     function handleSelectGroup(data) {
         setSelectedGroup(data);
     }
-    
+
     // получение новой даты
     function handleDateTime(data) {
         let dateObject = new Date(data);
         let timestamp = dateObject.getTime();
         setDateTime(timestamp);
     }
-    
+
+    // статусы студентов
+    const statuses = [
+        { value: 1, label: 'Учится' },
+        { value: 2, label: 'Академ' },
+        { value: 3, label: 'Отчислен' },
+    ]
+
     return (
         <>
 
@@ -344,6 +351,10 @@ function User_main() {
             {/* шапка страницы */}
             <User_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Последние записи</p>
+                </div>
                 {/* поиск */}
                 <div className='admin-main-search'>
                     <input
@@ -426,7 +437,7 @@ function User_main() {
                                 <p><span>ФИО:</span> {entries.student.fullName}</p>
                                 <p><span>Группа:</span> {entries.group.title}</p>
                                 <p><span>Тип работы:</span> {entries.work.type.title}</p>
-                                <p><span>Статус:</span> {entries.student.status.title}</p>
+                                <p><span>Статус:</span> {statuses.find(r => r.value === entries.student.status)?.label}</p>
                             </div>
                             <div className='col2'>
                                 <p><span>Дисциплина:</span> {entries.discipline.title}</p>
@@ -500,6 +511,8 @@ function User_main() {
                         Загрузить ещё
                     </button>
                 )}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
             </div>
 
             {/* модальное окно редактирования */}
@@ -526,7 +539,7 @@ function User_main() {
                                 }}
                             />
                         </div>
-                       <div><p><b>ФИО студента: </b></p></div>
+                        <div><p><b>ФИО студента: </b></p></div>
                         <div><p>{studentEdit}</p></div>
                         <div><p><b>Дисциплина: </b></p></div>
                         <div><p>{disciplineEdit}</p></div>

@@ -172,6 +172,10 @@ function Admin_direction() {
             {/* шапка страницы */}
             <Admin_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Направления факультета</p>
+                </div>
                 {/* поиск */}
                 <div className='admin-main-search'>
                     <input
@@ -207,7 +211,7 @@ function Admin_direction() {
                     />
                     <Select
                         styles={customStyles}
-                        placeholder="Степень образованя"
+                        placeholder="Степень образования"
                         value={filterGrade}
                         onChange={handleFilterGrade}
                         isSearchable={true}
@@ -245,8 +249,11 @@ function Admin_direction() {
                     <button className='btn-loadMore' onClick={loadMore}>
                         Загрузить ещё
                     </button>
-                )}</div>
-            
+                )}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
+
+            </div>
+
         </>
 
     );

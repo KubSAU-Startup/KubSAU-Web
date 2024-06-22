@@ -354,10 +354,11 @@ function User_prof() {
 
     // массив должностей сотрудников
     const position = [
-        // { value: 1, label: 'Администратор' },
+        { value: 1, label: 'Администратор' },
         { value: 2, label: 'Преподаватель' },
         { value: 3, label: 'Лаборант' }
     ]
+
     return (
         <>
             {/* окно загрузки */}
@@ -365,6 +366,10 @@ function User_prof() {
             {/* шапка страницы */}
             <User_header />
             <div id='body-content'>
+                {/* название страницы */}
+                <div className='page-name'>
+                    <p>Сотрудники кафедры</p>
+                </div>
                 {/* поиск */}
                 <div className='admin-main-search'>
                     <input
@@ -492,7 +497,11 @@ function User_prof() {
                         Загрузить ещё
                     </button>
                 )}
+                {/* заглушка, если нет данных */}
+                {searchResults.length === 0 && <div className='no-data'><p>Нет данных</p></div>}
             </div>
+
+
 
             {/* модальное окно добавления сотрудника */}
             <Empty_modal active={modalActive} setActive={setModalActive}>
