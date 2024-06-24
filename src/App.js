@@ -10,8 +10,6 @@ import Admin_department from './components/admin/Admin_department';
 import Admin_students from './components/admin/Admin_students';
 import Admin_direction from './components/admin/Admin_direction';
 import Admin_account from './components/admin/Admin_account';
-import Admin_users from './components/admin/Admin_users';
-import User_header from './components/users/User_header';
 import User_account from './components/users/User_account';
 import User_main from './components/users/User_main';
 import User_subject from './components/users/User_subject';
@@ -47,7 +45,6 @@ function App() {
           <Route path='AdminGroup' element={<Admin_groups />} />
           <Route path='AdminDirection' element={<Admin_direction />} />
           <Route path='AdminAccount' element={<Admin_account />} />
-          <Route path='AdminUsers' element={<Admin_users />} />
         </Route>
         <Route path='user/' element={<UserRoute />}>
           <Route path='UserChoice' element={<User_choice />} />

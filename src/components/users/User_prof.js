@@ -397,7 +397,7 @@ function User_prof() {
                 </div>
 
                 {/* кнопка добавления */}
-                <button className='add-student' onClick={() => {
+                {/* <button className='add-student' onClick={() => {
                     setModalActive(true);
                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                     document.body.style.overflow = 'hidden';
@@ -418,7 +418,7 @@ function User_prof() {
                     setErrorEmail('');
                 }}>
                     <FontAwesomeIcon icon={faPlusCircle} />
-                </button>
+                </button> */}
 
                 {/* данные о сотрудниках */}
                 {searchResults.slice(0, visibleItems).map(res => (
@@ -432,7 +432,7 @@ function User_prof() {
                             </div>
                         </div>
                         {/* кнопка настроек */}
-                        <button
+                        {/* <button
                             className='qr-setting'
                             onClick={() => {
                                 if (isSetOpen === true && res.id !== selectedItemId) {
@@ -449,9 +449,9 @@ function User_prof() {
                             <img src={require('../../img/setting.png')} alt='setting' />
                         </button>
                         {isSetOpen && selectedItemId === res.id && (
-                            <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}>
+                            <div className={`button-edit-delete ${isSetOpen && selectedItemId === res.id ? 'active' : ''}`}> */}
                                 {/* кнопка редактирования */}
-                                <button onClick={() => {
+                                {/* <button onClick={() => {
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
                                     const usMainHeaders = document.getElementsByClassName('us_main_header');
@@ -474,9 +474,9 @@ function User_prof() {
 
                                 }}>
                                     <img src={require('../../img/edit.png')} alt='edit' />
-                                </button>
+                                </button> */}
                                 {/* кнопка удаления */}
-                                <button onClick={() => {
+                                {/* <button onClick={() => {
                                     setModalDeleteActive(true); setDeleteId(res.id);
                                     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                                     document.body.style.overflow = 'hidden';
@@ -487,8 +487,8 @@ function User_prof() {
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                 }}>
                                     <img src={require('../../img/delete.png')} alt='delete' />
-                                </button>
-                            </div>)}
+                                </button> */}
+                            {/* </div>)} */}
                     </div>
                 ))}
                 {/* кнопка пагинации */}
@@ -504,7 +504,7 @@ function User_prof() {
 
 
             {/* модальное окно добавления сотрудника */}
-            <Empty_modal active={modalActive} setActive={setModalActive}>
+            {/* <Empty_modal active={modalActive} setActive={setModalActive}>
                 <div className='modal-students'>
                     <div>
                         <div className='input-conteiner'>
@@ -573,10 +573,10 @@ function User_prof() {
                         }}>Отмена</button>
                     </div>
                 </div>
-            </Empty_modal>
+            </Empty_modal> */}
 
             {/* модальное окно редактирования сотрудника */}
-            <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
+            {/* <Empty_modal active={modalEditActive} setActive={setModalEditActive}>
                 <div className='modal-students'>
                     <div>
                         <div className='input-conteiner'>
@@ -650,10 +650,10 @@ function User_prof() {
                         }}>Отмена</button>
                     </div>
                 </div>
-            </Empty_modal>
+            </Empty_modal> */}
 
             {/* модальное окно удаления сотрудника */}
-            <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
+            {/* <Empty_modal active={modalDeleteActive} setActive={setModalDeleteActive} >
                 <div className='content-delete'>
                     <p className='text-delete'>Вы уверены, что хотите удалить?</p>
                     <div className='modal-button'>
@@ -678,7 +678,7 @@ function User_prof() {
                         }}>Отмена</button>
                     </div>
                 </div>
-            </Empty_modal>
+            </Empty_modal> */}
 
             {/* модальные окна ошибок */}
             <Error_modal active={errorActive} text={textError} />

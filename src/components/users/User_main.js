@@ -286,6 +286,7 @@ function User_main() {
                 usMainHeaders[i].style.paddingRight = `10px`;
             }
             document.getElementById('body-content').style.paddingRight = ``;
+            setTitleEdit('');
         }
     }
 
@@ -563,6 +564,7 @@ function User_main() {
                     }}>Сохранить</button>
                     <button onClick={() => {
                         setModalEditActive(false);
+                        setTitleEdit('');
                         // Восстанавливаем позицию прокрутки
                         document.body.style.overflow = '';
                         const usMainHeaders = document.getElementsByClassName('us_main_header');

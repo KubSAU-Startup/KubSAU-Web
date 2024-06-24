@@ -55,6 +55,7 @@ function User_account() {
     const [userDepartments, setUserDepartments] = useState([]);
     const [urlActive, setUrlActive] = useState(false);
     const [urlServer, setUrlServer] = useState("");
+    const [isVisible, setIsVisible] = useState(false);
     const navigate = useNavigate();
 
     // получение данных об аккаунте (id) при загрузке страницы
@@ -68,6 +69,11 @@ function User_account() {
             } else {
                 setIsLoading(false);
                 setIdAccount(res.response);
+                if(res.response.departments.length !== 1){
+                    setIsVisible(true);
+                }else{
+                    setIsVisible(false);
+                }
                 setUserDepartments(res.response.departments);
             }
         }).catch((error) => {
@@ -341,9 +347,11 @@ function User_account() {
                             }}>Редактировать</button>
 
                             {/* кнопка смены кафедры */}
+                            {isVisible &&
                             <button style={{ marginLeft: '20px' }} onClick={() => {
                                 navigate('/user/UserChoice');
                             }}>Сменить кафедру</button>
+                            }
 
                         </div>
                         <div className='secure'>
