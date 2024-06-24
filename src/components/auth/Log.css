@@ -41,7 +41,9 @@
     justify-content: center;
     margin-bottom: 20px;
 }
-
+.input-login,.passw-eye{
+ position: relative;
+}
 .auth-input {
     padding: 15px;
     height: 40px;
@@ -51,7 +53,10 @@
     color: #454545;
     font-size: 15px;
 }
-
+.passw-eye{
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
 .passw-eye i {
     position: absolute;
     margin: 10px 10px;
@@ -90,12 +95,8 @@
 .auth-error {
     color: red;
     font-size: 12px;
-    margin-bottom: 10px;
-    visibility: visible;
-}
-
-.auth-error.hide {
-    visibility: hidden;
+    position: absolute;
+    top: 43px;
 }
 
 .url-input{

@@ -295,6 +295,7 @@ function Admin_main() {
                 adminMainHeaders[i].style.paddingRight = `10px`;
             }
             document.getElementById('body-content').style.paddingRight = ``;
+            setTitleEdit('');
         }
     }
 
@@ -578,6 +579,7 @@ function Admin_main() {
 
                     <button onClick={() => {
                         setModalEditActive(false);
+                        setTitleEdit('');
                         // Восстанавливаем позицию прокрутки
                         document.body.style.overflow = '';
                         const adminMainHeaders = document.getElementsByClassName('ad_main_header');

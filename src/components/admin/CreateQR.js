@@ -523,7 +523,7 @@ function CreateQR() {
       <div id='body-content'>
         {/* название страницы */}
         <div className='page-name'>
-          <p>QR-коды</p>
+          <p>Создать QR-код</p>
         </div>
         {/* поиск */}
         <div className='admin-main-search'>

@@ -10,6 +10,7 @@ import Forgot_pass from '../Modal/Forgot_pass';
 import Loading from '../Modal/Loading';
 import Error_empty from '../Modal/Error_empty';
 import Url_modal from '../Modal/Url_modal';
+import Empty_modal from '../Modal/Empty_modal';
 const eye = <FontAwesomeIcon icon={faEye} />;
 const eyeSlah = <FontAwesomeIcon icon={faEyeSlash} />;
 
@@ -21,37 +22,52 @@ function Log() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorEmptyActive, setErrorEmptyActive] = useState(false);
     const [errorUrl, setErrorUrl] = useState('');
-
+    const [errorLogin, setErrorLogin] = useState('');
+    const [errorPassword, setErrorPassword] = useState('');
     const [codeText, setCodeText] = useState('');
     const [textError, setTextError] = useState('');
     const [urlActive, setUrlActive] = useState(false);
     const [urlServer, setUrlServer] = useState("");
+    const [urlEditActive, setUrlEditActive] = useState(false);
 
     const navigate = useNavigate();
 
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit } = useForm();
 
     // функция регистрации пользователя
     const onSubmit = (data) => {
         setIsLoading(true);
+        setErrorLogin('')
+        setErrorPassword('')
 
-        loginAxios(data, (res) => {
-            if (res.success) {
-                const token = res.response.accessToken
-                localStorage.setItem('token', token)
-                setIsAuthenticated(true);
-            } else {
-                setErrorActive(true);
-                setIsAuthenticated(false);
+        if (data.login === '' || data.password === '') {
+            if (data.login === '') {
+                setErrorLogin('Введите логин')
+            }
+            if (data.password === '') {
+                setErrorPassword('Введите пароль')
             }
             setIsLoading(false);
 
-        }).catch((error) => {
-            setTextError(getTextError(error));
-            setCodeText(error.code);
-            setErrorEmptyActive(true);
-            setIsLoading(false);
-        });
+        } else {
+            loginAxios(data, (res) => {
+                if (res.success) {
+                    const token = res.response.accessToken
+                    localStorage.setItem('token', token)
+                    setIsAuthenticated(true);
+                } else {
+                    setErrorActive(true);
+                    setIsAuthenticated(false);
+                }
+                setIsLoading(false);
+
+            }).catch((error) => {
+                setTextError(getTextError(error));
+                setCodeText(error.code);
+                setErrorEmptyActive(true);
+                setIsLoading(false);
+            });
+        }
     }
 
     // проверка наличия токена
@@ -87,6 +103,7 @@ function Log() {
                     setIsAuthenticated(false);
                 }
             }).catch((error) => {
+
                 setTextError(getTextError(error));
                 setCodeText(error.code);
                 setErrorEmptyActive(true);
@@ -138,14 +155,19 @@ function Log() {
                         <div className='img-conteiner'>
                             <img src={require('../../img/logo.webp')} alt='Логотип КубГАУ' />
                         </div>
-                        <input className='auth-email auth-input' type="email" placeholder='Почта' {...register("email", {
-                            required: true, pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                        })} /><br></br>
-                        {errors.email && <p className='auth-error'>Некорректный e-mail</p>}
+                        <div className='input-login'>
+                            <input className='auth-input' type="text" placeholder='Логин' {...register("login")} /><br />
+                            {errorLogin !== '' && <p className='auth-error'>{errorLogin}</p>}
 
-                        <div className='passw-eye'><input className='auth-input auth-pass' type={passwordShown ? "text" : "password"} placeholder='Пароль' {...register("password")} /><i onClick={togglePasswordVisiblity}>{passwordShown ? eyeSlah : eye}</i></div>
+                        </div>
+
+                        <div className='passw-eye'>
+                            <input className='auth-input' type={passwordShown ? "text" : "password"} placeholder='Пароль' {...register("password")} /><i onClick={togglePasswordVisiblity}>{passwordShown ? eyeSlah : eye}</i>
+                            {errorPassword !== '' && <p className='auth-error'>{errorPassword}</p>}
+
+                        </div>
                         <div className='forgot_pass' onClick={() => { setForgotPass(true) }}>Забыли пароль?</div>
-                        <div className='chenge-url' onClick={() => { setUrlActive(true) }}>Изменить URL</div>
+                        <div className='chenge-url' onClick={() => { setUrlEditActive(true) }}>Изменить URL</div>
                         <div><input className='auth-submit' type='submit' value='Войти'></input></div>
                     </form>
                 </div>
@@ -171,6 +193,24 @@ function Log() {
                     </div>
                 </div>
             </Url_modal>
+
+            {/* модальное окно для редактирования url */}
+            <Empty_modal active={urlEditActive} setActive={setUrlEditActive}>
+                <div>
+                    <p><b>Введите URL:</b></p>
+                    <input
+                        className='url-input'
+                        value={urlServer}
+                        onChange={handleUrlServer}
+                        placeholder='URL...'
+                    />
+                    {(errorUrl !== '') && <p className='inputModalError' >{errorUrl}</p>}
+
+                    <div className='url-modal-button'>
+                        <button onClick={() => { editUrl() }}>Сохранить</button>
+                    </div>
+                </div>
+            </Empty_modal>
         </>
     );
 }

@@ -10,7 +10,7 @@ async function loginAxios(loginInfo, callback) {
     const url = `${localStorage.getItem('url')}/auth`
 
     await axios.post(url, {
-        login: loginInfo.email,
+        login: loginInfo.login,
         password: loginInfo.password
 
     }, {
