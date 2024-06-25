@@ -493,7 +493,7 @@ function Admin_main() {
                                         adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-
+                                    setTitleEdit('');
                                     setEditId(entries.work.id);
                                     setDateTime(entries.work.registrationDate);
                                     setErrorTitle('');
