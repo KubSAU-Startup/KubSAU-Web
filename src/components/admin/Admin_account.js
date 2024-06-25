@@ -307,7 +307,7 @@ function Admin_account() {
                                 <span>Отчество:</span><p>{dataAccount.middleName}</p>
                                 <span>Факультет:</span><p>{idAccount && idAccount.faculty?.title}</p>
                                 <span>Статус:</span><p>{position.find(res => res.value === dataAccount.type)?.label}</p>
-                                <span>Почта:</span><p>{dataAccount.email}</p>
+                                {dataAccount.email && <><span>Почта:</span><p>{dataAccount.email}</p></>}
                             </div>
 
                             {/* кнопка редактирования */}

@@ -319,7 +319,7 @@ function User_account() {
                                 <span>Отчество:</span><p>{dataAccount.middleName}</p>
                                 <span>Кафедра:</span><p>{idAccount?.selectedDepartmentId !== null && userDepartments.find(r => r.id === idAccount?.selectedDepartmentId)?.title}</p>
                                 <span>Статус:</span><p>{position.find(res => res.value === dataAccount.type)?.label}</p>
-                                <span>Почта:</span><p>{dataAccount.email}</p>
+                                {dataAccount.email && <><span>Почта:</span><p>{dataAccount.email}</p></>}
                             </div>
 
                             {/* кнопка редактирования */}
