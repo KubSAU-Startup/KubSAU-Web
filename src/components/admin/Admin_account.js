@@ -78,7 +78,7 @@ function Admin_account() {
     useEffect(() => {
         setIsLoading(true);
         if (idAccount !== null) {
-            getEmployeeById(idAccount.id, (res) => {
+            getEmployeeById(idAccount.employeeId, (res) => {
                 if (res.error) {
                     setTextError(getTextError(res.error));
                     setErrorActive(true);
