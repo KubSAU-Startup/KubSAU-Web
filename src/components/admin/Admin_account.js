@@ -30,7 +30,6 @@ function Admin_account() {
     const [errorEmail, setErrorEmail] = useState('');
     const [errorFirstN, setErrorFirstN] = useState('');
     const [errorLastN, setErrorLastN] = useState('');
-    const [errorMiddleN, setErrorMiddleN] = useState('');
 
     const [errorOldPasswd, setErrorOldPasswd] = useState('');
     const [errorRepeatPasswd, setErrorRepeatPasswd] = useState('');
@@ -101,10 +100,9 @@ function Admin_account() {
         setErrorEmail('');
         setErrorLastN('');
         setErrorFirstN('');
-        setErrorMiddleN('');
 
         // проверка ошибок ввода данных
-        if (!isValidEmail(emailEdit) || firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || emailEdit === '') {
+        if (!isValidEmail(emailEdit) || firstNEdit === '' || lastNEdit === '' || emailEdit === '') {
             if (!isValidEmail(emailEdit) && emailEdit !== '') {
                 setErrorEmail('Электронный адрес записан некорректно');
             }
@@ -114,9 +112,7 @@ function Admin_account() {
             if (lastNEdit === '') {
                 setErrorLastN('Заполните фамилию');
             }
-            if (middleNEdit === '') {
-                setErrorMiddleN('Заполните отчество');
-            }
+            
             if (emailEdit === '') {
                 setErrorEmail('Заполните почту');
             }
@@ -323,7 +319,6 @@ function Admin_account() {
                                 // обнуление и выбор необходимых данных
                                 setErrorLastN('');
                                 setErrorFirstN('');
-                                setErrorMiddleN('');
                                 setErrorEmail('');
                                 setModalEditActive(true);
                                 setFirstNEdit(dataAccount.firstName);
@@ -409,8 +404,6 @@ function Admin_account() {
                             <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
                             <label className='label-name'>Отчество</label>
                         </div>
-                        {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
-
                     </div>
                     <div>
                         <div className='input-conteiner'>

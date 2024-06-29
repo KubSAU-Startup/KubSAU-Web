@@ -399,12 +399,12 @@ function CreateQR() {
             setErrorActive(true);
             setIsLoading(false);
           } else {
-            let titleZip = '';
-            for (const prog of programQR) {
-              if (prog.program.id === idProgram) {
-                titleZip = `${prog.directivity.title}_${prog.grade.title}_${prog.program.semester}`;
-              }
-            }
+            let titleZip = 'archive';
+            // for (const prog of programQR) {
+            //   if (prog.program.id === idProgram) {
+            //     titleZip = `${prog.directivity.title}_${prog.grade.title}_${prog.program.semester}`;
+            //   }
+            // }
             const blob = new Blob([res], { type: "application/zip" });
             saveAs(blob, `${titleZip}.zip`);
           }

@@ -123,142 +123,142 @@ function User_prof() {
     };
 
     // добавление сотрудника
-    async function addData() {
-        setIsLoading(true);
-        setErrorEmail('');
-        setErrorLastN('');
-        setErrorFirstN('');
-        setErrorMiddleN('');
-        setErrorStaff('');
-        if (!isValidEmail(email) || firstN === '' || lastN === '' || middleN === '' || modalStaff === null) {
-            if (!isValidEmail(email) && email !== '') {
-                setErrorEmail('Электронный адрес записан некорректно');
-            }
-            if (firstN === '') {
-                setErrorFirstN('Заполните имя');
-            }
-            if (lastN === '') {
-                setErrorLastN('Заполните фамилию');
-            }
-            if (middleN === '') {
-                setErrorMiddleN('Заполните отчество');
-            }
-            if (modalStaff === null) {
-                setErrorStaff('Выберите должность');
-            }
-            setIsLoading(false);
+    // async function addData() {
+    //     setIsLoading(true);
+    //     setErrorEmail('');
+    //     setErrorLastN('');
+    //     setErrorFirstN('');
+    //     setErrorMiddleN('');
+    //     setErrorStaff('');
+    //     if (!isValidEmail(email) || firstN === '' || lastN === '' || middleN === '' || modalStaff === null) {
+    //         if (!isValidEmail(email) && email !== '') {
+    //             setErrorEmail('Электронный адрес записан некорректно');
+    //         }
+    //         if (firstN === '') {
+    //             setErrorFirstN('Заполните имя');
+    //         }
+    //         if (lastN === '') {
+    //             setErrorLastN('Заполните фамилию');
+    //         }
+    //         if (middleN === '') {
+    //             setErrorMiddleN('Заполните отчество');
+    //         }
+    //         if (modalStaff === null) {
+    //             setErrorStaff('Выберите должность');
+    //         }
+    //         setIsLoading(false);
 
-        } else {
-            await addNewEmployee(firstN, lastN, middleN, email, modalStaff.value, (res) => {
-                if (res.success) {
-                    setAllEmployees(prevData => [res.response, ...prevData]);
-                } else {
-                    setTextError(res.message);
-                    setCodeText(res.code);
-                    setErrorEmptyActive(true);
-                }
-                setIsLoading(false);
-            }).catch((error) => {
-                setTextError(error.message);
-                setCodeText(error.code);
-                setErrorOkActive(true);
-                setIsLoading(false);
-            });
-            document.body.style.overflow = '';
-            const usMainHeaders = document.getElementsByClassName('us_main_header');
-            for (let i = 0; i < usMainHeaders.length; i++) {
-                usMainHeaders[i].style.paddingRight = `10px`;
-            }
-            document.getElementById('body-content').style.paddingRight = ``;
+    //     } else {
+    //         await addNewEmployee(firstN, lastN, middleN, email, modalStaff.value, (res) => {
+    //             if (res.success) {
+    //                 setAllEmployees(prevData => [res.response, ...prevData]);
+    //             } else {
+    //                 setTextError(res.message);
+    //                 setCodeText(res.code);
+    //                 setErrorEmptyActive(true);
+    //             }
+    //             setIsLoading(false);
+    //         }).catch((error) => {
+    //             setTextError(error.message);
+    //             setCodeText(error.code);
+    //             setErrorOkActive(true);
+    //             setIsLoading(false);
+    //         });
+    //         document.body.style.overflow = '';
+    //         const usMainHeaders = document.getElementsByClassName('us_main_header');
+    //         for (let i = 0; i < usMainHeaders.length; i++) {
+    //             usMainHeaders[i].style.paddingRight = `10px`;
+    //         }
+    //         document.getElementById('body-content').style.paddingRight = ``;
 
-            setModalActive(false);
-        }
-    }
+    //         setModalActive(false);
+    //     }
+    // }
 
     // редактирование данных о сотруднике
-    async function editData() {
-        setIsLoading(true);
-        setErrorEmail('');
-        setErrorLastN('');
-        setErrorFirstN('');
-        setErrorMiddleN('');
-        setErrorStaff('');
-        if (!isValidEmail(emailEdit) || firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || modalStaffEdit === null) {
-            if (!isValidEmail(emailEdit) && emailEdit !== '') {
-                setErrorEmail('Электронный адрес записан некорректно');
-            }
-            if (firstNEdit === '') {
-                setErrorFirstN('Заполните имя');
-            }
-            if (lastNEdit === '') {
-                setErrorLastN('Заполните фамилию');
-            }
-            if (middleNEdit === '') {
-                setErrorMiddleN('Заполните отчество');
-            }
-            if (modalStaffEdit === null) {
-                setErrorStaff('Выберите должность');
-            }
-            setIsLoading(false);
-        } else {
-            await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit.value, (res) => {
-                if (res.success) {
-                    const editData = allEmployees.map(elem => {
-                        if (elem.id === editId) {
-                            return {
-                                ...elem, // копируем все свойства из исходного объекта
-                                firstName: firstNEdit,
-                                lastName: lastNEdit,
-                                middleName: middleNEdit,
-                                email: emailEdit,
-                                type: modalStaffEdit.value
-                            };
-                        } else {
-                            return elem; // если элемент не подлежит изменению, возвращаем его без изменений
-                        }
-                    });
-                    setAllEmployees(editData);
-                } else {
-                    setTextError(res.message);
-                    setCodeText(res.code);
-                    setErrorEmptyActive(true);
-                }
-                setIsLoading(false);
-            }).catch((error) => {
-                setTextError(error.message);
-                setCodeText(error.code);
-                setErrorOkActive(true);
-                setIsLoading(false);
-            });
-            document.body.style.overflow = '';
-            const usMainHeaders = document.getElementsByClassName('us_main_header');
-            for (let i = 0; i < usMainHeaders.length; i++) {
-                usMainHeaders[i].style.paddingRight = `10px`;
-            }
-            document.getElementById('body-content').style.paddingRight = ``;
-            setModalEditActive(false);
-        }
-    }
+    // async function editData() {
+    //     setIsLoading(true);
+    //     setErrorEmail('');
+    //     setErrorLastN('');
+    //     setErrorFirstN('');
+    //     setErrorMiddleN('');
+    //     setErrorStaff('');
+    //     if (!isValidEmail(emailEdit) || firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || modalStaffEdit === null) {
+    //         if (!isValidEmail(emailEdit) && emailEdit !== '') {
+    //             setErrorEmail('Электронный адрес записан некорректно');
+    //         }
+    //         if (firstNEdit === '') {
+    //             setErrorFirstN('Заполните имя');
+    //         }
+    //         if (lastNEdit === '') {
+    //             setErrorLastN('Заполните фамилию');
+    //         }
+    //         if (middleNEdit === '') {
+    //             setErrorMiddleN('Заполните отчество');
+    //         }
+    //         if (modalStaffEdit === null) {
+    //             setErrorStaff('Выберите должность');
+    //         }
+    //         setIsLoading(false);
+    //     } else {
+    //         await editEmployee(editId, firstNEdit, lastNEdit, middleNEdit, emailEdit, modalStaffEdit.value, (res) => {
+    //             if (res.success) {
+    //                 const editData = allEmployees.map(elem => {
+    //                     if (elem.id === editId) {
+    //                         return {
+    //                             ...elem, // копируем все свойства из исходного объекта
+    //                             firstName: firstNEdit,
+    //                             lastName: lastNEdit,
+    //                             middleName: middleNEdit,
+    //                             email: emailEdit,
+    //                             type: modalStaffEdit.value
+    //                         };
+    //                     } else {
+    //                         return elem; // если элемент не подлежит изменению, возвращаем его без изменений
+    //                     }
+    //                 });
+    //                 setAllEmployees(editData);
+    //             } else {
+    //                 setTextError(res.message);
+    //                 setCodeText(res.code);
+    //                 setErrorEmptyActive(true);
+    //             }
+    //             setIsLoading(false);
+    //         }).catch((error) => {
+    //             setTextError(error.message);
+    //             setCodeText(error.code);
+    //             setErrorOkActive(true);
+    //             setIsLoading(false);
+    //         });
+    //         document.body.style.overflow = '';
+    //         const usMainHeaders = document.getElementsByClassName('us_main_header');
+    //         for (let i = 0; i < usMainHeaders.length; i++) {
+    //             usMainHeaders[i].style.paddingRight = `10px`;
+    //         }
+    //         document.getElementById('body-content').style.paddingRight = ``;
+    //         setModalEditActive(false);
+    //     }
+    // }
 
     // функция удаления данных о сотруднике
-    async function deleteData() {
-        setIsLoading(true);
-        await deleteEmployee(deleteId, (res) => {
-            if (res.success) {
-                setAllEmployees(allEmployees.filter((a) => a.id !== deleteId));
-            } else {
-                setTextError(res.message);
-                setCodeText(res.code);
-                setErrorEmptyActive(true);
-            }
-            setIsLoading(false);
-        }).catch((error) => {
-            setTextError(error.message);
-            setCodeText(error.code);
-            setErrorOkActive(true);
-            setIsLoading(false);
-        });
-    }
+    // async function deleteData() {
+    //     setIsLoading(true);
+    //     await deleteEmployee(deleteId, (res) => {
+    //         if (res.success) {
+    //             setAllEmployees(allEmployees.filter((a) => a.id !== deleteId));
+    //         } else {
+    //             setTextError(res.message);
+    //             setCodeText(res.code);
+    //             setErrorEmptyActive(true);
+    //         }
+    //         setIsLoading(false);
+    //     }).catch((error) => {
+    //         setTextError(error.message);
+    //         setCodeText(error.code);
+    //         setErrorOkActive(true);
+    //         setIsLoading(false);
+    //     });
+    // }
 
     // обновление показываемых данных
     useEffect(() => {
@@ -336,21 +336,21 @@ function User_prof() {
     function handleFilterType(data) {
         setFilterType(data);
     }
-    function handleModalStaff(data) {
-        setModalStaff(data);
-    }
-    function handleModalStaffEdit(data) {
-        setModalStaffEdit(data);
-    }
+    // function handleModalStaff(data) {
+    //     setModalStaff(data);
+    // }
+    // function handleModalStaffEdit(data) {
+    //     setModalStaffEdit(data);
+    // }
 
     // проверка введенной почты
-    function isValidEmail(email) {
-        if (email === '') {
-            return true;
-        } else {
-            return /\S+@\S+\.\S+/.test(email);
-        }
-    }
+    // function isValidEmail(email) {
+    //     if (email === '') {
+    //         return true;
+    //     } else {
+    //         return /\S+@\S+\.\S+/.test(email);
+    //     }
+    // }
 
     // массив должностей сотрудников
     const position = [

@@ -17,7 +17,6 @@ function Admin_students() {
     const [modalActive, setModalActive] = useState(false);
     const [errorFirstN, setErrorFirstN] = useState('');
     const [errorLastN, setErrorLastN] = useState('');
-    const [errorMiddleN, setErrorMiddleN] = useState('');
     const [errorGroup, setErrorGroup] = useState('');
     const [errorStatus, setErrorStatus] = useState('');
 
@@ -188,18 +187,14 @@ function Admin_students() {
         setIsLoading(true);
         setErrorLastN('');
         setErrorFirstN('');
-        setErrorMiddleN('');
         setErrorGroup('');
         setErrorStatus('');
-        if (firstN === '' || lastN === '' || middleN === '' || modalGroup === null || modalStatus === null) {
+        if (firstN === '' || lastN === '' || modalGroup === null || modalStatus === null) {
             if (firstN === '') {
                 setErrorFirstN('Заполните имя');
             }
             if (lastN === '') {
                 setErrorLastN('Заполните фамилию');
-            }
-            if (middleN === '') {
-                setErrorMiddleN('Заполните отчество');
             }
             if (modalGroup === null) {
                 setErrorGroup('Выберите группу');
@@ -238,19 +233,15 @@ function Admin_students() {
     async function editData() {
         setErrorLastN('');
         setErrorFirstN('');
-        setErrorMiddleN('');
         setErrorGroup('');
         setErrorStatus('');
         setIsLoading(true);
-        if (firstNEdit === '' || lastNEdit === '' || middleNEdit === '' || modalEditGroup === null || modalEditStatus === null) {
+        if (firstNEdit === '' || lastNEdit === '' || modalEditGroup === null || modalEditStatus === null) {
             if (firstNEdit === '') {
                 setErrorFirstN('Заполните имя');
             }
             if (lastNEdit === '') {
                 setErrorLastN('Заполните фамилию');
-            }
-            if (middleNEdit === '') {
-                setErrorMiddleN('Заполните отчество');
             }
             if (modalEditGroup === null) {
                 setErrorGroup('Выберите группу');
@@ -451,7 +442,6 @@ function Admin_students() {
                     setModalStatus(null);
                     setErrorLastN('');
                     setErrorFirstN('');
-                    setErrorMiddleN('');
                     setErrorGroup('');
                     setErrorStatus('');
                     setModalActive(true);
@@ -533,7 +523,6 @@ function Admin_students() {
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                     setErrorLastN('');
                                     setErrorFirstN('');
-                                    setErrorMiddleN('');
                                     setErrorGroup('');
                                     setErrorStatus('');
                                     setEditId(res.id);
@@ -546,11 +535,11 @@ function Admin_students() {
                                     })
                                     setModalEditStatus({
                                         value: statuses.find(el =>
-                                            el.id === allStudents.find(r =>
-                                                r.id === res.id).status)?.id,
+                                            el.value === allStudents.find(r =>
+                                                r.id === res.id).status)?.value,
                                         label: statuses.find(el =>
-                                            el.id === allStudents.find(r =>
-                                                r.id === res.id).status)?.title
+                                            el.value === allStudents.find(r =>
+                                                r.id === res.id).status)?.label
                                     })
                                     setModalEditActive(true);
                                 }}>
@@ -605,7 +594,6 @@ function Admin_students() {
                             <input type='text' className='name-stud' placeholder=' ' value={middleN} onChange={e => setMiddleN(e.target.value)} />
                             <label className='label-name'>Отчество</label>
                         </div>
-                        {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
                     </div>
                     <div style={{ marginBottom: '20px' }}>
                         <Select
@@ -674,7 +662,6 @@ function Admin_students() {
                             <input type='text' className='name-stud' placeholder=' ' value={middleNEdit} onChange={e => setMiddleNEdit(e.target.value)} />
                             <label className='label-name'>Отчество</label>
                         </div>
-                        {(errorMiddleN !== '') && <p className='inputModalError' >{errorMiddleN}</p>}
                     </div>
                     <div style={{ marginBottom: '20px' }}>
                         <Select
@@ -698,11 +685,7 @@ function Admin_students() {
                             maxMenuHeight={120}
                             onChange={handleModalEditStatus}
                             isSearchable={true}
-                            options={statuses.map(el =>
-                            ({
-                                value: el.id,
-                                label: el.title
-                            }))} />
+                            options={statuses} />
                         {(errorStatus !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorStatus}</p>}
                     </div>
 

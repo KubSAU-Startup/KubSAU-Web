@@ -264,7 +264,7 @@ async function searchOfStudents(offset, limit, param, query, callback) {
             limit: limit,
             groupId: param.groupId,
             gradeId: param.gradeId,
-            status: param.statusId,
+            status: param.status,
             query: query
         }
     }).then((res) => {

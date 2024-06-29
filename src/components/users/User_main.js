@@ -34,7 +34,7 @@ function User_main() {
     const [modalEditActive, setModalEditActive] = useState(false);
     const [modalDeleteActive, setModalDeleteActive] = useState(false);
     const [dateTime, setDateTime] = useState(null);
-
+    const [needTitle, setNeedTitle] = useState(false);
     const [studentEdit, setStudentEdit] = useState(null);
     const [disciplineEdit, setDisciplineEdit] = useState(null);
     const [workTypeEdit, setWorkTypeEdit] = useState(null);
@@ -235,12 +235,7 @@ function User_main() {
     // функция редактирования работы
     async function editData() {
         setIsLoading(true);
-        if (workTypeEdit !== 'Курсовая')
-            setTitleEdit('');
-
-        setErrorTitle('');
-
-        if (titleEdit === '') {
+        if (titleEdit === '' && needTitle === true) {
             setErrorTitle('Введите название работы');
             setIsLoading(false);
         } else {
@@ -431,8 +426,11 @@ function User_main() {
                 {searchResults.map(entries => (
                     <div className='cart-stud' key={entries.work.id}>
                         <div className='data'>
-                            {new Date(entries.work.registrationDate).toLocaleString("ru-ru")}
-                        </div>
+                            {new Date(entries.work.registrationDate).toLocaleString("ru-ru", {
+                                year: "numeric",
+                                month: "numeric",
+                                day: "numeric", hour: '2-digit', minute: '2-digit'
+                            })}                        </div>
                         <div className='content'>
                             <div className='col1'>
                                 <p><span>ФИО:</span> {entries.student.fullName}</p>
@@ -444,7 +442,7 @@ function User_main() {
                                 <p><span>Дисциплина:</span> {entries.discipline.title}</p>
                                 <p><span>Преподаватель:</span> {entries.employee.lastName} {entries.employee.firstName} {entries.employee.middleName}</p>
                                 <p><span>Кафедра:</span> {entries.department.title}</p>
-                                {entries.work.title && <p><span>Название:</span> {entries.work.title}</p>}
+                                {entries.work.type.needTitle && <p><span>Название:</span> {entries.work.title}</p>}
                             </div>
                         </div>
                         {/* кнопка настроек */}
@@ -478,6 +476,7 @@ function User_main() {
                                     }
                                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
                                     setTitleEdit('');
+                                    setNeedTitle(entries.work.type.needTitle);
                                     setEditId(entries.work.id);
                                     setDateTime(entries.work.registrationDate);
                                     setErrorTitle('');
@@ -535,7 +534,7 @@ function User_main() {
                                 value={dateTime}
                                 onChange={handleDateTime}
                                 options={{
-                                    dateFormat: "d.m.Y, H:i:S",
+                                    dateFormat: "d.m.Y, H:i",
                                     enableTime: true,
                                     time_24hr: true
                                 }}
@@ -551,7 +550,7 @@ function User_main() {
                         <div><p>{departmentEdit}</p></div>
                     </div>
                     <div>
-                        {workTypeEdit === 'Курсовая' && <div className='input-conteiner'>
+                        {needTitle === true && <div className='input-conteiner'>
                             <input type='text' className='name-dapartment' placeholder=' ' value={titleEdit} onChange={e => setTitleEdit(e.target.value)} />
                             <label className='label-name'>Название работы</label>
                         </div>}
