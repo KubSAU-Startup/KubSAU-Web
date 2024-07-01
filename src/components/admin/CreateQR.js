@@ -578,8 +578,16 @@ function CreateQR() {
               </div>
               <div className='qr2'>
                 <span>Дисциплины: </span>
+                <div className='dicip' style={{marginRight: '10px'}}>
+                  {value.disciplines.slice(0, Math.ceil(value.disciplines.length / 2)).map((res) => (
+                    <div>
+                      <p>{res.title}</p>
+                      <p className='work-type'>{allWorkTypes.find(r => r.id === res.workTypeId)?.title}</p>
+                    </div>
+                  ))}
+                </div>
                 <div className='dicip'>
-                  {value.disciplines.map((res) => (
+                  {value.disciplines.slice(Math.ceil(value.disciplines.length / 2), value.disciplines.length).map((res) => (
                     <div>
                       <p>{res.title}</p>
                       <p className='work-type'>{allWorkTypes.find(r => r.id === res.workTypeId)?.title}</p>
