@@ -211,9 +211,9 @@ function Admin_students() {
                     setErrorEmptyActive(true);
                 }
                 setIsLoading(false);
-            }).catch((error) => {
-                setTextError(error.message);
-                setCodeText(error.code);
+            }).catch((err) => {
+                setTextError(err.response.data.error.message);
+                setCodeText(err.response.data.error.code);
                 setErrorOkActive(true);
                 setIsLoading(false);
             });
@@ -454,7 +454,8 @@ function Admin_students() {
                     <div className='cart-stud' key={res.id}>
                         <div className='content'>
                             <div className='col1'>
-                                <p><span>ФИО:</span> {res.lastName + " " + res.firstName + " " + res.middleName}</p>
+                                {res.middleName !== null ? res.middleName === '' : ''}
+                                <p><span>ФИО:</span> {res.lastName + " " + res.firstName} {res.middleName !== null && " " + res.middleName}</p>
                                 {res.groupId &&
                                     <p><span>Группа:</span> {allGroups.find(el => el.id === res.groupId)?.title}</p>}
                                 {res.groupId &&
