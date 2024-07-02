@@ -272,12 +272,13 @@ async function searchOfStudents(offset, limit, param, query, callback) {
     })
 }
 
-async function addNewStudent(firstN, lastN, middleN, group, status, callback) {
+async function addNewStudent(names, group, status, callback) {
     const url = `${localStorage.getItem('url')}/students`;
     await axios.post(url, {
-        firstName: firstN,
-        lastName: lastN,
-        middleName: middleN,
+        // firstName: firstN,
+        // lastName: lastN,
+        // middleName: middleN,
+        names: names,
         groupId: group,
         status: status
     }, {

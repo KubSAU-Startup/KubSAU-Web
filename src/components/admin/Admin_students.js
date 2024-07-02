@@ -55,6 +55,8 @@ function Admin_students() {
 
     const [editId, setEditId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
+    const [nameStudents, setNameStudents] = useState('');
+    const [errorNames, setErrorNames] = useState('');
 
     const [lastN, setLastN] = useState('');
     const [firstN, setFirstN] = useState('');
@@ -185,16 +187,12 @@ function Admin_students() {
     // функция добавления
     async function addData() {
         setIsLoading(true);
-        setErrorLastN('');
-        setErrorFirstN('');
+        setErrorNames('');
         setErrorGroup('');
         setErrorStatus('');
-        if (firstN === '' || lastN === '' || modalGroup === null || modalStatus === null) {
-            if (firstN === '') {
-                setErrorFirstN('Заполните имя');
-            }
-            if (lastN === '') {
-                setErrorLastN('Заполните фамилию');
+        if (nameStudents === '' || modalGroup === null || modalStatus === null) {
+            if (nameStudents === '') {
+                setErrorNames('Добавьте ФИО студентов');
             }
             if (modalGroup === null) {
                 setErrorGroup('Выберите группу');
@@ -204,9 +202,10 @@ function Admin_students() {
             }
             setIsLoading(false);
         } else {
-            await addNewStudent(firstN, lastN, middleN, modalGroup.value, modalStatus.value, (res) => {
+            await addNewStudent(nameStudents, modalGroup.value, modalStatus.value, (res) => {
                 if (res.success) {
-                    setAllStudents(prevData => [res.response, ...prevData]);
+                    setAllStudents(prevData => [...res.response, ...prevData]);
+                    console.log(res.response);
                 } else {
                     setTextError(res.message);
                     setCodeText(res.code);
@@ -313,7 +312,7 @@ function Admin_students() {
 
     // обновление данных для отображения
     useEffect(() => {
-        setSearchResults(allStudents)
+        setSearchResults(allStudents);
     }, [allStudents])
 
     // установление фильтров
@@ -435,9 +434,11 @@ function Admin_students() {
                         adminMainHeaders[i].style.paddingRight = `${scrollbarWidth + 10}px`;
                     }
                     document.getElementById('body-content').style.paddingRight = `${scrollbarWidth}px`;
-                    setLastN('');
-                    setFirstN('');
-                    setMiddleN('');
+                    // setLastN('');
+                    // setFirstN('');
+                    // setMiddleN('');
+                    setNameStudents('');
+                    setErrorNames('');
                     setModalGroup(null);
                     setModalStatus(null);
                     setErrorLastN('');
@@ -576,6 +577,59 @@ function Admin_students() {
             <Empty_modal active={modalActive} setActive={setModalActive}>
                 <div className='modal-students'>
                     <div>
+                        <textarea value={nameStudents} className='names-input' placeholder='Фамилия Имя Отчество
+Фамилия Имя Отчество' onChange={event => setNameStudents(event.target.value)} />
+                        {(errorNames !== '') && <p className='inputModalError' >{errorNames}</p>}
+
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Группа"
+                            value={modalGroup}
+                            maxMenuHeight={120}
+                            onChange={handleModalGroup}
+                            isSearchable={true}
+                            options={allGroups.map(el => ({
+                                value: el.id,
+                                label: el.title,
+                            }))}
+                        />
+                        {(errorGroup !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorGroup}</p>}
+                    </div>
+                    <div>
+                        <Select
+                            styles={customStylesModal}
+                            placeholder="Статус"
+                            value={modalStatus}
+                            maxMenuHeight={120}
+                            onChange={handleModalStatus}
+                            isSearchable={true}
+                            options={statuses}
+                        />
+                        {(errorStatus !== '') && <p style={{ color: 'red', fontSize: '12px', position: 'absolute' }} >{errorStatus}</p>}
+                    </div>
+                    <div className='modal-button'>
+                        <button onClick={() => {
+                            addData();
+                        }}>Сохранить</button>
+
+                        <button onClick={() => {
+                            document.body.style.overflow = '';
+                            const adminMainHeaders = document.getElementsByClassName('ad_main_header');
+                            for (let i = 0; i < adminMainHeaders.length; i++) {
+                                adminMainHeaders[i].style.paddingRight = `10px`;
+                            }
+                            document.getElementById('body-content').style.paddingRight = ``;
+                            setModalActive(false);
+                        }}>Отмена</button>
+                    </div>
+                </div>
+            </Empty_modal>
+            {/* <Empty_modal active={modalActive} setActive={setModalActive}>
+                <div className='modal-students'>
+                    <div>
                         <div className='input-conteiner'>
                             <input type='text' className='name-stud' placeholder=' ' value={lastN} onChange={e => setLastN(e.target.value)} />
                             <label className='label-name'>Фамилия</label>
@@ -638,7 +692,7 @@ function Admin_students() {
                         }}>Отмена</button>
                     </div>
                 </div>
-            </Empty_modal>
+            </Empty_modal> */}
 
             {/* модальное окно для редактирования */}
             <Empty_modal active={modalEditActive} setActive={setModalEditActive}>

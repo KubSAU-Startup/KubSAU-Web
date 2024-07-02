@@ -137,3 +137,16 @@
     font-size: 20px;
     color: #027a00;
 }
+
+.names-input{
+    min-width: 400px;
+    max-width: 900px;
+    min-height: 100px;
+    max-height: 400px;
+    border: 3px solid #027a00;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
