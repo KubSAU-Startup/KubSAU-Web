@@ -205,7 +205,6 @@ function Admin_students() {
             await addNewStudent(nameStudents, modalGroup.value, modalStatus.value, (res) => {
                 if (res.success) {
                     setAllStudents(prevData => [...res.response, ...prevData]);
-                    console.log(res.response);
                 } else {
                     setTextError(res.message);
                     setCodeText(res.code);
