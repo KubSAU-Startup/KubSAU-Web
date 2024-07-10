@@ -1,5 +1,6 @@
 .modal {
-    height: 100vh;
+    min-width: 1000px;
+    height: 100%;
     width: 100vw;
     background-color: rgba(0, 0, 0, 0.4);
     position: fixed;
@@ -12,6 +13,8 @@
     opacity: 0;
     pointer-events: none;
     transition: 0.5s;
+    z-index: 1;
+
 }
 
 .modal.active {
@@ -34,7 +37,7 @@
 }
 .modal-content button {
     border-radius: 3px;
-    border: 1px solid #858585;
+    border: 0;
     background: #26BD00;
     color: #fff;
     font-size: 16px;
@@ -45,4 +48,90 @@
 .modal-content button:hover{
     background: #26bd00b7;
 
+}
+
+.error-modal {
+    width: 400px;
+    height: 300px;
+    text-align: center;
+}
+
+.error-modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.error-icon {
+    font-size: 60px;
+    color: #ffff00;
+    margin-right: 50px;
+}
+
+.error-modal-header p {
+    font-size: 20px;
+    font-weight: 700;
+}
+.error-modal{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+.error-modal>p, .error-modal>a {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+.error-modal>a{
+    margin-bottom: 40px;
+}
+
+.btn-to-log:link,
+.btn-to-log:visited {
+    color: #fff;
+    text-decoration: none;
+    background-color: #04D300;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 20px;
+    margin-top: 30px;
+}
+
+.btn-to-log:hover,
+.btn-to-log:active{
+    background-color: #1e971c;
+}
+
+.value-input{
+    display: flex;
+    align-items: baseline;
+}
+
+.value-input > p{
+    margin-right: 20px;
+}
+
+.error-empty-header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+.error-modal-empty > p{
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.btn-to-ok{
+    width: 100%;
+}
+
+.inputModalError {
+    color: red;
+    font-size: 12px;
+    margin-top: -25px;
+    position: absolute;
 }

@@ -5,19 +5,19 @@ import './index.css';
 import Choice from '../src/components/admin/Choice'
 import Log from './components/auth/Log';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
+// import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
 
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
+  // <React.StrictMode>
+    // <BrowserRouter>
       <App/>
-    </BrowserRouter>
+    // </BrowserRouter>
         
 
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 reportWebVitals();

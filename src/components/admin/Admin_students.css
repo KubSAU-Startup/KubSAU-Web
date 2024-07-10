@@ -3,22 +3,17 @@
     border: 1px solid #A2A2A2;
     background: #F1F1F1;
     box-shadow: 6px 6px 4px 0px rgba(0, 0, 0, 0.25);
-    margin: 20px 70px;
+    margin: 10px 70px;
     padding: 20px 30px;
     position: relative;
 }
 
-.student-setting {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.student-setting img {
-    width: 18px;
+#body-content{
+    display: grid;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 1000px;
+    box-sizing: content-box;
 }
 
 .cart-stud p {
@@ -27,6 +22,131 @@
     margin: 10px 0;
 }
 
-.cart-stud span{
+.cart-stud span {
     font-weight: 700;
+}
+
+.get-params,
+.delete-params {
+    font-size: 18px;
+    color: #fff;
+    font-weight: 700;
+    margin-top: 20px;
+    height: 40px;
+    padding: 0 20px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.get-params {
+    background-color: #04D300;
+    color: #fff;
+    border: none;
+    margin-right: 20px;
+}
+
+.get-params:hover {
+    background-color: #1e971c;
+}
+
+.delete-params {
+    color: #04D300;
+    background-color: #fff;
+    border: 3px solid #04D300;
+}
+
+.delete-params:hover {
+    color: #1e971c;
+    border-color: #1e971c;
+}
+
+.add-student {
+    display: flex;
+    margin: 0 70px 10px auto;
+    background: none;
+    border: none;
+    color: #04D300;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+.modal-students {
+    display: grid;
+    justify-content: left;
+    grid-gap: -40px;
+
+}
+
+.input-conteiner {
+    display: flex;
+    justify-content: left;
+    position: relative;
+}
+
+.label-name {
+    color: #000;
+    font-size: 16px;
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+.name-stud,
+.name-course {
+    width: 400px;
+    border: none;
+    border-bottom: 1px solid #919191;
+    outline: 0;
+    padding: 5px 10px;
+    font-size: 16px;
+    color: #000;
+    background: none;
+    top: -50px
+}
+
+.name-stud:focus,
+.name-course:focus,
+.name-stud:hover,
+.name-course:hover {
+    border-bottom: 1px solid #000000;
+    transition: 0.3s;
+}
+
+.name-stud:focus~.label-name,
+.name-course:focus~.label-name,
+.name-stud:not(:placeholder-shown)~.label-name,
+.name-course:not(:placeholder-shown)~.label-name {
+    top: -18px;
+    font-size: 12px;
+    color: #4a4a4a;
+}
+
+.no-data{
+    display: flex;
+    justify-content: center;
+    color: #626262;
+    font-size: 16px;
+    margin-top: 40px;
+    font-weight: 700;
+}
+
+.page-name{
+    margin: 40px 70px 0;
+    font-weight: 700;
+    font-size: 20px;
+    color: #027a00;
+}
+
+.names-input{
+    min-width: 400px;
+    max-width: 900px;
+    min-height: 100px;
+    max-height: 400px;
+    border: 3px solid #027a00;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 30px;
 }

@@ -10,7 +10,7 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-image: url('../../img/bg.png');
+    background-image: url('../../img/bg.webp');
     background-repeat: no-repeat;
     background-position: center center;
     background-attachment: fixed;
@@ -41,7 +41,9 @@
     justify-content: center;
     margin-bottom: 20px;
 }
-
+.input-login,.passw-eye{
+ position: relative;
+}
 .auth-input {
     padding: 15px;
     height: 40px;
@@ -50,10 +52,11 @@
     background: #E2E2E2;
     color: #454545;
     font-size: 15px;
-    /* margin-top: 10px;
-    margin-bottom: 10px; */
 }
-
+.passw-eye{
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
 .passw-eye i {
     position: absolute;
     margin: 10px 10px;
@@ -62,10 +65,19 @@
 .forgot_pass {
     color: #4E4E4E;
     font-size: 15px;
-    /* display: inline; */
     cursor: pointer;
     margin: 20px 0;
     float: left;
+}
+
+.chenge-url{
+    color: #006f07;
+    font-size: 15px;
+    cursor: pointer;
+    margin: 0;
+    margin-bottom: 20px;
+    float: left;
+    text-decoration: underline;
 }
 
 .auth-submit {
@@ -77,15 +89,27 @@
     border-radius: 10px;
     background: #4B4B4B;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
 }
 
 .auth-error {
     color: red;
     font-size: 12px;
-    margin-bottom: 10px;
-    visibility: visible;
+    position: absolute;
+    top: 43px;
 }
 
-.auth-error.hide {
-    visibility: hidden;
+.url-input{
+    width: 500px;
+    padding: 10px;
+    background-color: #E2E2E2;
+    border: 1px solid #454545;
+    color: #000;
+    border-radius: 5px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+.url-modal-button{
+    display: flex;
+    justify-content: center;
 }

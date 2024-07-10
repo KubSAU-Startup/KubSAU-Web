@@ -5,9 +5,12 @@
     margin-top: 50px;
 }
 
-.img-account img {
-    width: 215px;
-    float: right;
+.img-account {
+    font-size: 300px;
+    /* float: right; */
+    display: flex;
+    margin-left: auto;
+    color: #04D300;
     margin-right: 90px;
 }
 
@@ -16,8 +19,9 @@
     border-radius: 20px;
     border: 2px solid #04D300;
     background: rgba(15, 7, 7, 0.00);
-    width: 670px;
-    padding: 20px 80px;
+    /* width: 670px; */
+    padding: 20px 45px;
+    margin-right: 70px;
     margin-bottom: 30px;
 }
 
@@ -27,19 +31,24 @@
     font-weight: 700;
 }
 
-.personal-data .data,
-.secure .data {
-    display: flex;
+.personal-data .data {
+    display: grid;
+    grid-template-columns: 0.3fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
 }
 
-.personal-data .data div,
-.secure .data div {
+.secure .data {
     display: grid;
+    grid-template-columns: 0.1fr 0.2fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+    align-items: center;
 }
+
 
 .personal-data .data p,
 .secure .data p {
-    margin-left: 20px;
     color: #000;
     font-size: 18px;
     font-weight: 400;
@@ -52,35 +61,40 @@
     font-weight: 700;
 }
 
-.personal-data .data p,
-.personal-data .data span,
-.secure .data p,
-.secure .data span {
-    margin-bottom: 10px;
-}
-
 .personal-data button,
 .secure button {
     border-radius: 4px;
     background: #26BD00;
     border: none;
-    padding: 5px 40px;
+    padding: 7px 30px;
     color: #FFF;
     font-size: 18px;
     font-weight: 500;
     cursor: pointer;
+    font-weight: 700;
 }
 
 .secure-password {
     border-radius: 5px;
     border: 1px solid #16A000;
     background-color: #5BED4E;
-    margin-left: 20px;
-    margin-bottom: 10px;
-    padding: 0 10px;
+    /* margin-left: 20px;
+    margin-bottom: 10px; */
+    padding: 5px 10px;
     font-size: 16px;
 }
-
-.secure .data div:first-child img{
-    float: right;
+.content-password{
+    margin-bottom: 35px;
+}
+.content-password p:first-child{
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+.password-input {
+    border-radius: 5px;
+    border: 1px solid #9c9c9c;
+    background-color: #d4d4d4;
+    width: 400px;
+    padding: 5px 10px;
+    font-size: 16px;
 }

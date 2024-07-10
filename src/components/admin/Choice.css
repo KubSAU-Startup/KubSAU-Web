@@ -2,8 +2,9 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    height: 100vh;
-    background-image: url('../../img/bg_change.png');
+    /* height: 100vh; */
+    min-height: 100vh;
+    background-image: url('../../img/bg_change.webp');
     background-repeat: no-repeat;
     background-position: center center;
     background-attachment: fixed;
@@ -67,3 +68,4 @@
     width: 100px;
     height: 80px;
 }
+
